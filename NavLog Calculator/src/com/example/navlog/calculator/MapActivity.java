@@ -152,7 +152,11 @@ public class MapActivity extends Activity
 			Log.d(TAG, e.getMessage()); 
 		}*/
 	}
-	
+	public String getSomeValue()
+	{
+		String value = "some value";
+		return value;
+	}
 	 
 
 	@Override
