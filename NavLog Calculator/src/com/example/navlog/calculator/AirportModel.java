@@ -60,6 +60,11 @@ public class AirportModel
 		copyAirport(a);
 	}
 	
+	public void emptyMethod()
+	{
+		
+	}
+	
 	
 	
 	
