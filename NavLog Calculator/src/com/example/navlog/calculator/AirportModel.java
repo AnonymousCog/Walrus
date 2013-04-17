@@ -50,6 +50,11 @@ public class AirportModel
 	
 	
 	
+	private void notImportant()
+	{
+		
+	}
+	
 	public AirportModel()
 	{
 		
