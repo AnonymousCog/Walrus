@@ -60,15 +60,6 @@ public class AirportModel
 		copyAirport(a);
 	}
 	
-	public int emptyMethod()
-	{
-		String hola= "hola";
-		return 1;
-	}
-	
-	
-	
-	
 	public void copyAirport(AirportModel a)
 	{
 		setName(a.getName());
