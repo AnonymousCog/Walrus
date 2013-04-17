@@ -62,7 +62,7 @@ public class AirportModel
 	
 	public int emptyMethod()
 	{
-		String hola= "chao";
+		String hola= "hola";
 		return 1;
 	}
 	
