@@ -152,13 +152,7 @@ public class MapActivity extends Activity
 			Log.d(TAG, e.getMessage()); 
 		}*/
 	}
-	public String getSomeValue()
-	{
-		String value = "some value";
-		return value;
-	}
-	 
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
