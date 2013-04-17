@@ -1,0 +1,36 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+	<item 
+        android:id="@+id/map_select"
+        android:showAsAction="always"
+        android:title="@string/map_selector"
+        android:actionViewClass="android.widget.Spinner" />
+		
+ 
+   	<item
+        android:id="@+id/waypoint_add_setting"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/waypoint_add"/>
+   	
+	<item
+        android:id="@+id/waypoint_remove_setting"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/waypoint_remove"/>
+	
+	<item
+        android:id="@+id/center_map_setting"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/map_center"/>
+	
+
+	<item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/>
+    
+
+</menu>

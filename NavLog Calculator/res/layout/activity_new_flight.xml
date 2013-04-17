@@ -1,0 +1,73 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <EditText
+        android:id="@+id/departureAirportCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/newFlightTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp"
+        android:hint="@string/Departure_Airport_Code"
+        android:inputType="textCapWords"
+        android:text="tjsj"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/DestinationAirportCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/departureAirportCode"
+        android:layout_below="@+id/departureAirportCode"
+        android:layout_marginTop="42dp"
+        android:inputType="textCapWords"
+        android:text="tjmz"
+        android:ems="10"
+        android:hint="@string/Destination_Airport_Code" />
+
+    <TextView
+        android:id="@+id/fromPreviousTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/newFlightTextView"
+        android:layout_below="@+id/DestinationAirportCode"
+        android:layout_marginTop="36dp"
+        android:text="@string/Choose_Previous_Flight"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/newFlightTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/departureAirportCode"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="27dp"
+        android:text="@string/Create_A_New_Flight"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Spinner
+        android:id="@+id/spinner1"
+        style="@style/AppTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/fromPreviousTextView"
+        android:layout_below="@+id/fromPreviousTextView"
+        android:layout_marginTop="26dp"
+        android:spinnerMode="dialog" />
+
+    <Button
+        android:id="@+id/SubmitBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="23dp"
+        android:onClick="submitPressed"
+        android:text="@string/Submit" />
+
+</RelativeLayout>

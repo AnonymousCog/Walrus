@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">NavLog Calculator</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main_nav_log">NavLog</string>
+    <string name="title_activity_log_in_or_regiister">Log In Or Register</string>
+    <string name="title_activity_new_flight">New Flight</string>
+    <string name="Destination_Airport_Code">Destination Airport Code</string>
+    <string name="Departure_Airport_Code">Departure Airport Code</string>
+    <string name="Choose_Previous_Flight">Choose Previous Flight</string>
+    <string name="Create_A_New_Flight">Create A New Flight</string>
+    <string name="Submit">Submit</string>
+    <string name="Email">Email</string>
+    <string name="Havent_got_an_account_yet">Havent got an account yet?</string>
+    <string name="Log_In">Log In</string>
+    <string name="Password">Password</string>
+    <string name="Sign_Up">Sign Up</string>
+    <string name="title_activity_android_detech_touch">Map View</string>
+    <string name="action_settings">Settings</string>
+    <string name="waypoint_add">Add Waypoint</string>
+    <string name="waypoint_remove">Remove Waypoint</string>
+    <string name="title_activity_map">MapActivity</string>
+    <string name="map_selector">Map Select</string>
+    <string name="map_center">Center Map</string>
+    <string name="title_activity_map_download">MapDownloadActivity</string>
+
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<maps>
+     <map> 
+          <type>WAC</type> 
+          <name>CJ-27</name>
+     	  <downloaded>True</downloaded>
+          <expiration>02/04/2014</expiration>
+          <north>19.659721</north>
+          <south>14.730666</south>
+          <east>-60.626548</east>
+          <west>-74.979220</west>
+          <mapPxWidth>10310</mapPxWidth>
+          <mapPxHeight>3100</mapPxHeight>
+          <tilePxWidth>1031</tilePxWidth>
+          <tilePxHeight>310</tilePxHeight>
+     </map>
+     <map>
+          <type>TAC</type> 
+          <name>ZZ-68</name>
+          <downloaded>False</downloaded>
+          <expiration>02/04/2014</expiration>
+		  <north>19.659721</north>
+          <south>14.730666</south>
+          <east>-60.626548</east>
+          <west>-74.979220</west>
+          <mapPxWidth>10310</mapPxWidth>
+          <mapPxHeight>3100</mapPxHeight>
+          <tilePxWidth>1031</tilePxWidth>
+          <tilePxHeight>310</tilePxHeight>
+     </map>
+</maps>
+
