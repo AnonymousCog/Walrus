@@ -5,5 +5,10 @@ public class test {
 	{
 		String poto = "hola";
 	}
+	
+	private void test2()
+	{
+		
+	}
 
 }
