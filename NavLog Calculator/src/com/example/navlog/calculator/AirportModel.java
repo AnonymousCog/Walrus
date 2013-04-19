@@ -53,6 +53,7 @@ public class AirportModel
 	private void notImportant()
 	{
 		String arigato = "mr roboto poto";
+		
 	}
 	
 	public AirportModel()
