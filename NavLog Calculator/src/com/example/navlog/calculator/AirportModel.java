@@ -47,19 +47,7 @@ public class AirportModel
 	private static final String ns = null; //ns -> namespace
 	private String TAG = "MapModel";
 	private static final String filePath = "data/Airports.xml";
-	
-	
-	
-	private void notImportant()
-	{
-		String arigato = "mr roboto poto";
-	}
-	
-	private void otrometodo()
-	{
-	
-	}
-	
+		
 	public AirportModel()
 	{
 		
