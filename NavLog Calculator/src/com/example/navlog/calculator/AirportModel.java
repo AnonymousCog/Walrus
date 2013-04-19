@@ -55,6 +55,11 @@ public class AirportModel
 		String arigato = "mr roboto poto";
 	}
 	
+	private void otrometodo()
+	{
+	
+	}
+	
 	public AirportModel()
 	{
 		
