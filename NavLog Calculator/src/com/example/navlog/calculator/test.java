@@ -5,8 +5,17 @@ public class test {
 	{
 		String poto = "hola";
 	}
+	private void test1()
+	{
+		
+	}
 	
 	private void test2()
+	{
+		
+	}
+	
+	private void test3()
 	{
 		
 	}
