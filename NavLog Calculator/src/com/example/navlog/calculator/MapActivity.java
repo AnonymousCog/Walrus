@@ -128,30 +128,7 @@ public class MapActivity extends Activity
 		
 		this.placeDepartureAirport();
 		this.placeDestinationAirport();
-	
-		/*try
-		{
-			//boolean contains = savedInstanceState.containsKey(allWaypointLongitudes);
-			
-			if(savedInstanceState != null && savedInstanceState.containsKey(allWaypointLongitudes))
-			{
-				double[] latitudes = savedInstanceState.getDoubleArray(allwaypointLatitudes);
-				double[] longitudes = savedInstanceState.getDoubleArray(allWaypointLongitudes);
-				int waypointCount = latitudes.length;
-				
-				if(waypointCount > 0)
-				{
-					for(int i=0;i<waypointCount;i++)
-					{
-						placeWaypointOnMap(latitudes[i], longitudes[i]);
-					}
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			Log.d(TAG, e.getMessage()); 
-		}*/
+
 	}
 	
 	@Override
@@ -348,6 +325,25 @@ public class MapActivity extends Activity
 		}
 		
 	}
+    
+    private void placeCurrentLocationOnMap(ImageView marker, double lat, double lon, double alt)
+    {
+    	try
+		{
+    		mapView.removeMarker(marker);
+			marker.setImageResource(R.drawable.ic_current_location);
+				
+			flightData.addWaypoint(marker, lat, lon, alt); 
+			mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
+			
+			Toast.makeText(getApplicationContext(), " Lat  : "+ lat + "\n Long : " + lon + "\n Alt : "+ alt, Toast.LENGTH_SHORT).show();
+		}
+		catch(Exception e)
+		{
+			Log.d(TAG, e.getMessage()); 
+		}
+    	
+    }
 
 
 
@@ -492,23 +488,17 @@ public class MapActivity extends Activity
 		@Override
 		public void onLocationChanged(Location location) 
 		{
-			
-			/*String text = "My current location is: " 
-			+"\nLatitude = "+ location.getLatitude() 
-			+ "\nLogitude = " + location.getLongitude() 
-			+ "\nAccuracy = " + location.getAccuracy()
-		    + "\nSpeed = " + location.getSpeed();*/
-			//Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
-			// label.setText(text);
-			
+						
 			try
 			{
 				double latitude = location.getLatitude();
 				double longitude = location.getLongitude();
-				
-				mapView.removeMarker(currentLocationMarker);
-				mapView.addMarker(currentLocationMarker, latitude, longitude);
-				flightData.setCurrentLocation(currentLocationMarker, latitude, longitude);
+				double altitude = location.getAltitude();
+				float speed = location.getSpeed();
+				//mapView.removeMarker(currentLocationMarker);
+				placeCurrentLocationOnMap(currentLocationMarker, latitude, longitude, altitude);
+				//mapView.addMarker(currentLocationMarker, latitude, longitude);
+				//flightData.setCurrentLocation(currentLocationMarker, latitude, longitude,0);
 				//mapView.slideToAndCenter(latitude, longitude);
 				mapView.requestRender();
 			}
