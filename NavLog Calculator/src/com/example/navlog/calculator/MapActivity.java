@@ -379,7 +379,7 @@ public class MapActivity extends Activity
 		{
 			double latLong[] = new double[2];
 			latLong = mapView.pixelsToLatLng(arg0, arg1);
-			placeWaypointOnMap(latLong[0], latLong[1]);//Latitude, Longitude, altitude
+			placeWaypointOnMap(latLong[0], latLong[1],0);//Latitude, Longitude, altitude
 		}
 
 		@Override
