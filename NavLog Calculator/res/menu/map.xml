@@ -6,12 +6,6 @@
         android:title="@string/map_selector"
         android:actionViewClass="android.widget.Spinner" />
 		
- 
-   	<item
-        android:id="@+id/waypoint_add_setting"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/waypoint_add"/>
    	
 	<item
         android:id="@+id/waypoint_remove_setting"
@@ -31,6 +25,12 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
+	
+	<item
+        android:id="@+id/calculate"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/calculate_flight"/>
     
 
 </menu>

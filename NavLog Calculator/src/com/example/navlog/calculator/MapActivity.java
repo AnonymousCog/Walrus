@@ -241,9 +241,10 @@ public class MapActivity extends Activity
 	public boolean onOptionsItemSelected(MenuItem item) 
 	{
 	    switch (item.getItemId()) {
-	        case R.id.waypoint_add_setting:
+	        case R.id.calculate:
 	        	
-	        	
+	        	Intent intent = new Intent(this, CalculationsActivity.class);
+	        	startActivity(intent);
 	        	
 	        	break;
 	        
@@ -263,6 +264,8 @@ public class MapActivity extends Activity
 	        	
 	        	
 	        	break;
+	        	
+	       
 	        	
 	        case R.id.center_map_setting:
 	        	centerMap();
