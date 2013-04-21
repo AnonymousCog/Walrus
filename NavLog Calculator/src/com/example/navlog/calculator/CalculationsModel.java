@@ -103,10 +103,10 @@ public class CalculationsModel
 			double lat1, lat2, lon1, lon2;
 			
 			//Calculamos salida -> Waypoint1
-			lat1 = this.departure.getLatitude();
-			lon1 = this.departure.getLongitude();
-			lat2 = this.points.get(0).getLatitude();
-			lon2 = this.points.get(0).getLongitude();
+			lat1 = Math.toRadians(this.departure.getLatitude());
+			lon1 = Math.toRadians(this.departure.getLongitude());
+			lat2 = Math.toRadians(this.points.get(0).getLatitude());
+			lon2 = Math.toRadians(this.points.get(0).getLongitude());
 			
 			if (Math.sin(lon2-lon1)<0)       
 				   TC[0]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));    
@@ -115,22 +115,24 @@ public class CalculationsModel
 			
 			//Calculamos Waypoint 1 -> Waypoint N
 			for(int i=0; i<length-1; i++)
-			{
-				Waypoint A = this.points.get(i);
-				Waypoint B = this.points.get(i+1);
+			{				
+				lat1 = Math.toRadians(this.points.get(i).getLatitude());
+				lon1 = Math.toRadians(this.points.get(i).getLongitude());
+				lat2 = Math.toRadians(this.points.get(i+1).getLatitude());
+				lon2 = Math.toRadians(this.points.get(i+1).getLongitude());
 				
-				if (Math.sin(B.getLongitude()-A.getAltitude())<0)       
-				   TC[i+1]=Math.acos((Math.sin(B.getLatitude())-Math.sin(A.getLatitude())*Math.cos(LegDist(A,B)))/(Math.sin(LegDist(A,B))*Math.cos(A.getLatitude())));    
-			    else       
-				   TC[i+1]=2*Math.PI-Math.acos((Math.sin(B.getLatitude())-Math.sin(A.getLatitude())*Math.cos(LegDist(A,B)))/(Math.sin(LegDist(A,B))*Math.cos(A.getLatitude())));    
+				if (Math.sin(lon2-lon1)<0)       
+					   TC[i+1]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+				    else       
+					   TC[i+1]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));    
 			}
 			
 			
 			//Calculamos Waypoint N -> Llegada
-			lat1 = this.points.get(length).getLatitude();
-			lon1 = this.points.get(length).getLongitude();
-			lat2 = this.destination.getLatitude();
-			lon2 =  this.destination.getLongitude();
+			lat1 = Math.toRadians(this.points.get(length).getLatitude());
+			lon1 = Math.toRadians(this.points.get(length).getLongitude());
+			lat2 = Math.toRadians(this.destination.getLatitude());
+			lon2 =  Math.toRadians(this.destination.getLongitude());
 			if (Math.sin(lon2-lon1)<0)       
 				   TC[length]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));    
 			    else       
@@ -140,12 +142,10 @@ public class CalculationsModel
 		}
 		
 		/**
-	   * Calcular Wind Correction Angle
-	   * @param A waypoint a evaluar
-	   * @param B waypoint a evaluar
-	   * @return double en radianes 
+	   * Calcular los Wind Correction Angles
+	   * @return (double)array con los resultados en radianes 
 	   */
-		public double WCA(Waypoint A, Waypoint B)
+		public double[] WCA(Waypoint A, Waypoint B)
 		{
 			double wca=0;
 			wca= Math.asin((WindVel()/EstGS(A,B))*Math.sin(MH(A,B)-WindDir())); 
