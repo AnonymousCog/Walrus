@@ -59,6 +59,10 @@
             android:name="com.example.navlog.calculator.MapDownloadActivity"
             android:label="@string/title_activity_map_download" >
         </activity>
+        <activity
+            android:name="com.example.navlog.calculator.CalculationsActivity"
+            android:label="@string/title_activity_calculations" >
+        </activity>
     </application>
 
 </manifest>
