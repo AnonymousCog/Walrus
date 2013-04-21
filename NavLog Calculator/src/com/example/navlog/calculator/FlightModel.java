@@ -100,6 +100,17 @@ public class FlightModel
 		return longitudes;
 	}
 	
+	public double[] getAllWaypointAltitudes()
+	{
+		int lenght = this.points.size();
+		double[] altitudes = new double[lenght];
+		for(int i=0;i<lenght;i++)
+		{
+			altitudes[i] = this.points.get(i).getAltitude();
+		}
+		return altitudes;
+	}
+	
 	public class Waypoint
 	{
 		private double latitude;
