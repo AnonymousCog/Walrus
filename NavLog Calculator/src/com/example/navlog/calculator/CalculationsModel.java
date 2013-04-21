@@ -28,7 +28,7 @@ public class CalculationsModel
 		public CalculationsModel(FlightModel incFlightModel)
 	    {
 			destination = incFlightModel.getDepartureLocation();
-			departude = incFlightModel.getArrivalLocation();
+			departure = incFlightModel.getArrivalLocation();
 			points = incFlightModel.getPoints();
     	}
 		
@@ -114,19 +114,27 @@ public class CalculationsModel
 				   TC[0]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));
 			
 			//Calculamos Waypoint 1 -> Waypoint N
-			for(int i=0; i<length; i++)
+			for(int i=0; i<length-1; i++)
 			{
-	
-				double tc=0;
-				if (Math.sin(lon2-lon1)<0)       
-				   tc=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(A,B)))/(Math.sin(LegDist(A,B))*Math.cos(lat1)));    
+				Waypoint A = this.points.get(i);
+				Waypoint B = this.points.get(i+1);
+				
+				if (Math.sin(B.getLongitude()-A.getAltitude())<0)       
+				   TC[i+1]=Math.acos((Math.sin(B.getLatitude())-Math.sin(A.getLatitude())*Math.cos(LegDist(A,B)))/(Math.sin(LegDist(A,B))*Math.cos(A.getLatitude())));    
 			    else       
-				   tc=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(A,B)))/(Math.sin(LegDist(A,B))*Math.cos(lat1)));    
+				   TC[i+1]=2*Math.PI-Math.acos((Math.sin(B.getLatitude())-Math.sin(A.getLatitude())*Math.cos(LegDist(A,B)))/(Math.sin(LegDist(A,B))*Math.cos(A.getLatitude())));    
 			}
 			
 			
 			//Calculamos Waypoint N -> Llegada
-			
+			lat1 = this.points.get(length).getLatitude();
+			lon1 = this.points.get(length).getLongitude();
+			lat2 = this.destination.getLatitude();
+			lon2 =  this.destination.getLongitude();
+			if (Math.sin(lon2-lon1)<0)       
+				   TC[length]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+			    else       
+				   TC[length]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));
 			
 			return TC;
 		}
