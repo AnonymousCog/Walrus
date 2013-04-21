@@ -12,10 +12,9 @@ public class FlightModel
 	private Waypoint departureLocation;
 	private Waypoint destinationLocation;
 	
-	
-	public void addWaypoint(ImageView m, double lat, double lon)
+	public void addWaypoint(ImageView m, double lat, double lon, double alt)
 	{
-		points.push(new Waypoint(m, lat, lon));
+		points.push(new Waypoint(m, lat, lon, alt));
 	}
 	public Waypoint removeLastWaypoint()
 	{
@@ -55,9 +54,9 @@ public class FlightModel
 	{
 		this.currentLocation = currentLocation;
 	}
-	public void setCurrentLocation(ImageView m, double lat, double lon)
+	public void setCurrentLocation(ImageView m, double lat, double lon, double alt)
 	{
-		this.currentLocation = new Waypoint(m, lat, lon);
+		this.currentLocation = new Waypoint(m, lat, lon,alt);
 	}
 	
 	public void setDepartureLocation(Waypoint departureLocation) 
@@ -66,7 +65,7 @@ public class FlightModel
 	}
 	public void setDepartureLocation(ImageView m, double lat, double lon)
 	{
-		this.departureLocation = new Waypoint(m, lat, lon);
+		this.departureLocation = new Waypoint(m, lat, lon,0);
 	}
 	
 	public void setArrivalLocation(Waypoint arrivalLocation) 
@@ -75,7 +74,7 @@ public class FlightModel
 	}
 	public void setArrivalLocation(ImageView m, double lat, double lon)
 	{
-		this.destinationLocation = new Waypoint(m, lat, lon);
+		this.destinationLocation = new Waypoint(m, lat, lon,0);
 	}
 	public double[] getAllWaypointLatitudes()
 	{
@@ -101,20 +100,31 @@ public class FlightModel
 		return longitudes;
 	}
 	
-	
+	public double[] getAllWaypointAltitudes()
+	{
+		int lenght = this.points.size();
+		double[] altitudes = new double[lenght];
+		for(int i=0;i<lenght;i++)
+		{
+			altitudes[i] = this.points.get(i).getAltitude();
+		}
+		return altitudes;
+	}
 	
 	public class Waypoint
 	{
 		private double latitude;
 		private double longitude;
+		private double altitude;
 		private ImageView marker;
 		
 
-		public Waypoint(ImageView m, double lat, double lon)
+		public Waypoint(ImageView m, double lat, double lon, double alt)
 		{
 			this.setMarker(m);
 			this.setLatitude(lat);
 			this.setLongitude(lon);
+			this.setAltitude(alt);
 		}
 		
 		
@@ -135,6 +145,16 @@ public class FlightModel
 		}
 		public void setMarker(ImageView marker) {
 			this.marker = marker;
+		}
+
+
+		public double getAltitude() {
+			return altitude;
+		}
+
+
+		public void setAltitude(double altitude) {
+			this.altitude = altitude;
 		}
 	}
 
