@@ -72,6 +72,7 @@ public class MapActivity extends Activity
 {	
 	private static final String allWaypointLongitudes = "Waypoint_Longitudes";
 	private static final String	allwaypointLatitudes = "Waypoint_Latitudes";
+	private static final String allwaypointAltitudes = "Waypoint_Altitudes";
 	
 	
 	private String TAG = "MapActivity";
@@ -194,13 +195,14 @@ public class MapActivity extends Activity
 		super.onRestoreInstanceState(in);
 		double[] latitudes = in.getDoubleArray(allwaypointLatitudes);
 		double[] longitudes = in.getDoubleArray(allWaypointLongitudes);
+		double[] altitudes = in.getDoubleArray(allwaypointAltitudes);
 		int waypointCount = latitudes.length;
 		
 		if(waypointCount > 0)
 		{
 			for(int i=0;i<waypointCount;i++)
 			{
-				placeWaypointOnMap(latitudes[i], longitudes[i]);
+				placeWaypointOnMap(latitudes[i], longitudes[i], altitudes[i]);
 			}
 		}
 
@@ -328,14 +330,14 @@ public class MapActivity extends Activity
 		
 	}
 	
-    private void placeWaypointOnMap(double lat, double lon)
+    private void placeWaypointOnMap(double lat, double lon, double alt)
 	{
 		try
 		{
 			ImageView marker = new ImageView(this);
 			marker.setImageResource(R.drawable.ic_waypoint);
 				
-			flightData.addWaypoint(marker, lat, lon); 
+			flightData.addWaypoint(marker, lat, lon, alt); 
 			mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
 			
 			Toast.makeText(getApplicationContext(), " Lat  : "+ lat + "\n Long: " + lon, Toast.LENGTH_SHORT).show();
@@ -377,7 +379,7 @@ public class MapActivity extends Activity
 		{
 			double latLong[] = new double[2];
 			latLong = mapView.pixelsToLatLng(arg0, arg1);
-			placeWaypointOnMap(latLong[0], latLong[1]);//Latitude, Longitude
+			placeWaypointOnMap(latLong[0], latLong[1]);//Latitude, Longitude, altitude
 		}
 
 		@Override
