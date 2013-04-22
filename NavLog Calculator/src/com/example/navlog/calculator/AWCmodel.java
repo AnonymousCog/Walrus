@@ -14,6 +14,7 @@ public class AWCmodel
 	{
 		try 
 		{
+			
 			String uri =String.format("http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&"+
 						"requestType=retrieve&format=xml&mostRecentForEachStation=constraint&hoursBeforeNow=5&stationString={0},{1}","TJSJ", "TJMZ");
 				    

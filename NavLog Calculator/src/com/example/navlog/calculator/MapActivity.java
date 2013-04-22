@@ -505,10 +505,11 @@ public class MapActivity extends Activity
 			{
 				double latitude = location.getLatitude();
 				double longitude = location.getLongitude();
+				double altitude = location.getAltitude();
 				
 				mapView.removeMarker(currentLocationMarker);
 				mapView.addMarker(currentLocationMarker, latitude, longitude);
-				flightData.setCurrentLocation(currentLocationMarker, latitude, longitude);
+				flightData.setCurrentLocation(currentLocationMarker, latitude, longitude,altitude);
 				//mapView.slideToAndCenter(latitude, longitude);
 				mapView.requestRender();
 			}
