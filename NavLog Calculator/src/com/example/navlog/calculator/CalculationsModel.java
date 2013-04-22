@@ -145,12 +145,12 @@ public class CalculationsModel
 	   * @param B waypoint a evaluar
 	   * @return double en radianes 
 	   */
-		public double WCA(Waypoint A, Waypoint B)
+		/*public double WCA(Waypoint A, Waypoint B)
 		{
 			double wca=0;
 			wca= Math.asin((WindVel()/EstGS(A,B))*Math.sin(MH(A,B)-WindDir())); 
 			return wca;
-		}
+		}*/
 		
 		/**
 	   * Calcular True Heading
@@ -159,11 +159,11 @@ public class CalculationsModel
 	   * @param B waypoint a evaluar
 	   * @return Valor en radianes
 	   */
-		public double TH(Waypoint A, Waypoint B)
+		/*public double TH(Waypoint A, Waypoint B)
 		{
 			double th = TC(A,B) + WCA(A,B);
 			return th;
-		}
+		}*/
 		
 		/**
 	   * Calcular Variation de un waypoint.
@@ -182,38 +182,38 @@ public class CalculationsModel
 		/**
 	   * Calcular Magnetic Heading
 	   */
-		public double MH(Waypoint A, Waypoint B)
+		/*public double MH(Waypoint A, Waypoint B)
 		{
 			double mh = TH(A,B) + Var(A);
 			return mh;		
-		}
+		}*/
 				
 		/**
 	   * Calcular Deviation
 	   * Este valor sale del avion en particular. No se puede calcular.
 	   * Pueden haber 2 aviones identicos, con valores distintos.
 	   */
-		public double Dev()
+		/*public double Dev()
 		{
 			return plane.getDeviation();
-		}
+		}*/
 		
 		/**
 	   * Calcular Course o compass Heading.
 	   * Es el numero que buscas en la brujula y apuntas cuando vuelas.
 	   */
-		public double CH(Waypoint A, Waypoint B)
+		/*public double CH(Waypoint A, Waypoint B)
 		{
 			double ch = MH(A, B)+ Dev();
 			return ch;
-		}
+		}*/
 		
 		/**
 	   * Calcular Distancia Total
 	   * usando haversine formula
 	   * @return double con el total de la distancia en radianes
 	   */
-		public double TotalDist()
+		/*public double TotalDist()
 		{ 
 			double R = 6371.0087714; 																// Earth Radius in KM
 			double latDistance = Math.toRadians(coordPrincipales.getLatitudFinal() - coordPrincipales.getLatitudInicial());
@@ -227,7 +227,7 @@ public class CalculationsModel
 
 		    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 			return R * c;
-		}
+		}*/
 		
 		/**
 		   * Calcula distancia entre 2 puntos
@@ -246,18 +246,18 @@ public class CalculationsModel
 		/**
 		   * Calcula distancia entre punto y destino
 		   */
-		public double LegRemaining(Waypoint A, Waypoint B)
+		/*public double LegRemaining(Waypoint A, Waypoint B)
 		{
 			double remaining = TotalDist() - LegDist(A,B);
 			return remaining;
-		}
+		}*/
 		
 		/**
 		   * Calcula Estimated Ground Speed
 		   * Es el TAS tomando en consideracion la direccion del viento y obviamente la velocidad del mismo.
 		   * @return double con valor calculado
 		   */
-		public double EstGS(Waypoint A, Waypoint B)
+		/*public double EstGS(Waypoint A, Waypoint B)
 		{
 			int n = 1;					
 			double x = Math.toRadians(WindDir());						// Wind direction in Radians;
@@ -268,7 +268,7 @@ public class CalculationsModel
 			k = Math.pow(k,2);
 			double gs = TAS()*(Math.sqrt(n-k))-WindVel()*l;
 			return gs;
-		}
+		}*/
 		
 		/**
 		   * Calcula Actual Ground Speed
@@ -284,13 +284,13 @@ public class CalculationsModel
 		   * @param B Waypoint B a evaluar
 		 * @return double value
 		   */
-		public Double ETE(Waypoint A, Waypoint B)
+		/*public Double ETE(Waypoint A, Waypoint B)
 		{								
 			double time;
 			time= (TotalDist() / EstGS(A,B)) * 60.0;
 			DecimalFormat twoDForm = new DecimalFormat("#0.0");
 			return Double.valueOf(twoDForm.format(time));
-		}
+		}*/
 		
 		/**
 		   * Calcula Total Time Enroute

@@ -36,17 +36,17 @@ package com.example.navlog.calculator;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-
-
-
-
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -56,14 +56,10 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import com.example.navlog.calculator.R;
 import com.example.navlog.calculator.FlightModel.Waypoint;
 import com.qozix.mapview.*;
 import com.qozix.mapview.MapView.MapEventListener;
-
-
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
@@ -85,6 +81,9 @@ public class MapActivity extends Activity
 	private OnItemSelectedListener mySpinnerListener;
 	private LocationManager locationManager;
 	private LocationListener locationListener;
+	
+	private double waypointLatitudeWithNoAltitude;
+	private double waypointLongitudeWithNoAltitude;
 	
 	
 	@Override
@@ -160,9 +159,10 @@ public class MapActivity extends Activity
 		super.onSaveInstanceState(out);
 		double[] latitudes = flightData.getAllWaypointLatitudes();
 		double[] longitudes = flightData.getAllWaypointLongitudes();
+		double[] altitudes = flightData.getAllWaypointAltitudes();
 		out.putDoubleArray(allwaypointLatitudes, latitudes);
 		out.putDoubleArray(allWaypointLongitudes, longitudes);
-		
+		out.putDoubleArray(allwaypointAltitudes, altitudes);
 		
 	}
 	
@@ -268,8 +268,43 @@ public class MapActivity extends Activity
     	mapView.requestRender();
 		
 	}
+	/*
+	 *  method below Temporarily using self generated numbers for altitude, this will later be populated
+	 * by the airplane profile's set altitudes
+	 */
 
+	private void selectAltitudeDialog()
+	{
+		String[] altitudes = new String[12];
+		for(int i =0 ; i<12; i++)
+		{
+			double alt = (i+1) * 1000;
+			altitudes[i] = Double.toString(alt);
+		}
+	    AlertDialog.Builder b = new Builder(this);
+	    b.setTitle("Altitude");
+	    b.setItems(altitudes, new OnClickListener() {
 
+	        @Override
+	        public void onClick(DialogInterface dialog, int which) {
+
+	            dialog.dismiss();
+	            if (which > 0 &&  which < 13) 
+	            {
+	            	
+	            	double alt = (which+1) * 1000;
+	            	placeWaypointOnMap(alt);//Latitude, Longitude, altitude
+	            	
+	            } 
+	            
+	        }
+
+		
+	    });
+
+	    b.show();
+
+	}
 
 	private void removeLastPlacedWaypointOnMap()
 	{
@@ -317,7 +352,7 @@ public class MapActivity extends Activity
 			flightData.addWaypoint(marker, lat, lon, alt); 
 			mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
 			
-			Toast.makeText(getApplicationContext(), " Lat  : "+ lat + "\n Long: " + lon, Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), " Lat  : "+ lat + "\n Long: " + lon + "Alt : " + alt, Toast.LENGTH_SHORT).show();
 		}
 		catch(Exception e)
 		{
@@ -325,6 +360,11 @@ public class MapActivity extends Activity
 		}
 		
 	}
+    
+    private void placeWaypointOnMap(double alt)
+    {
+    	placeWaypointOnMap(this.waypointLatitudeWithNoAltitude, this.waypointLongitudeWithNoAltitude, alt);
+    }
     
     private void placeCurrentLocationOnMap(ImageView marker, double lat, double lon, double alt)
     {
@@ -375,7 +415,9 @@ public class MapActivity extends Activity
 		{
 			double latLong[] = new double[2];
 			latLong = mapView.pixelsToLatLng(arg0, arg1);
-			placeWaypointOnMap(latLong[0], latLong[1],0);//Latitude, Longitude, altitude
+			waypointLatitudeWithNoAltitude = latLong[0];
+			waypointLongitudeWithNoAltitude = latLong[1];
+			selectAltitudeDialog();
 		}
 
 		@Override
@@ -495,6 +537,8 @@ public class MapActivity extends Activity
 				double longitude = location.getLongitude();
 				double altitude = location.getAltitude();
 				float speed = location.getSpeed();
+				
+				
 				//mapView.removeMarker(currentLocationMarker);
 				placeCurrentLocationOnMap(currentLocationMarker, latitude, longitude, altitude);
 				//mapView.addMarker(currentLocationMarker, latitude, longitude);
