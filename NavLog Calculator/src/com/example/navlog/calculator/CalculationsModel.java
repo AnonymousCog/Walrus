@@ -2,13 +2,10 @@ package com.example.navlog.calculator;
 
 import java.text.DecimalFormat;
 import java.util.Stack;
-
 import com.example.navlog.calculator.FlightModel.Waypoint;
-
 
 /**
 * Clase Java para executar calculos basados en coordenadas
-* 
 * @author Grupo A Capstone
 * @version 1.0
 */
@@ -22,8 +19,7 @@ public class CalculationsModel
 
 		/**
 	   * Constructor Clase NavCalculations
-	   * @param incCoordenadas trae los puntos de salida y llegada.
-		 * @return 
+	   * @param incFlightModel modelo con todos los Waypoints, departure y destination
 	   */
 		public CalculationsModel(FlightModel incFlightModel)
 	    {
@@ -34,8 +30,8 @@ public class CalculationsModel
 		
 		/**
 		   * Transforma valor Radianes a Millas Nauticas
-		   * @param valor en radianes
-		   * @return valor en NM
+		   * @param incValue valor en radianes
+		   * @return valor en Millas Nauticas
 		   */
 		public double radiansToNm(double incValue)
 		{
@@ -44,8 +40,8 @@ public class CalculationsModel
 		
 		/**
 		   * Transforma valor Radianes a Grados
-		   * @param valor en radianes
-		   * @return valor en grados
+		   * @param incValue valor en radianes
+		   * @return Resultado en grados
 		   */
 		public double radiansToDeg(double incValue)
 		{
@@ -53,52 +49,83 @@ public class CalculationsModel
 		}
 		
 		/**
-		   * Calcular Wind Direction
+		 * Arreglo con las Direcciones de Viento de todos los Legs
+		 */
+		private double[] WindDirs;
+		/**
+		 * Implementacion para entrar los datos de Weather
+		 */
+		private void setWindDirs()
+		{
+		
+		}
+		
+		/**
+		   * Get Wind Direction
+		   * @param index indice
+		   * @return double con la direccion en radianes
 		   */
-		public double WindDir()
+		public double getWindDir(int index)
 		{			
-			return Math.toRadians((double)0);
+			return Math.toRadians(WindDirs[index]);
+		}
+		
+		/**
+		 * Arreglo con las velocidades de Viento de todos los Legs
+		 */
+		private double[] WindVels;
+		
+		/**
+		 * Implementacion para entrar los datos de Weather
+		 */
+		private void setWindVels()
+		{
+			
 		}
 		
 		/**
 		   * Wind Velocity
+		   * @param index indice 
 		   * @return Wind velocity
 		   */
-		public double WindVel()
+		
+		public double getWindVel(int index)
 		{
-			return Math.toRadians((double)0);
+			return Math.toRadians(WindVels[index]);
 		}
 		
+		
+		private double[] WindTemps;
 		/**
 		   * Wind Temperature
 		   * @return temperatura en Kelvin
-		   */
-		public double WindTemp()
+		   */		
+		public double getWindTemp(int index)
 		{
-			return (double)0;
+			return (WindTemps[index]);
 		}
 		
 		/**
 		   * Calcular True Air Speed 
 		   * @param alt altidude del avion para ese waypoint
-		   * @param power Porciento de power% que el piloto piensa usar
-		   * @return valor del TAS.
+		   * @return 3 valores del TAS (20 under, standard, 20 over).
 		   */
-		public double TAS(double alt, double power)
+		public double TAS(double alt)
 		{			
-			double tas = 0;
+			double TASs = 0;
 			//Implementar funcion de getTAS desde el profile
-			return tas;
+			return TASs;
 		}
 		
+		private double[]TCs;
 		/**
-	   * Calculates Initial True Course
+		 * Calculates Initial True Course
 		 * @return (double)array with the list of TC's
 		   */
-		public double[] TC()
+		public double[] getTCs()
 		{
-			int length = this.points.size();
-			double[]TC = new double[length+1];
+			int length = this.points.size() + 1;
+			TCs = new double[length];
 					
 			double lat1, lat2, lon1, lon2;
 			
@@ -109,12 +136,12 @@ public class CalculationsModel
 			lon2 = Math.toRadians(this.points.get(0).getLongitude());
 			
 			if (Math.sin(lon2-lon1)<0)       
-				   TC[0]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+				   TCs[0]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
 			    else       
-				   TC[0]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));
+				   TCs[0]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));
 			
 			//Calculamos Waypoint 1 -> Waypoint N
-			for(int i=0; i<length-1; i++)
+			for(int i=0; i<this.points.size()-1; i++)
 			{				
 				lat1 = Math.toRadians(this.points.get(i).getLatitude());
 				lon1 = Math.toRadians(this.points.get(i).getLongitude());
@@ -122,90 +149,110 @@ public class CalculationsModel
 				lon2 = Math.toRadians(this.points.get(i+1).getLongitude());
 				
 				if (Math.sin(lon2-lon1)<0)       
-					   TC[i+1]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+					   TCs[i+1]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
 				    else       
-					   TC[i+1]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+					   TCs[i+1]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
 			}
-			
-			
+						
 			//Calculamos Waypoint N -> Llegada
 			lat1 = Math.toRadians(this.points.get(length).getLatitude());
 			lon1 = Math.toRadians(this.points.get(length).getLongitude());
 			lat2 = Math.toRadians(this.destination.getLatitude());
 			lon2 =  Math.toRadians(this.destination.getLongitude());
 			if (Math.sin(lon2-lon1)<0)       
-				   TC[length]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+				   TCs[length]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
 			    else       
-				   TC[length]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(LegDist(this.departure,this.points.get(0))))/(Math.sin(LegDist(this.departure,this.points.get(0)))*Math.cos(lat1)));
+				   TCs[length]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));
 			
-			return TC;
+			return TCs;
 		}
 		
+		private double[]WCAs;
 		/**
 	   * Calcular los Wind Correction Angles
-	   * @return (double)array con los resultados en radianes 
+	   * @return (double)array con los resultados en radianes (debes convertir a angular) 
 	   */
-		public double[] WCA(Waypoint A, Waypoint B)
+		public double[] getWCA()
 		{
-			double wca=0;
-			wca= Math.asin((WindVel()/EstGS(A,B))*Math.sin(MH(A,B)-WindDir())); 
-			return wca;
+			int length = this.points.size()+1;
+			WCAs = new double[length];
+					
+			double lat1, lat2, lon1, lon2;
+			
+			//Calculamos salida -> Waypoint1			
+			double m = Math.sin(this.getWindDir(0) - TCs[0]);
+			double xw = m * this.getWindVel(0);
+			WCAs[0] = xw / (this.TAS(this.points.get(0).getAltitude())); //radianes
+			
+			//Calculamos Waypoint 1 -> Waypoint N
+			for(int i=0; i<this.points.size()-1; i++)
+			{				
+				m = Math.sin(this.getWindDir(i+1) - TCs[i+1]);
+				xw = m * this.getWindVel(i+1);
+				WCAs[i+1] = xw / (this.TAS(this.points.get(i+1).getAltitude())); //radianes
+			}
+						
+			//Calculamos Waypoint N -> Llegada
+			m = Math.sin(this.getWindDir(length) - TCs[TCs.length]);
+			xw = m * this.getWindVel(length);
+			WCAs[length] = xw / (this.TAS(this.points.get(length).getAltitude())); //radianes
+			
+			return WCAs;
 		}
 		
+		
+		private double[]THs;
 		/**
 	   * Calcular True Heading
 	   * Cuando saco la variacion
-	   * @param A waypoint a evaluar
-	   * @param B waypoint a evaluar
-	   * @return Valor en radianes
+	   * @return (double) array con los Valores en radianes
 	   */
-		public double TH(Waypoint A, Waypoint B)
+		public double[] getTHs()
 		{
-			double th = TC(A,B) + WCA(A,B);
-			return th;
+			int size = this.points.size()+1;
+			THs = new double[size];
+			for(int i=0; i<size ;i++)
+			{
+				THs[i] = TCs[i] + WCAs[i];
+			}			
+			return THs;
 		}
 		
+		private double[]Vars;
 		/**
 	   * Calcular Variation de un waypoint.
 	   * Variation es 12 para PR y varia segun longitudes y latitudes pero es bastante general por una zona/mapa
-	   * @param Waypont a calcular
-	   * @return double en radianes
+	   * @return (double)array en radianes
 	   */
-		public double Var(Waypoint A)
+		public double[] Var()
 		{
-			double var=  -65.6811 + (0.99*(A.getLatitude())) + (0.0128899*Math.pow(A.getLatitude(),2)) - 0.0000905928*Math.pow(A.getLatitude(), 3)+ 2.87622*A.getLongitude() - 
-			        0.0116268*A.getLatitude()*A.getLongitude() - 0.00000603925*(Math.pow(A.getLatitude(),3))*A.getLongitude() - 0.0389806*(Math.pow(A.getLongitude(), 2)) - 
-			        0.0000403488*A.getLatitude()*(Math.pow(A.getLongitude(),2)) + 0.000168556*(Math.pow(A.getLongitude(),3));
-	        return var;
+			int size = this.points.size()+1;
+			Vars = new double[size];
+			for(int i=0; i<this.points.size() ;i++)
+			{
+				Vars[i] = -65.6811 + (0.99*(this.points.get(i).getLatitude())) + (0.0128899*Math.pow(this.points.get(i).getLatitude(),2)) - 0.0000905928*Math.pow(this.points.get(i).getLatitude(), 3)+ 2.87622*this.points.get(i).getLongitude() - 
+				        0.0116268*this.points.get(i).getLatitude()*this.points.get(i).getLongitude() - 0.00000603925*(Math.pow(this.points.get(i).getLatitude(),3))*this.points.get(i).getLongitude() - 0.0389806*(Math.pow(this.points.get(i).getLongitude(), 2)) - 
+				        0.0000403488*this.points.get(i).getLatitude()*(Math.pow(this.points.get(i).getLongitude(),2)) + 0.000168556*(Math.pow(this.points.get(i).getLongitude(),3));
+			}
+			Vars[size]= -65.6811 + (0.99*(this.destination.getLatitude())) + (0.0128899*Math.pow(this.destination.getLatitude(),2)) - 0.0000905928*Math.pow(this.destination.getLatitude(), 3)+ 2.87622*this.destination.getLongitude() - 
+			        0.0116268*this.destination.getLatitude()*this.destination.getLongitude() - 0.00000603925*(Math.pow(this.destination.getLatitude(),3))*this.destination.getLongitude() - 0.0389806*(Math.pow(this.destination.getLongitude(), 2)) - 
+			        0.0000403488*this.destination.getLatitude()*(Math.pow(this.destination.getLongitude(),2)) + 0.000168556*(Math.pow(this.destination.getLongitude(),3));;
+	        return Vars;
 		}
 		
+		private double[]MHs;
 		/**
 	   * Calcular Magnetic Heading
 	   */
-		public double MH(Waypoint A, Waypoint B)
+		public double[] MH()
 		{
-			double mh = TH(A,B) + Var(A);
-			return mh;		
-		}
-				
-		/**
-	   * Calcular Deviation
-	   * Este valor sale del avion en particular. No se puede calcular.
-	   * Pueden haber 2 aviones identicos, con valores distintos.
-	   */
-		public double Dev()
-		{
-			return plane.getDeviation();
-		}
-		
-		/**
-	   * Calcular Course o compass Heading.
-	   * Es el numero que buscas en la brujula y apuntas cuando vuelas.
-	   */
-		public double CH(Waypoint A, Waypoint B)
-		{
-			double ch = MH(A, B)+ Dev();
-			return ch;
+			int size = this.points.size()+1;
+			MHs = new double[size];
+			for(int i=0; i<size;i++)
+			{
+				MHs[i] = THs[i] + Vars[i];
+			}			
+			return MHs;		
 		}
 		
 		/**
@@ -216,12 +263,12 @@ public class CalculationsModel
 		public double TotalDist()
 		{ 
 			double R = 6371.0087714; 																// Earth Radius in KM
-			double latDistance = Math.toRadians(coordPrincipales.getLatitudFinal() - coordPrincipales.getLatitudInicial());
-		    double lngDistance = Math.toRadians(coordPrincipales.getLongitudFinal() - coordPrincipales.getLongitudInicial());
+			double latDistance = Math.toRadians(this.destination.getLatitude() - this.departure.getLatitude());
+		    double lngDistance = Math.toRadians(this.destination.getLongitude() - this.departure.getLongitude());
 
 		    double a = (Math.sin(latDistance / 2) * Math.sin(latDistance / 2)) +					
-		                    (Math.cos(Math.toRadians(coordPrincipales.getLatitudInicial()))) *
-		                    (Math.cos(Math.toRadians(coordPrincipales.getLatitudFinal()))) *
+		                    (Math.cos(Math.toRadians(this.departure.getLatitude()))) *
+		                    (Math.cos(Math.toRadians(this.destination.getLatitude()))) *
 		                    (Math.sin(lngDistance / 2)) *
 		                    (Math.sin(lngDistance / 2));
 
@@ -229,67 +276,108 @@ public class CalculationsModel
 			return R * c;
 		}
 		
+		private double[] LegDists;
 		/**
 		   * Calcula distancia entre 2 puntos
-		   * @return double con distancia entre 2 waypoints en radianes
+		   * @return (double)array con las distancias en todos los LEGS
 		   */
-		public double LegDist(Waypoint A, Waypoint B)
+		public double[] LegDist()
+		{
+			int size = this.points.size()+1;
+			LegDists = new double[size];
+			Waypoint A; Waypoint B;
+			
+			if(size ==1)
+			{
+				LegDists[0] = TotalDist();
+				return LegDists;
+			}
+							
+			//Leg distance departure -> waypoint 1
+			A = this.departure;
+			B = this.points.get(0);			
+			LegDists[0] = getDistance(A,B);
+			
+			// Waypoint 1 -> N
+			
+			for(int i =0;i<this.points.size()-1;i++)
+			{
+				A = this.points.get(i);
+				B = this.points.get(i+1);
+				LegDists[i+1] = getDistance(A,B);
+			}
+			
+			// Waypoint N -> Final
+			A = this.points.get(points.size());
+			B = this.destination;					
+			LegDists[size] = getDistance(A,B);
+			
+			return LegDists;
+		}
+		
+		private double getDistance(Waypoint A, Waypoint B)
 		{
 			double lat1 = A.getLatitude();
 			double lat2 = B.getLatitude();
 			double lon1 = A.getLongitude();
-			double lon2 = B.getLongitude();
-
-			return (Math.acos(Math.sin(lat1)*Math.sin(lat2)+Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon1-lon2)));		
+			double lon2 = B.getLongitude();	
+			return (Math.acos(Math.sin(lat1)*Math.sin(lat2)+Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon1-lon2)));			
 		}
+		
 		
 		/**
 		   * Calcula distancia entre punto y destino
 		   */
 		public double LegRemaining(Waypoint A, Waypoint B)
 		{
-			double remaining = TotalDist() - LegDist(A,B);
+			double remaining = TotalDist() - getDistance(A,B);
 			return remaining;
 		}
 		
 		/**
+		 * Ground Speed Array
+		 */
+		private double[] GSs;
+		/**
 		   * Calcula Estimated Ground Speed
-		   * Es el TAS tomando en consideracion la direccion del viento y obviamente la velocidad del mismo.
 		   * @return double con valor calculado
 		   */
-		public double EstGS(Waypoint A, Waypoint B)
+		public double[] EstGS()
 		{
-			int n = 1;					
-			double x = Math.toRadians(WindDir());						// Wind direction in Radians;
-			double y = TC(A,B);											// True Course in Radians
-			double l = Math.cos(x-y);
-			double m = Math.sin(x-y);		
-			double k = (WindVel() / TAS())*m;
-			k = Math.pow(k,2);
-			double gs = TAS()*(Math.sqrt(n-k))-WindVel()*l;
-			return gs;
+			int size= this.points.size()+1;
+			GSs = new double[size];
+			for(int i=0;i<size;i++)
+			{
+				double l = Math.cos(this.getWindDir(i) - TCs[i]);
+				double m = Math.sin(this.getWindDir(i) - TCs[i]);
+				double k = (this.getWindVel(i) / TAS(this.points.get(i).getAltitude()))*m;
+				k = Math.pow(k,2);
+				double gs = TAS(this.points.get(i).getAltitude())*(Math.sqrt(1-k))-this.getWindVel(i)*l;
+				GSs[i] = gs;
+			}
+			return GSs;
 		}
-		
+	
 		/**
-		   * Calcula Actual Ground Speed
-		   */
-		public void ActGS()
-		{
-			
-		}
-		
+		 * Estimated Time Enroute Array
+		 */
+		private double[] ETEs;
 		/**
 		   * Calcula Estimated Time Enroute
-		   * @param A Waypoint A a evaluar
-		   * @param B Waypoint B a evaluar
 		 * @return double value
 		   */
-		public Double ETE(Waypoint A, Waypoint B)
-		{								
+		public double[] ETE()
+		{	
 			double time;
-			time= (TotalDist() / EstGS(A,B)) * 60.0;
-			DecimalFormat twoDForm = new DecimalFormat("#0.0");
-			return Double.valueOf(twoDForm.format(time));
+			int size = this.points.size()+1;
+			ETEs = new double[size];
+			for(int i=0 ; i<this.points.size()-1;i++)
+			{
+				time= (TotalDist() / GSs[i]) * 60.0;
+				DecimalFormat twoDForm = new DecimalFormat("#0.0");
+				ETEs[i]= Double.valueOf(twoDForm.format(time));
+			}
+			return ETEs;			
 		}
 		
 		/**
@@ -298,16 +386,7 @@ public class CalculationsModel
 		public void TTE()
 		{
 			
-		}
-		
-		/**
-		   * Calcula Actual Time Enroute
-		   */
-		public void ATE()
-		{
-		
-		}
-		
+		}		
 		
 		/**
 		   * Calcular Estimated Time Arrival
@@ -316,16 +395,8 @@ public class CalculationsModel
 		{
 			
 		}
-				
-		/**
-		   * Calcular Actual Time Arrival
-		   */
-		public void ATA()
-		{
-			
-		}
-	
-    }
+							
+   }
 
 
 
