@@ -16,6 +16,12 @@ public class FlightModel
 	{
 		points.push(new Waypoint(m, lat, lon, alt));
 	}
+	
+	public void addWaypoint(Waypoint waypoint)
+	{
+		points.push(waypoint);
+	}
+	
 	public Waypoint removeLastWaypoint()
 	{
 		Waypoint removed =  points.pop();
