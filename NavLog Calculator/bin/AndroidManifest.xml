@@ -63,6 +63,10 @@
             android:name="com.example.navlog.calculator.CalculationsActivity"
             android:label="@string/title_activity_calculations" >
         </activity>
+        <activity
+            android:name="com.example.navlog.calculator.AirplaneListActivity"
+            android:label="@string/title_activity_airplane_list" >
+        </activity>
     </application>
 
 </manifest>

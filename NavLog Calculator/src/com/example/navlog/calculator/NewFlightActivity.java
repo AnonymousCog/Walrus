@@ -19,8 +19,10 @@ public class NewFlightActivity extends Activity
 {
 	public final static String departureLatitude ="Departure_Latitude";
 	public final static String departureLongitude ="Departure_Longitude";
+	public final static String departureAltitude = "Departure_Altitude";
 	public final static String destinationLatitude ="Destination_Latitude";
 	public final static String destinationLongitude ="Destination_Longitude";
+	public final static String destinationAltitude = "Destination_Altitude";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,11 +68,13 @@ public class NewFlightActivity extends Activity
 			//Toast.makeText(getApplicationContext(), "Town: " + ap.getTown() ,Toast.LENGTH_SHORT).show();
 			double departureLat = ap.getLatitude();
 			double departureLong = ap.getLongitude();
+			double departureAlt = ap.getELEV();
 			
 			ap = new AirportModel();
 			boolean destinationFound = ap.parseAirportXML(this.getApplicationContext(), destCode.toUpperCase(loc));
 			double destinationLat = ap.getLatitude();
 			double destinationLong = ap.getLongitude();
+			double destinationAlt = ap.getELEV();
 			
 			
 	    	if(departureFound == true && destinationFound == true )
@@ -78,9 +82,11 @@ public class NewFlightActivity extends Activity
 	    		Intent intent = new Intent(this, MapActivity.class);
 	    		intent.putExtra(departureLatitude, departureLat);
 	    		intent.putExtra(departureLongitude, departureLong);
+	    		intent.putExtra(departureAltitude, departureAlt);
 	    		
 	    		intent.putExtra(destinationLatitude, destinationLat);
 	    		intent.putExtra(destinationLongitude, destinationLong);
+	    		intent.putExtra(destinationAltitude, destinationAlt);
 	    		
 	    		startActivity(intent);
 	    	}
