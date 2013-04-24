@@ -36,7 +36,8 @@ public class MainNavLogActivity extends Activity {
     }
     public void goToSetup(View view)
     {
-    	Intent intent = new Intent(this, MapDownloadActivity.class);
+    	//Intent intent = new Intent(this, MapDownloadActivity.class);
+    	Intent intent = new Intent(this, AirplaneListActivity.class);
     	startActivity(intent);
     }
 }
