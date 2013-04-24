@@ -2,7 +2,6 @@ package com.navlog.models;
 
 import java.text.DecimalFormat;
 import java.util.Stack;
-
 import com.navlog.models.FlightModel.Waypoint;
 
 
@@ -24,10 +23,11 @@ public class CalculationsModel
 	   * @param incFlightModel modelo con todos los Waypoints, departure y destination
 	   */
 		public CalculationsModel(FlightModel incFlightModel)
-	    {
+	    {		
+			AviationWeatherModel awcModel = new AviationWeatherModel(incFlightModel);
 			destination = incFlightModel.getDepartureLocation();
 			departure = incFlightModel.getArrivalLocation();
-			points = incFlightModel.getPoints();
+			points = incFlightModel.getPoints();		
     	}
 		
 		/**
