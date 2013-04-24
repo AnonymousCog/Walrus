@@ -24,6 +24,11 @@ public class FlightModel
 		this.setDepartureICAO(depICAO);
 		this.setDestinationICAO(destICAO);			
 	}
+	
+	public FlightModel(double[] lat, double[]lon, String depICAO, double depLat, double depLon, String destICAO, double destLat, double destLon)
+	{
+		//departureLocation = new Waypoint()
+	}
 	public void addWaypoint(ImageView m, double lat, double lon, double alt)
 	{
 		points.push(new Waypoint(m, lat, lon, alt));
@@ -150,7 +155,10 @@ public class FlightModel
 		private double altitude;
 		private ImageView marker;
 		
-
+		public Waypoint()
+		{
+			
+		}
 		public Waypoint(ImageView m, double lat, double lon, double alt)
 		{
 			this.setMarker(m);
