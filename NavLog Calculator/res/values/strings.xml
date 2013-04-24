@@ -24,8 +24,8 @@
     <string name="title_activity_map">MapActivity</string>
     <string name="map_selector">Map Select</string>
     <string name="map_center">Center Map</string>
-    <string name="title_activity_map_download">MapDownloadActivity</string>
-    <string name="title_activity_calculations">CalculationsActivity</string>
-    <string name="title_activity_airplane_list">AirplaneListActivity</string>
+    <string name="title_activity_map_download">Download Maps</string>
+    <string name="title_activity_calculations">Flight Calculations</string>
+    <string name="title_activity_airplane_list">Airplane Profiles</string>
 
 </resources>
