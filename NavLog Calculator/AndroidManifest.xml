@@ -67,6 +67,10 @@
             android:name="com.navlog.activities.AirplaneListActivity"
             android:label="@string/title_activity_airplane_list" >
         </activity>
+        <activity
+            android:name="com.navlog.activities.AirplaneProfileActivity"
+            android:label="@string/title_activity_airplane_profile" >
+        </activity>
     </application>
 
 </manifest>
