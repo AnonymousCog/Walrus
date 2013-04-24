@@ -71,6 +71,8 @@ public class MapActivity extends Activity
 	private static final String	allwaypointLatitudes = "Waypoint_Latitudes";
 	private static final String allwaypointAltitudes = "Waypoint_Altitudes";
 	
+	public static final String flightModelDetails = "Flight_Data";
+	
 	
 	private String TAG = "MapActivity";
 	private MapView mapView;
@@ -213,7 +215,7 @@ public class MapActivity extends Activity
 		mapView.removeMapEventListener(myMapListener);
 		
 	}
-
+	
 
 
 	@Override
@@ -221,9 +223,8 @@ public class MapActivity extends Activity
 	{
 	    switch (item.getItemId()) {
 	        case R.id.calculate:
+	        	launchCalculationsActivity();
 	        	
-	        	Intent intent = new Intent(this, CalculationsActivity.class);
-	        	startActivity(intent);
 	        	
 	        	break;
 	        
@@ -393,6 +394,15 @@ public class MapActivity extends Activity
 			Log.d(TAG, e.getMessage()); 
 		}
     	
+    }
+    
+    private void launchCalculationsActivity()
+    {
+    	Intent intent = new Intent(this, CalculationsActivity.class);
+    	Bundle b = new Bundle();
+    	b.putSerializable(flightModelDetails, this.flightData);
+    	intent.putExtras(b);
+    	startActivity(intent);
     }
 
 
