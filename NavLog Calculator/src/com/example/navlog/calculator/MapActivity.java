@@ -366,15 +366,15 @@ public class MapActivity extends Activity
     	placeWaypointOnMap(this.waypointLatitudeWithNoAltitude, this.waypointLongitudeWithNoAltitude, alt);
     }
     
-    private void placeCurrentLocationOnMap(ImageView marker, double lat, double lon, double alt)
+    private void placeCurrentLocationOnMap(double lat, double lon, double alt)
     {
     	try
 		{
-    		mapView.removeMarker(marker);
-			marker.setImageResource(R.drawable.ic_current_location);
+    		mapView.removeMarker(currentLocationMarker);
+			currentLocationMarker.setImageResource(R.drawable.ic_current_location);
 				
-			flightData.addWaypoint(marker, lat, lon, alt); 
-			mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
+			flightData.addWaypoint(currentLocationMarker, lat, lon, alt); 
+			mapView.addMarker(currentLocationMarker,lat, lon); //with true value computes addmarker with real pixel values
 			
 			Toast.makeText(getApplicationContext(), " Lat  : "+ lat + "\n Long : " + lon + "\n Alt : "+ alt, Toast.LENGTH_SHORT).show();
 		}
@@ -536,13 +536,12 @@ public class MapActivity extends Activity
 				double latitude = location.getLatitude();
 				double longitude = location.getLongitude();
 				double altitude = location.getAltitude();
+
 				float speed = location.getSpeed();
-				
-				
-				//mapView.removeMarker(currentLocationMarker);
-				placeCurrentLocationOnMap(currentLocationMarker, latitude, longitude, altitude);
-				//mapView.addMarker(currentLocationMarker, latitude, longitude);
-				//flightData.setCurrentLocation(currentLocationMarker, latitude, longitude,0);
+
+				placeCurrentLocationOnMap(latitude, longitude, altitude);
+			
+
 				//mapView.slideToAndCenter(latitude, longitude);
 				mapView.requestRender();
 			}

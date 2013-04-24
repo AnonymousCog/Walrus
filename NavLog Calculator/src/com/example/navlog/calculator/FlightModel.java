@@ -11,7 +11,19 @@ public class FlightModel
 	private Waypoint currentLocation;
 	private Waypoint departureLocation;
 	private Waypoint destinationLocation;
+	private String departureICAO;
+	private String destinationICAO;
 	
+	/**
+	 * Constructor Modelo Informacion de Vuelo.
+	 * @param depICAO codigo ICAO del aeropuerto de Salida
+	 * @param destICAO codigo ICAO del aeropuerto de Llegada
+	 */
+	public FlightModel(String depICAO, String destICAO)
+	{
+		this.setDepartureICAO(depICAO);
+		this.setDestinationICAO(destICAO);			
+	}
 	public void addWaypoint(ImageView m, double lat, double lon, double alt)
 	{
 		points.push(new Waypoint(m, lat, lon, alt));
@@ -117,6 +129,20 @@ public class FlightModel
 		return altitudes;
 	}
 	
+	public String getDepartureICAO() {
+		return departureICAO;
+	}
+	public void setDepartureICAO(String departureICAO) {
+		this.departureICAO = departureICAO;
+	}
+
+	public String getDestinationICAO() {
+		return destinationICAO;
+	}
+	public void setDestinationICAO(String destinationICAO) {
+		this.destinationICAO = destinationICAO;
+	}
+
 	public class Waypoint
 	{
 		private double latitude;
