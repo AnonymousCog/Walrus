@@ -1,4 +1,4 @@
-package com.example.navlog.calculator;
+package com.navlog.activities;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -10,6 +10,8 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import com.example.navlog.calculator.R;
 
 
 import android.net.Uri;

@@ -31,7 +31,7 @@
  * 
  */
 
-package com.example.navlog.calculator;
+package com.navlog.activities;
 
 
 import android.os.Bundle;
@@ -57,7 +57,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.navlog.calculator.R;
-import com.example.navlog.calculator.FlightModel.Waypoint;
+import com.navlog.models.FlightModel;
+import com.navlog.models.FlightModel.Waypoint;
 import com.qozix.mapview.*;
 import com.qozix.mapview.MapView.MapEventListener;
 import android.location.Location;
@@ -74,7 +75,7 @@ public class MapActivity extends Activity
 	private String TAG = "MapActivity";
 	private MapView mapView;
 	private ImageView currentLocationMarker;
-	private FlightModel flightData = new FlightModel();
+	private FlightModel flightData;
 
 	
 	private MapEventListener myMapListener;
@@ -97,8 +98,7 @@ public class MapActivity extends Activity
 		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#330000ff")));
 		actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#550000ff")));
 		*/
-		
-		
+		initFlightData();
 		mapView = new MapView(this);
 		//mapView.registerGeolocator(19.659721, -74.979220 , 14.730666, -60.626548);//works but not 100% accurate
 		int mapWidth = 10310;
@@ -314,6 +314,16 @@ public class MapActivity extends Activity
 			mapView.removeMarker(point.getMarker());
 		}
 	
+	}
+	
+	private void initFlightData()
+	{
+		Intent i = getIntent();
+		String  deptICAO = i.getStringExtra(NewFlightActivity.departureICAO);
+				
+		String  destICAO = i.getStringExtra(NewFlightActivity.destinationICAO);
+		
+		flightData = new FlightModel(deptICAO ,destICAO);
 	}
 	
 	private void placeDepartureAirport()

@@ -1,4 +1,6 @@
-package com.example.navlog.calculator;
+package com.navlog.activities;
+
+import com.example.navlog.calculator.R;
 
 import android.os.Bundle;
 import android.app.Activity;

@@ -26,5 +26,6 @@
     <string name="map_center">Center Map</string>
     <string name="title_activity_map_download">MapDownloadActivity</string>
     <string name="title_activity_calculations">CalculationsActivity</string>
+    <string name="title_activity_airplane_list">AirplaneListActivity</string>
 
 </resources>
