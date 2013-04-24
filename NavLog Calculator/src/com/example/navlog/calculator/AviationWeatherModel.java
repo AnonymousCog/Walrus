@@ -11,13 +11,17 @@ import org.w3c.dom.Document;
 public class AviationWeatherModel 
 {
 	private FlightModel flightInfo;
+	private String[] waypointsICAOS;
 	
 	public AviationWeatherModel(FlightModel incInfo)
 	{
+		flightInfo = incInfo;
+	}
+	
+	private void calculateMetar()
+	{
 		try 
 		{
-			flightInfo = incInfo;
-			
 			String uri =String.format("http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&"+
 						"requestType=retrieve&format=xml&mostRecentForEachStation=constraint&hoursBeforeNow=5&stationString={0},{1}",flightInfo.getDepartureICAO(),flightInfo.getDestinationICAO());
 				    
