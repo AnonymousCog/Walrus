@@ -1,8 +1,10 @@
-package com.example.navlog.calculator;
+package com.navlog.models;
 
 import java.text.DecimalFormat;
 import java.util.Stack;
-import com.example.navlog.calculator.FlightModel.Waypoint;
+
+import com.navlog.models.FlightModel.Waypoint;
+
 
 /**
 * Clase Java para executar calculos basados en coordenadas

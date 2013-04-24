@@ -21,7 +21,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.navlog.calculator.MainNavLogActivity"
+            android:name="com.navlog.activities.MainNavLogActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_main_nav_log"
             android:screenOrientation="portrait" >
@@ -32,39 +32,39 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.navlog.calculator.LogInOrRegisterActivity"
+            android:name="com.navlog.activities.LogInOrRegisterActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_log_in_or_regiister"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.example.navlog.calculator.NewFlightActivity"
+            android:name="com.navlog.activities.NewFlightActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_new_flight"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.example.navlog.calculator.AndroidDetechTouch"
+            android:name="com.navlog.activities.AndroidDetechTouch"
             android:label="@string/title_activity_android_detech_touch" >
         </activity>
         <activity
-            android:name="com.example.navlog.calculator.AndroidDetechTouchActivity"
+            android:name="com.navlog.activities.AndroidDetechTouchActivity"
             android:label="@string/title_activity_android_detech_touch" >
         </activity>
         <activity
-            android:name="com.example.navlog.calculator.MapActivity"
+            android:name="com.navlog.activities.MapActivity"
             android:label="@string/title_activity_map" >
         </activity>
         <activity
-            android:name="com.example.navlog.calculator.MapDownloadActivity"
+            android:name="com.navlog.activities.MapDownloadActivity"
             android:label="@string/title_activity_map_download" >
         </activity>
         <activity
-            android:name="com.example.navlog.calculator.CalculationsActivity"
+            android:name="com.navlog.activities.CalculationsActivity"
             android:label="@string/title_activity_calculations" >
         </activity>
         <activity
-            android:name="com.example.navlog.calculator.AirplaneListActivity"
+            android:name="com.navlog.activities.AirplaneListActivity"
             android:label="@string/title_activity_airplane_list" >
         </activity>
     </application>

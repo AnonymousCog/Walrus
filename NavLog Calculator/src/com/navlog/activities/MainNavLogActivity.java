@@ -1,4 +1,4 @@
-package com.example.navlog.calculator;
+package com.navlog.activities;
 
 import com.example.navlog.calculator.R;
 

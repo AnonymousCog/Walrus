@@ -1,9 +1,11 @@
-package com.example.navlog.calculator;
+package com.navlog.activities;
 
 
 import java.util.Locale;
 
 import com.example.navlog.calculator.R;
+import com.navlog.models.AirportModel;
+import com.navlog.models.MapModel;
 
 import android.app.Activity;
 import android.content.Intent;

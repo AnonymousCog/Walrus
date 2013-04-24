@@ -1,10 +1,12 @@
-package com.example.navlog.calculator;
+package com.navlog.activities;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
+
+import com.example.navlog.calculator.R;
 
 import android.os.Bundle;
 import android.app.ListActivity;

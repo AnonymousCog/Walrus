@@ -17,7 +17,7 @@
 //Airport indexing fails on and after airport id 188 and I dont know why
 //ucs on 188 was an double -3.5 instead of int -3
 
-package com.example.navlog.calculator;
+package com.navlog.models;
 
 import java.io.IOException;
 import java.io.InputStream;

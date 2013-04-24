@@ -1,4 +1,4 @@
-package com.example.navlog.calculator;
+package com.navlog.models;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
