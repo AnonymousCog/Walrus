@@ -3,11 +3,7 @@ package com.navlog.models;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Stack;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -16,8 +12,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.navlog.models.FlightModel.Waypoint;
-
-
 
 public class AviationWeatherModel 
 {
@@ -32,7 +26,6 @@ public class AviationWeatherModel
 	 * los puntos de salida y llegada. Tambien debe incluir los ICAO para ambos aeropuertos.
 	 * En el constructor se conecta a http://www.aviationweather.gov y se baja toda la data necesaria.
 	 */
-	@SuppressWarnings("null")
 	public AviationWeatherModel(FlightModel incInfo)
 	{
 		List<String> allWeatherStations = null;	
