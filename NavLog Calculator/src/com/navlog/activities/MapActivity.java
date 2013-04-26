@@ -71,6 +71,8 @@ public class MapActivity extends Activity
 	private static final String	allwaypointLatitudes = "Waypoint_Latitudes";
 	private static final String allwaypointAltitudes = "Waypoint_Altitudes";
 	
+	public static final String flightModelDetails = "Flight_Data";
+	
 	
 	private String TAG = "MapActivity";
 	private MapView mapView;
@@ -90,29 +92,38 @@ public class MapActivity extends Activity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
+		
+		double top , left, right, bottom;
+		left = -60.700833;
+		top = 19.651389;
+		right = -73.066667;
+		bottom = 16.1;
 		super.onCreate(savedInstanceState);
 		
-		/*Action bar Style
-		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-		ActionBar actionBar = getActionBar(); 
-		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#330000ff")));
-		actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#550000ff")));
-		*/
 		initFlightData();
 		mapView = new MapView(this);
 		//mapView.registerGeolocator(19.659721, -74.979220 , 14.730666, -60.626548);//works but not 100% accurate
 		int mapWidth = 10310;
 		int mapHeight = 3100;
-		mapView.registerGeolocator(19.659721, -73.200000 , 16.00000, -60.626548);//better but numbers are hammered
+		//mapView.registerGeolocator(19.659721, -73.200000 , 16.00000, -60.626548);//better but numbers are hammered
+		mapView.registerGeolocator(19.659721, -73.270000 , 16.10000, -60.626548);//better but numbers are hammered
+		//mapView.registerGeolocator(top , right, bottom, left);
 		String mapPath = "CJ-27-20-South/CJ-27-20-South-%col%_%row%.jpg";
 		mapView.addZoomLevel(mapWidth, mapHeight, mapPath, 1031, 310);
 		//mapView.addZoomLevel(mapWidth, mapHeight, "tiles/CJ-27-20-South-%col%_%row%.jpg", 1031, 310);
+		
+		/*
+		 * -60.783333 long 
+		 * x 19.55 lat
+		 * x 73.116667 long
+		 * 16.00 lat
+		 */
 		
 	      
         currentLocationMarker = new ImageView(this);
 	    currentLocationMarker.setImageResource(R.drawable.ic_current_location);
 	   
-	    //subscribing listeners at the onResume methos
+	    //subscribing respective listeners at the onResume method
 	    locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new MyLocationListener();  
         myMapListener = new NLMapListner();
@@ -135,9 +146,7 @@ public class MapActivity extends Activity
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.map, menu);
 		
-		String[] maps = {"cj-70", "pr-11", "zz-68","cj-70", "pr-11", "zz-68",
-    			"cj-70", "pr-11", "zz-68","cj-70", "pr-11", "zz-68","cj-70", 
-    			"pr-11","zz-68","cj-70", "pr-11", "zz-68"}; //This should be replaced by the contents of the MAPS XML FILE
+		String[] maps = {"CJ-27-20 South"}; //This should be replaced by the contents of the MAPS XML FILE
 		
         Spinner spinner = (Spinner) menu.findItem(R.id.map_select).getActionView();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
@@ -213,7 +222,7 @@ public class MapActivity extends Activity
 		mapView.removeMapEventListener(myMapListener);
 		
 	}
-
+	
 
 
 	@Override
@@ -221,9 +230,8 @@ public class MapActivity extends Activity
 	{
 	    switch (item.getItemId()) {
 	        case R.id.calculate:
+	        	launchCalculationsActivity();
 	        	
-	        	Intent intent = new Intent(this, CalculationsActivity.class);
-	        	startActivity(intent);
 	        	
 	        	break;
 	        
@@ -336,6 +344,8 @@ public class MapActivity extends Activity
 		marker.setImageResource(R.drawable.ic_departure_airport);
 		flightData.setDepartureLocation(marker, lat, lon);
 		mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
+    	mapView.moveToAndCenter(lat, lon);
+    	mapView.requestRender();
 		
 	}
 	
@@ -380,19 +390,27 @@ public class MapActivity extends Activity
     {
     	try
 		{
+    		currentLocationMarker.setImageResource(R.drawable.ic_current_location);
     		mapView.removeMarker(currentLocationMarker);
-			currentLocationMarker.setImageResource(R.drawable.ic_current_location);
-				
-			flightData.addWaypoint(currentLocationMarker, lat, lon, alt); 
+    		flightData.setCurrentLocation(currentLocationMarker, lat, lon, alt);
 			mapView.addMarker(currentLocationMarker,lat, lon); //with true value computes addmarker with real pixel values
 			
-			Toast.makeText(getApplicationContext(), " Lat  : "+ lat + "\n Long : " + lon + "\n Alt : "+ alt, Toast.LENGTH_SHORT).show();
+			//Toast.makeText(getApplicationContext(), " Lat  : "+ lat + "\n Long : " + lon + "\n Alt : "+ alt, Toast.LENGTH_SHORT).show();
 		}
 		catch(Exception e)
 		{
 			Log.d(TAG, e.getMessage()); 
 		}
     	
+    }
+    
+    private void launchCalculationsActivity()
+    {
+    	Intent intent = new Intent(this, CalculationsActivity.class);
+    	Bundle b = new Bundle();
+    	b.putSerializable(flightModelDetails, this.flightData);
+    	intent.putExtras(b);
+    	startActivity(intent);
     }
 
 
@@ -427,7 +445,8 @@ public class MapActivity extends Activity
 			latLong = mapView.pixelsToLatLng(arg0, arg1);
 			waypointLatitudeWithNoAltitude = latLong[0];
 			waypointLongitudeWithNoAltitude = latLong[1];
-			selectAltitudeDialog();
+			//selectAltitudeDialog();
+			placeWaypointOnMap(latLong[0],latLong[1],0);
 		}
 
 		@Override

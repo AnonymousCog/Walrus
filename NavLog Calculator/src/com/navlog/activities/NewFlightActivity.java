@@ -126,9 +126,7 @@ public class NewFlightActivity extends Activity
     
     public void populateSpinner()
     {
-    	String[] maps = {"cj-70", "pr-11", "zz-68","cj-70", "pr-11", "zz-68",
-    			"cj-70", "pr-11", "zz-68","cj-70", "pr-11", "zz-68","cj-70", "pr-11",
-    			"zz-68","cj-70", "pr-11", "zz-68"}; //This should be replaced by the contents of the MAPS XML FILE
+    	String[] maps = {"Flight #1", "Flight #2","Flight #3"}; //This should be replaced by the contents of the MAPS XML FILE
         Spinner spinner = (Spinner) findViewById(R.id.spinner1);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
         	(this, android.R.layout.simple_spinner_item, maps);

@@ -5,8 +5,12 @@ import java.util.Stack;
 
 import android.widget.ImageView;
 
-public class FlightModel 
+public class FlightModel implements java.io.Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 620210547609466539L;
 	private Stack<Waypoint> points = new Stack<Waypoint>();
 	private Waypoint currentLocation;
 	private Waypoint departureLocation;
@@ -25,9 +29,9 @@ public class FlightModel
 		this.setDestinationICAO(destICAO);			
 	}
 	
-	public FlightModel(double[] lat, double[]lon, String depICAO, double depLat, double depLon, String destICAO, double destLat, double destLon)
+	public FlightModel()
 	{
-		//departureLocation = new Waypoint()
+		
 	}
 	public void addWaypoint(ImageView m, double lat, double lon, double alt)
 	{
@@ -148,12 +152,16 @@ public class FlightModel
 		this.destinationICAO = destinationICAO;
 	}
 
-	public class Waypoint
+	public class Waypoint implements java.io.Serializable
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5807655103001199853L;
 		private double latitude;
 		private double longitude;
 		private double altitude;
-		private ImageView marker;
+		private transient ImageView marker;
 		
 		public Waypoint()
 		{
