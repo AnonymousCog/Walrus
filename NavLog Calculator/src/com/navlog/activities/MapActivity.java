@@ -112,12 +112,7 @@ public class MapActivity extends Activity
 		mapView.addZoomLevel(mapWidth, mapHeight, mapPath, 1031, 310);
 		//mapView.addZoomLevel(mapWidth, mapHeight, "tiles/CJ-27-20-South-%col%_%row%.jpg", 1031, 310);
 		
-		/*
-		 * -60.783333 long 
-		 * x 19.55 lat
-		 * x 73.116667 long
-		 * 16.00 lat
-		 */
+		
 		
 	      
         currentLocationMarker = new ImageView(this);

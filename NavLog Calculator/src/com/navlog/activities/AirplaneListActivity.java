@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Set;
 
 import com.example.navlog.calculator.R;
@@ -12,7 +13,9 @@ import com.example.navlog.calculator.R;
 import android.os.Bundle;
 import android.app.ListActivity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -53,6 +56,23 @@ public class AirplaneListActivity extends ListActivity {
 			}
 		});
 	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) 
+	{
+	    switch (item.getItemId()) {
+	        case R.id.add_airplane:
+	        	launchAirplaneProfileActivity();
+	        	
+	        	
+	        	break;
+	        
+	        
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	    return true;
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) 
@@ -60,6 +80,12 @@ public class AirplaneListActivity extends ListActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.airplane_list, menu);
 		return true;
+	}
+	
+	public void launchAirplaneProfileActivity()
+	{
+		Intent intent = new Intent(this, AirplaneProfileActivity.class);
+    	startActivity(intent);
 	}
 	
 			class MyListAdaptor extends ArrayAdapter<String> implements SectionIndexer 
@@ -83,7 +109,8 @@ public class AirplaneListActivity extends ListActivity {
 						String ch = s.substring(0, 1);
 						// convert to uppercase otherwise lowercase a -z will be sorted
 						// after upper A-Z
-						ch = ch.toUpperCase();
+						
+						ch = ch.toUpperCase(Locale.getDefault());
 				
 						// HashMap will prevent duplicates
 						alphaIndexer.put(ch, x);

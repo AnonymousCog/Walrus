@@ -1,47 +1,55 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ScrollView1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin" >
+    <LinearLayout
+    	 android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btnNewFlight"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="45dp"
-        android:onClick="GoToNewFlight"
-        android:text="New Flight" />
+	    <Button
+	        android:id="@+id/btnNewFlight"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+	        android:layout_marginRight="@dimen/activity_horizontal_margin"
+	        android:layout_marginTop="45dp"
+	        android:onClick="GoToNewFlight"
+	        android:text="@string/new_flight" />
+	
+	    <Button
+	        android:id="@+id/btnHistory"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+	        android:layout_marginRight="@dimen/activity_horizontal_margin"
+	        android:layout_marginTop="23dp"
+	        android:text="@string/history" />
+	
+	    <Button
+	        android:id="@+id/btnMapDownload"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+	        android:layout_marginRight="@dimen/activity_horizontal_margin"
+	        android:layout_marginTop="30dp"
+	        android:onClick="goToMapDownload"
+	        android:text="@string/downloadMaps" />
+	
+	    <Button
+	        android:id="@+id/btnAirplaneProfile"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+	        android:layout_marginRight="@dimen/activity_horizontal_margin"
+	        android:layout_marginTop="25dp"
+	        android:onClick="goToAirplaneList"
+	        android:text="@string/airplaneProfiles" />
 
-    <Button
-        android:id="@+id/btnHistory"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btnNewFlight"
-        android:layout_alignRight="@+id/btnNewFlight"
-        android:layout_below="@+id/btnNewFlight"
-        android:layout_marginTop="23dp"
-        android:text="History" />
-
-    <Button
-        android:id="@+id/btnSetup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btnHistory"
-        android:layout_alignRight="@+id/btnHistory"
-        android:layout_below="@+id/btnHistory"
-        android:onClick="goToSetup"
-        android:layout_marginTop="30dp"
-        android:text="Setup" />
-
-    <Button
-        android:id="@+id/btnLogOut"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btnSetup"
-        android:layout_alignRight="@+id/btnSetup"
-        android:layout_below="@+id/btnSetup"
-        android:layout_marginTop="25dp"
-        android:onClick="logOutPressed"
-        android:text="Log Out" />
-
-</RelativeLayout>
+</LinearLayout>
+</ScrollView>

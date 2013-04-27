@@ -6,29 +6,21 @@ import com.example.navlog.calculator.R.menu;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.content.Intent;
 import android.view.Menu;
-import android.view.View;
 
-public class AirplaneProfileActivity extends Activity {
+public class CruisePerformanceActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_airplane_profile);
+		setContentView(R.layout.activity_cruise_performance);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.airplane_profile, menu);
+		getMenuInflater().inflate(R.menu.cruise_performance, menu);
 		return true;
-	}
-	
-	public void createPerformanceParameter(View view)
-	{
-    	Intent intent = new Intent(this, CruisePerformanceActivity.class);
-    	startActivity(intent);
 	}
 
 }
