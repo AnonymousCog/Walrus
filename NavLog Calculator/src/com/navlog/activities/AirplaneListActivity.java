@@ -27,14 +27,10 @@ import android.widget.Toast;
 
 public class AirplaneListActivity extends ListActivity {
 
-	static final String[] Airplanes = new String[] { "My Plane - Airbus - A318",
-		"Rental Plane - Astra - SPX", "Joe's Plane - Boeing - 767",
-		"Sam's -Bombardier - CRJ","Company - Cessna - VII",
-		"Company2 - Cessna - III", "Company - Cessna - XLS",
-		"Company - Cessna - V", "Company - Cessna - X",
-		"Company - Cessna - SII"};
+	private String[] Airplanes;
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 
 		LinkedList<String> mLinked = new LinkedList<String>();

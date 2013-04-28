@@ -1,7 +1,6 @@
 package com.navlog.models;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class AirplaneProfileModel implements java.io.Serializable
@@ -11,7 +10,6 @@ public class AirplaneProfileModel implements java.io.Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = 6939222492100483403L;
-	private static final String extension = ".ser";
 	private String airplaneName;
 	private String airplaneBrand;
 	private String airplaneModel;
@@ -23,18 +21,16 @@ public class AirplaneProfileModel implements java.io.Serializable
 		
 	}
 	
-	public AirplaneProfileModel(String fileName)
-	{
-		/*this class must be able to initialize from
-		 * any activity by receiving the fileName that
-		 * will be stored in share preferences.
-		 */
-		
-	}
+	
 	public void addCruisePerformanceParam(String label,CruisePerformanceModel param)
 	{
 		performanceParams.put(label, param);
 		
+	}
+	
+	public void removeCruisePerformanceParam(String label)
+	{
+		performanceParams.remove(label);
 	}
 	public CruisePerformanceModel getCruisePerformanceParam(String label)
 	{
@@ -48,18 +44,7 @@ public class AirplaneProfileModel implements java.io.Serializable
 	
 	public String[] getAllLabels()
 	{
-		int size = performanceParams.size();
-		int index = 0;
-		String[] labels = new String[size];
-		Iterator<Map.Entry<String, CruisePerformanceModel>> entries = performanceParams.entrySet().iterator();
-		while(entries.hasNext() && index<size)
-		{
-			Map.Entry<String, CruisePerformanceModel> entry = entries.next();
-			labels[index] = entry.getKey();
-			index++;
-		}
-		
-		
+		String[] labels =(String[]) performanceParams.keySet().toArray();	
 		return labels;
 	}
 	
@@ -98,11 +83,8 @@ public class AirplaneProfileModel implements java.io.Serializable
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	public static String getExtension() {
-		return extension;
-	}
 	
-	public String getDisplayName()
+	public String getLabel()
 	{
 		String displayName;
 		displayName = this.getAirplaneName() +" - " 
@@ -112,11 +94,7 @@ public class AirplaneProfileModel implements java.io.Serializable
 		return displayName;
 	}
 	
-	public String getFileName()
-	{
-		String fileName = this.getDisplayName() + getExtension();
-		return fileName;
-	}
+	
 		
 
 }

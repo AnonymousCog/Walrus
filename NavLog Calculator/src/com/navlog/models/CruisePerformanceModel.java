@@ -38,7 +38,7 @@ public class CruisePerformanceModel implements java.io.Serializable
 		String label;
 		String alt  = Integer.toString(this.getAltitude());
 		String r = Integer.toString(this.getRpm());
-		label = alt + " - " + rpm;
+		label = alt + " - " + r;
 		return label;
 	}
 	public int getAltitude() {
