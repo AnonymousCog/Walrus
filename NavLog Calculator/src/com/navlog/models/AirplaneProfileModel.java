@@ -1,6 +1,7 @@
 package com.navlog.models;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class AirplaneProfileModel implements java.io.Serializable
@@ -44,7 +45,16 @@ public class AirplaneProfileModel implements java.io.Serializable
 	
 	public String[] getAllLabels()
 	{
-		String[] labels =(String[]) performanceParams.keySet().toArray();	
+		int size = performanceParams.size();
+		int index = 0;
+		String[] labels = new String[size];
+		Iterator<Map.Entry<String ,CruisePerformanceModel>> entries = performanceParams.entrySet().iterator();
+		while (entries.hasNext()) 
+		{
+		    Map.Entry<String ,CruisePerformanceModel> entry = entries.next();
+		    labels[index] = entry.getKey();
+		    index++;
+		}
 		return labels;
 	}
 	

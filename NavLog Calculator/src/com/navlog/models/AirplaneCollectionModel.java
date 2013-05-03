@@ -1,6 +1,7 @@
 package com.navlog.models;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class AirplaneCollectionModel implements java.io.Serializable 
@@ -38,8 +39,24 @@ public class AirplaneCollectionModel implements java.io.Serializable
 	
 	public String[] getAllLabels()
 	{
-		String[] labels =(String[]) profiles.keySet().toArray();	
+		int size = profiles.size();
+		int index = 0;
+		String[] labels = new String[size];
+		Iterator<Map.Entry<String ,AirplaneProfileModel>> entries = profiles.entrySet().iterator();
+		while (entries.hasNext()) 
+		{
+		    Map.Entry<String ,AirplaneProfileModel> entry = entries.next();
+		    labels[index] = entry.getKey();
+		    index++;
+		}
 		return labels;
+	}
+	
+	public int getSize()
+	{
+		int size;
+		size = profiles.size();
+		return size;
 	}
 
 }
