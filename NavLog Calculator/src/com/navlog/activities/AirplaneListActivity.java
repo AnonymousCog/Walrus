@@ -1,7 +1,6 @@
 package com.navlog.activities;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,7 +15,6 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,17 +25,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.example.navlog.calculator.R;
 import com.navlog.models.AirplaneCollectionModel;
 import com.navlog.models.AirplaneProfileModel;
-import com.navlog.models.FlightModel;
+
 
 public class AirplaneListActivity extends ListActivity {
 	
 	public static final String fileName = "AirplaneList.ser";
 	public static final String airplaneProfileKey = "airplane";
+	private String profileToEdit;
 	AirplaneCollectionModel list = new AirplaneCollectionModel();
 	ListView lv;
 
@@ -94,10 +91,12 @@ public class AirplaneListActivity extends ListActivity {
 	    case (0) : { 
 	      if (resultCode == Activity.RESULT_OK) 
 	      { 
+	    	
 	    	Bundle b = data.getExtras();
 	    	AirplaneProfileModel profile = new AirplaneProfileModel();
 	  		profile = (AirplaneProfileModel) b.getSerializable(airplaneProfileKey);
 	  		String label = profile.getLabel();
+	  		this.list.removeAirplaneProfile(this.profileToEdit);
 	  		this.list.addAirplaneProfile(label, profile);
 	  		this.saveAirplaneList();
 	  		
@@ -182,6 +181,7 @@ public class AirplaneListActivity extends ListActivity {
 	
 	private void launchLoadedProfileActivity(String label)
     {
+		this.profileToEdit = label;
     	Intent intent = new Intent(this, AirplaneProfileActivity.class);
     	Bundle b = new Bundle();
     	AirplaneProfileModel profile = this.list.getAirplaneProfile(label);

@@ -62,7 +62,7 @@
 	            android:textAppearance="?android:attr/textAppearanceLarge" />
 	
 	        <Spinner
-	            android:id="@+id/spinner1"
+	            android:id="@+id/performanceSpinner"
 	            android:layout_width="match_parent"
 	            android:layout_height="wrap_content"
 	            android:layout_marginBottom="@dimen/activity_vertical_margin"
@@ -78,7 +78,7 @@
 	            android:layout_marginLeft="@dimen/activity_horizontal_margin"
 	            android:layout_marginRight="@dimen/activity_horizontal_margin"
 	            android:layout_marginTop="@dimen/activity_vertical_margin"
-	            android:onClick="createPerformanceParameter"
+	            android:onClick="launchCruisePerformanceActivity"
 	            android:text="@string/createCruisePerformance" />
 		</LinearLayout>
 				        
