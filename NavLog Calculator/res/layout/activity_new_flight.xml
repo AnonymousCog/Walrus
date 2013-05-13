@@ -30,44 +30,48 @@
         android:ems="10"
         android:hint="@string/Destination_Airport_Code" />
 
-    <TextView
-        android:id="@+id/fromPreviousTextView"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/SubmitBtn"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/newFlightTextView"
-        android:layout_below="@+id/DestinationAirportCode"
-        android:layout_marginTop="36dp"
-        android:text="@string/Choose_Previous_Flight"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="23dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:onClick="submitPressed"
+        android:text="@string/Submit" />
+
+    <Spinner
+        android:id="@+id/spinner1"
+        style="@style/AppTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/SubmitBtn"
+        android:layout_below="@+id/fromPreviousTextView"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="30dp"
+        android:spinnerMode="dialog" />
 
     <TextView
         android:id="@+id/newFlightTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/departureAirportCode"
+        android:layout_alignLeft="@+id/fromPreviousTextView"
         android:layout_alignParentTop="true"
         android:layout_marginTop="27dp"
         android:text="@string/Create_A_New_Flight"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Spinner
-        android:id="@+id/spinner1"
-        style="@style/AppTheme"
+    <TextView
+        android:id="@+id/fromPreviousTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/fromPreviousTextView"
-        android:layout_below="@+id/fromPreviousTextView"
-        android:layout_marginTop="26dp"
-        android:spinnerMode="dialog" />
-
-    <Button
-        android:id="@+id/SubmitBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/DestinationAirportCode"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="23dp"
-        android:onClick="submitPressed"
-        android:text="@string/Submit" />
+        android:layout_marginTop="118dp"
+        android:text="@string/Choose_Previous_Flight"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

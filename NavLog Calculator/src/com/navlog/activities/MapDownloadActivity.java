@@ -57,6 +57,13 @@ public class MapDownloadActivity extends Activity {
 		registerReceiver(downloadReceiver, filter);
 		
 	}
+	
+	@Override
+	protected void onStop()
+	{
+	    unregisterReceiver(downloadReceiver);
+	    super.onStop();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

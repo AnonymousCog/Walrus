@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry exported="true" kind="lib" path="libs/disklrucache-1.3.1.jar"/>
 	<classpathentry kind="lib" path="/Applications/eclipse/android-sdk-macosx/platforms/android-17/android.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/Applications/eclipse/android-sdk-macosx/docs/reference"/>
@@ -13,5 +12,6 @@
 			<accessrule kind="nonaccessible" pattern="com/android/internal/**"/>
 		</accessrules>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/mapviewlib.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -22,9 +22,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.navlog.activities.MainNavLogActivity"
-            android:configChanges="orientation"
-            android:label="@string/title_activity_main_nav_log"
-            android:screenOrientation="portrait" >
+            android:label="@string/title_activity_main_nav_log">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -70,6 +68,10 @@
         <activity
             android:name="com.navlog.activities.AirplaneProfileActivity"
             android:label="@string/title_activity_airplane_profile" >
+        </activity>
+        <activity
+            android:name="com.navlog.activities.CruisePerformanceActivity"
+            android:label="@string/title_activity_cruise_performance" >
         </activity>
     </application>
 

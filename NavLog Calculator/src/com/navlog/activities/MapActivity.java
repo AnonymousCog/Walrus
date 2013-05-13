@@ -36,12 +36,7 @@ package com.navlog.activities;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
@@ -59,8 +54,11 @@ import android.widget.Toast;
 import com.example.navlog.calculator.R;
 import com.navlog.models.FlightModel;
 import com.navlog.models.FlightModel.Waypoint;
-import com.qozix.mapview.*;
+import com.navlog.support.MapTileDecoderResource;
+import com.qozix.mapview.MapView;
 import com.qozix.mapview.MapView.MapEventListener;
+import com.qozix.mapview.tiles.MapTileDecoder;
+
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
@@ -84,9 +82,7 @@ public class MapActivity extends Activity
 	private OnItemSelectedListener mySpinnerListener;
 	private LocationManager locationManager;
 	private LocationListener locationListener;
-	
-	private double waypointLatitudeWithNoAltitude;
-	private double waypointLongitudeWithNoAltitude;
+	private MapTileDecoder mapDecoder;
 	
 	
 	@Override
@@ -94,10 +90,24 @@ public class MapActivity extends Activity
 	{
 		
 		double top , left, right, bottom;
+		//marron test
+		
+		
+		top = 19.659721;
+		right = -73.116667;//-73.270000;
+		bottom = 16;
+		left = -60.626548;
+		
+		
+		//from map Better!
+		/*
 		left = -60.700833;
 		top = 19.651389;
 		right = -73.066667;
 		bottom = 16.1;
+		*/
+		
+		
 		super.onCreate(savedInstanceState);
 		
 		initFlightData();
@@ -105,19 +115,14 @@ public class MapActivity extends Activity
 		//mapView.registerGeolocator(19.659721, -74.979220 , 14.730666, -60.626548);//works but not 100% accurate
 		int mapWidth = 10310;
 		int mapHeight = 3100;
-		//mapView.registerGeolocator(19.659721, -73.200000 , 16.00000, -60.626548);//better but numbers are hammered
-		mapView.registerGeolocator(19.659721, -73.270000 , 16.10000, -60.626548);//better but numbers are hammered
-		//mapView.registerGeolocator(top , right, bottom, left);
+		mapView.registerGeolocator(top , right, bottom, left);
 		String mapPath = "CJ-27-20-South/CJ-27-20-South-%col%_%row%.jpg";
 		mapView.addZoomLevel(mapWidth, mapHeight, mapPath, 1031, 310);
+		mapDecoder = new MapTileDecoderResource();
+		mapView.setTileDecoder(mapDecoder);
 		//mapView.addZoomLevel(mapWidth, mapHeight, "tiles/CJ-27-20-South-%col%_%row%.jpg", 1031, 310);
-		
-		/*
-		 * -60.783333 long 
-		 * x 19.55 lat
-		 * x 73.116667 long
-		 * 16.00 lat
-		 */
+		mapView.setShouldIntercept( true );
+		mapView.setCacheEnabled( false );
 		
 	      
         currentLocationMarker = new ImageView(this);
@@ -155,7 +160,7 @@ public class MapActivity extends Activity
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         
-        mySpinnerListener = new SpinnerListener();
+        mySpinnerListener = new MapSpinnerListener();
         spinner.setOnItemSelectedListener(mySpinnerListener);// reference to a OnItemSelectedListener, that you can use to perform actions based on user selection
         
 	
@@ -209,7 +214,15 @@ public class MapActivity extends Activity
 	    super.onResume();
 	    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener); 
 	    mapView.addMapEventListener(myMapListener);
+	    mapView.requestRender();
 	    
+	}
+	
+	@Override
+	public void onPause()
+	{
+		super.onPause();
+		mapView.clear();
 	}
 
 
@@ -223,6 +236,13 @@ public class MapActivity extends Activity
 		
 	}
 	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		mapView.destroy();
+		mapView = null;
+	}
 
 
 	@Override
@@ -281,38 +301,6 @@ public class MapActivity extends Activity
 	 * by the airplane profile's set altitudes
 	 */
 
-	private void selectAltitudeDialog()
-	{
-		String[] altitudes = new String[12];
-		for(int i =0 ; i<12; i++)
-		{
-			double alt = (i+1) * 1000;
-			altitudes[i] = Double.toString(alt);
-		}
-	    AlertDialog.Builder b = new Builder(this);
-	    b.setTitle("Altitude");
-	    b.setItems(altitudes, new OnClickListener() {
-
-	        @Override
-	        public void onClick(DialogInterface dialog, int which) {
-
-	            dialog.dismiss();
-	            if (which > 0 &&  which < 13) 
-	            {
-	            	
-	            	double alt = (which+1) * 1000;
-	            	placeWaypointOnMap(alt);//Latitude, Longitude, altitude
-	            	
-	            } 
-	            
-	        }
-
-		
-	    });
-
-	    b.show();
-
-	}
 
 	private void removeLastPlacedWaypointOnMap()
 	{
@@ -381,10 +369,6 @@ public class MapActivity extends Activity
 		
 	}
     
-    private void placeWaypointOnMap(double alt)
-    {
-    	placeWaypointOnMap(this.waypointLatitudeWithNoAltitude, this.waypointLongitudeWithNoAltitude, alt);
-    }
     
     private void placeCurrentLocationOnMap(double lat, double lon, double alt)
     {
@@ -415,7 +399,7 @@ public class MapActivity extends Activity
 
 
 
-	public class SpinnerListener implements OnItemSelectedListener
+	public class MapSpinnerListener implements OnItemSelectedListener
     {
 
 		@Override
@@ -441,11 +425,9 @@ public class MapActivity extends Activity
 		@Override
 		public void onDoubleTap(int arg0, int arg1) 
 		{
+			
 			double latLong[] = new double[2];
 			latLong = mapView.pixelsToLatLng(arg0, arg1);
-			waypointLatitudeWithNoAltitude = latLong[0];
-			waypointLongitudeWithNoAltitude = latLong[1];
-			//selectAltitudeDialog();
 			placeWaypointOnMap(latLong[0],latLong[1],0);
 		}
 
@@ -473,11 +455,6 @@ public class MapActivity extends Activity
 			
 		}
 
-		@Override
-		public void onFlingComplete() {
-			// TODO Auto-generated method stub
-			
-		}
 
 		@Override
 		public void onPinch(int arg0, int arg1) {
@@ -553,6 +530,8 @@ public class MapActivity extends Activity
     	
     }
     
+
+    
     public class MyLocationListener implements LocationListener
     {
 
@@ -566,13 +545,12 @@ public class MapActivity extends Activity
 				double longitude = location.getLongitude();
 				double altitude = location.getAltitude();
 
-				float speed = location.getSpeed();
+				//float speed = location.getSpeed();
 
 				placeCurrentLocationOnMap(latitude, longitude, altitude);
-			
-
+		
 				//mapView.slideToAndCenter(latitude, longitude);
-				mapView.requestRender();
+				//mapView.requestRender();
 			}
 			catch(Exception e)
 			{
