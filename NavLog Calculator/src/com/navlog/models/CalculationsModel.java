@@ -1,6 +1,11 @@
 package com.navlog.models;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import com.navlog.models.FlightModel.Waypoint;
 
@@ -17,25 +22,67 @@ public class CalculationsModel
 		private Waypoint departure;
 		private Waypoint destination;
 		private Stack<Waypoint> points=new Stack<Waypoint>();
+		private LegDataEntry dataEntry;
 
 		/**
-	   * Constructor Clase NavCalculations
-	   * @param incFlightModel modelo con todos los Waypoints, departure y destination
+	   * Constructor Clase NavCalculations. Todos los valores entregados por la clase estan en radianes.
+	   * La clase tiene disponible 2 metodos: radiansToNm y radiansToDeg para cambiar su valor a Millas nauticas 
+	   * o grados segun sea necesario.
+	   * 
+	   * @param incFlightModel class with Flight Information. It contains departure, destination and waypoints.
+	   * @param _dataEntry The LegDataEntry Class. It contains a map with leg by leg data entered by the user.
 	   */
-		public CalculationsModel(FlightModel incFlightModel)
+		private CalculationsModel(FlightModel incFlightModel, LegDataEntry _dataEntry)
 	    {		
-			AviationWeatherModel awcModel = new AviationWeatherModel(incFlightModel);
 			destination = incFlightModel.getDepartureLocation();
 			departure = incFlightModel.getArrivalLocation();
-			points = incFlightModel.getPoints();		
+			points = incFlightModel.getPoints();
+			dataEntry = _dataEntry;
     	}
+		
+		
+		/**Method to retrieve leg by leg Data. Each List row its a Map that returns the key and its value. 
+		 * Keys available: TC, WCA, TH, VAR, MH, DST, REM, TOTAL, GS, ETE, ETA, FUEL
+		 * @return Map with values. Map(Key, Value) with Key as String and value as double*/
+		private List<Map> getData()
+		{
+			// Initialize the result
+			Map<String, Double> aLegData= new Hashtable<String, Double>();
+			List<Map> returnMap = null;
+			
+			// Using the Fligh Model information we calculate the total values of Distance, Time and Fuel Consumption.
+			
+			
+			// Determine Leg quantity using the lenght of the Data Entry.
+			int LegQuantity = dataEntry.allLegDataEntry.size();
+				
+
+			// Iterate through the Leg Quantity
+			for(int i=0;i<LegQuantity;i++)
+			{
+				aLegData = dataEntry.aDataEntry;
+			
+				
+				//
+				
+				// voy leg por leg calculando y creando valores en aResultLeg dando el nombre de la llame y su valor (ej TC = 120.99)
+			}
+			
+			
+			
+			// agrego el mapa al arreglo dataResults
+			
+			// Devuelvo la lista
+			return returnMap;
+		}
+		
 		
 		/**
 		   * Transforma valor Radianes a Millas Nauticas
 		   * @param incValue valor en radianes
 		   * @return valor en Millas Nauticas
 		   */
-		public double radiansToNm(double incValue)
+		private double radiansToNm(double incValue)
 		{
 			return (incValue*180*60/Math.PI);
 		}
@@ -45,7 +92,7 @@ public class CalculationsModel
 		   * @param incValue valor en radianes
 		   * @return Resultado en grados
 		   */
-		public double radiansToDeg(double incValue)
+		private double radiansToDeg(double incValue)
 		{
 			return ((180/Math.PI)*incValue);
 		}
@@ -63,11 +110,11 @@ public class CalculationsModel
 		}
 		
 		/**
-		   * Get Wind Direction
-		   * @param index indice
-		   * @return double con la direccion en radianes
-		   */
-		public double getWindDir(int index)
+	   * Get Wind Direction
+	   * @param index indice
+	   * @return double con la direccion en radianes
+	   */
+		private double getWindDir(int index)
 		{			
 			return Math.toRadians(WindDirs[index]);
 		}
@@ -91,7 +138,7 @@ public class CalculationsModel
 		   * @return Wind velocity
 		   */
 		
-		public double getWindVel(int index)
+		private double getWindVel(int index)
 		{
 			return Math.toRadians(WindVels[index]);
 		}
@@ -102,7 +149,7 @@ public class CalculationsModel
 		   * Wind Temperature
 		   * @return temperatura en Kelvin
 		   */		
-		public double getWindTemp(int index)
+		private double getWindTemp(int index)
 		{
 			return (WindTemps[index]);
 		}
@@ -112,7 +159,7 @@ public class CalculationsModel
 		   * @param alt altidude del avion para ese waypoint
 		   * @return 3 valores del TAS (20 under, standard, 20 over).
 		   */
-		public double TAS(double alt)
+		private double TAS(double alt)
 		{			
 			double TASs = 0;
 			//Implementar funcion de getTAS desde el profile
@@ -124,7 +171,7 @@ public class CalculationsModel
 		 * Calculates Initial True Course
 		 * @return (double)array with the list of TC's
 		   */
-		public double[] getTCs()
+		private double[] getTCs()
 		{
 			int length = this.points.size() + 1;
 			TCs = new double[length];
@@ -174,7 +221,7 @@ public class CalculationsModel
 	   * Calcular los Wind Correction Angles
 	   * @return (double)array con los resultados en radianes (debes convertir a angular) 
 	   */
-		public double[] getWCA()
+		private double[] getWCA()
 		{
 			int length = this.points.size()+1;
 			WCAs = new double[length];
@@ -209,7 +256,7 @@ public class CalculationsModel
 	   * Cuando saco la variacion
 	   * @return (double) array con los Valores en radianes
 	   */
-		public double[] getTHs()
+		private double[] getTHs()
 		{
 			int size = this.points.size()+1;
 			THs = new double[size];
@@ -226,7 +273,7 @@ public class CalculationsModel
 	   * Variation es 12 para PR y varia segun longitudes y latitudes pero es bastante general por una zona/mapa
 	   * @return (double)array en radianes
 	   */
-		public double[] Var()
+		private double[] Var()
 		{
 			int size = this.points.size()+1;
 			Vars = new double[size];
@@ -246,7 +293,7 @@ public class CalculationsModel
 		/**
 	   * Calcular Magnetic Heading
 	   */
-		public double[] MH()
+		private double[] MH()
 		{
 			int size = this.points.size()+1;
 			MHs = new double[size];
@@ -262,7 +309,7 @@ public class CalculationsModel
 	   * usando haversine formula
 	   * @return double con el total de la distancia en radianes
 	   */
-		public double TotalDist()
+		private double TotalDist()
 		{ 
 			double R = 6371.0087714; 																// Earth Radius in KM
 			double latDistance = Math.toRadians(this.destination.getLatitude() - this.departure.getLatitude());
@@ -283,7 +330,7 @@ public class CalculationsModel
 		   * Calcula distancia entre 2 puntos
 		   * @return (double)array con las distancias en todos los LEGS
 		   */
-		public double[] LegDist()
+		private double[] LegDist()
 		{
 			int size = this.points.size()+1;
 			LegDists = new double[size];
@@ -330,7 +377,7 @@ public class CalculationsModel
 		/**
 		   * Calcula distancia entre punto y destino
 		   */
-		public double LegRemaining(Waypoint A, Waypoint B)
+		private double LegRemaining(Waypoint A, Waypoint B)
 		{
 			double remaining = TotalDist() - getDistance(A,B);
 			return remaining;
@@ -344,7 +391,7 @@ public class CalculationsModel
 		   * Calcula Estimated Ground Speed
 		   * @return double con valor calculado
 		   */
-		public double[] EstGS()
+		private double[] EstGS()
 		{
 			int size= this.points.size()+1;
 			GSs = new double[size];
@@ -368,7 +415,7 @@ public class CalculationsModel
 		   * Calcula Estimated Time Enroute
 		 * @return double value
 		   */
-		public double[] ETE()
+		private double[] ETE()
 		{	
 			double time;
 			int size = this.points.size()+1;
@@ -385,7 +432,7 @@ public class CalculationsModel
 		/**
 		   * Calcula Total Time Enroute
 		   */
-		public void TTE()
+		private void TTE()
 		{
 			
 		}		
@@ -393,7 +440,7 @@ public class CalculationsModel
 		/**
 		   * Calcular Estimated Time Arrival
 		   */
-		public void ETA()
+		private void ETA()
 		{
 			
 		}

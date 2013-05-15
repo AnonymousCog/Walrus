@@ -21,22 +21,15 @@ public class AviationWeatherModel
 	private List<WeatherStation> listaAWCs;
 	
 	/**
-	 * Constructor
-	 * @param incInfo Recibe la clase Flightmodel con todos los waypoints ademas de
-	 * los puntos de salida y llegada. Tambien debe incluir los ICAO para ambos aeropuertos.
 	 * En el constructor se conecta a http://www.aviationweather.gov y se baja toda la data necesaria.
+	 * @param incInfo Recibe la clase Flightmodel con todos los waypoints ademas de los puntos de salida y llegada.
+	 * Tambien debe incluir los ICAO para ambos aeropuertos. 
+	 *
 	 */
 	public AviationWeatherModel(FlightModel incInfo)
 	{
 		List<String> allWeatherStations = null;	
-		Waypoint aWaypoint;	
-		List<Waypoint> points = incInfo.getPoints();		
-		allWeatherStations.add(incInfo.getDepartureICAO());
-		for(int i=0; i<points.size();i++)
-		{
-			aWaypoint = points.get(i);
-			allWeatherStations.add(getClosestStation(aWaypoint.getLongitude(), aWaypoint.getLatitude()));
-		}
+		allWeatherStations.add(incInfo.getDepartureICAO());		
 		allWeatherStations.add(incInfo.getDestinationICAO());		
 		calculateMetars(allWeatherStations);
 	}
@@ -110,46 +103,6 @@ public class AviationWeatherModel
             System.out.println("XML Passing Exception = " + e);
         }		
 	}
-	
-	/**
-	 * Metodo para buscar en el WAC la estacion metereologica mas cercana a las coordenadas.
-	 * @param lat latitud del waypoint
-	 * @param lon longitud del waypoint
-	 * @return codigo de la estacion
-	 */
-	private String getClosestStation(double lat, double lon)
-	{
-		String uri =String.format("http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource="+
-					"stations&requestType=retrieve&format=xml&radialDistance=10;{0},{1}&fields=station_id",lon,lat);
-		try
-		{
-			URL url = new URL(uri);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Accept", "application/xml");
-	
-			InputStream xml = connection.getInputStream();
-	
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.parse(xml);			
-			doc.getDocumentElement().normalize();
-			NodeList nList = doc.getElementsByTagName("Station");
-			
-			Node node = nList.item(0);
-				
-			if(node.getNodeType() == Node.ELEMENT_NODE)
-			{
-				Element element = (Element) node;
-				return getTagValue("station_id", element);												
-			}
-		}
-		catch(Exception e)
-		{
-			System.out.println("XML Passing Exceptoin =" +e);
-		}
-		return null;
-	}
 		 
 	private static String getTagValue(String sTag, Element eElement) 
 	{
@@ -157,4 +110,72 @@ public class AviationWeatherModel
 	    Node nValue = nlList.item(0);
 		return nValue.getNodeValue();
 	}	
+}
+
+class WeatherStation 
+{
+	private String ICAO;
+	private String atisCode;
+	private String observationTime;
+	private double elevation;
+	private double visibility;
+	private double windSpeed;
+	private double windDirection;
+	private double temperature;
+	private List<String> skyConditions;
+	public String getICAO() {
+		return ICAO;
+	}
+	public void setICAO(String iCAO) {
+		ICAO = iCAO;
+	}
+	public String getAtisCode() {
+		return atisCode;
+	}
+	public void setAtisCode(String atisCode) {
+		this.atisCode = atisCode;
+	}
+	public double getElevation() {
+		return elevation;
+	}
+	public void setElevation(double elevation) {
+		this.elevation = elevation;
+	}
+	public String getObservationTime() {
+		return observationTime;
+	}
+	public void setObservationTime(String observationTime) {
+		this.observationTime = observationTime;
+	}
+	public double getVisibility() {
+		return visibility;
+	}
+	public void setVisibility(double visibility) {
+		this.visibility = visibility;
+	}
+	public double getWindSpeed() {
+		return windSpeed;
+	}
+	public void setWindSpeed(double windSpeed) {
+		this.windSpeed = windSpeed;
+	}
+	public double getWindDirection() {
+		return windDirection;
+	}
+	public void setWindDirection(double windDirection) {
+		this.windDirection = windDirection;
+	}
+	public double getTemperature() {
+		return temperature;
+	}
+	public void setTemperature(double temperature) {
+		this.temperature = temperature;
+	}
+	public List<String> getSkyConditions() {
+		return skyConditions;
+	}
+	public void setSkyConditions(List<String> skyConditions) {
+		this.skyConditions = skyConditions;
+	}
+			
 }
