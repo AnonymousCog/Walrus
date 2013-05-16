@@ -134,9 +134,6 @@ class legData
 	private double EST_GS;
 	private double ACT_GS;
 	private double ETE;
-	private double ATE;
-	private double ATA;
-	private double ETA;
 	private double LEG_FUEL;
 	private double LEG_FUEL_REM;
 	public int getLEG() {
@@ -240,24 +237,6 @@ class legData
 	}
 	public void setETE(double eTE) {
 		ETE = eTE;
-	}
-	public double getATE() {
-		return ATE;
-	}
-	public void setATE(double aTE) {
-		ATE = aTE;
-	}
-	public double getATA() {
-		return ATA;
-	}
-	public void setATA(double aTA) {
-		ATA = aTA;
-	}
-	public double getETA() {
-		return ETA;
-	}
-	public void setETA(double eTA) {
-		ETA = eTA;
 	}
 	public double getLEG_FUEL() {
 		return LEG_FUEL;
