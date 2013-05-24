@@ -127,6 +127,22 @@ public class FlightModel implements java.io.Serializable
 		return longitudes;
 	}
 	
+	public String[] getAllLabels()
+	{
+		double[] latitudes = this.getAllWaypointLatitudes();
+		double[] longitudes = this.getAllWaypointLongitudes();
+		int length = latitudes.length;
+		String[] labels = new String[length+2];
+		labels[0] = this.getDepartureICAO();
+		
+		for(int i=1;i<length+1;i++)
+		{
+			labels[i] = Double.toString(latitudes[i-1]) +", " + Double.toString(longitudes[i-1]);
+		}
+		labels[length+1] = this.getDestinationICAO();
+		return labels;
+	}
+	
 	public double[] getAllWaypointAltitudes()
 	{
 		int lenght = this.points.size();

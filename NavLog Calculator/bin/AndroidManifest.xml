@@ -61,6 +61,8 @@
             android:name="com.navlog.activities.CalculationsActivity"
             android:label="@string/title_activity_calculations" >
         </activity>
+        <activity android:name="com.navlog.activities.CalculationsActivity$DetailsActivity"
+     	/>
         <activity
             android:name="com.navlog.activities.AirplaneListActivity"
             android:label="@string/title_activity_airplane_list" >

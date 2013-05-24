@@ -61,7 +61,7 @@ public class AirplaneProfileActivity extends Activity {
 	    	CruisePerformanceModel performance = new CruisePerformanceModel();
 	  		performance = (CruisePerformanceModel) b.getSerializable(cruisePerformanceKey);
 	  		String label = performance.getLabel();
-	  		//this.profile.removeCruisePerformanceParam(performanceToEdit);
+	  		this.profile.removeCruisePerformanceParam(performanceToEdit);
 	  		this.profile.addCruisePerformanceParam(label, performance);	  		
 	  		this.populateList();
 	      

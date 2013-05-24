@@ -1,15 +1,10 @@
 package com.navlog.activities;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 
 
 import android.app.Activity;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -39,7 +34,7 @@ public class AirplaneListActivity extends ListActivity {
 	{
 		super.onCreate(savedInstanceState);
 		
-		AirplaneCollectionModel loaded = loadAirplaneList();
+		AirplaneCollectionModel loaded = AirplaneCollectionModel.loadAirplaneList(this.getApplicationContext());
 		if(loaded != null)
 		{
 			list = loaded;
@@ -64,7 +59,7 @@ public class AirplaneListActivity extends ListActivity {
 	public void onDestroy()
 	{
 		super.onDestroy();
-		saveAirplaneList();
+		list.saveAirplaneList(this.getApplicationContext());
 	}
 	
 	private void setListcontent()
@@ -93,7 +88,7 @@ public class AirplaneListActivity extends ListActivity {
 	  		String label = profile.getLabel();
 	  		this.list.removeAirplaneProfile(this.profileToEdit);
 	  		this.list.addAirplaneProfile(label, profile);
-	  		this.saveAirplaneList();
+	  		list.saveAirplaneList(this.getApplicationContext());
 	  		
 	  		
 	  		String[] labels = this.list.getAllLabels();;
@@ -133,46 +128,6 @@ public class AirplaneListActivity extends ListActivity {
 		return true;
 	}
 	
-	public void saveAirplaneList()
-	{
-		Context context = this.getApplicationContext();
-		FileOutputStream fos;
-		try 
-		{
-			fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
-			ObjectOutputStream os = new ObjectOutputStream(fos);
-			os.writeObject(this.list);
-			os.close();
-		} 
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
-		
-		
-	}
-	
-	public AirplaneCollectionModel loadAirplaneList()
-	{
-		Context context = this.getApplicationContext();
-		FileInputStream fis;
-		AirplaneCollectionModel airplaneList = new AirplaneCollectionModel();
-		try 
-		{
-			fis = context.openFileInput(fileName);
-			ObjectInputStream is = new ObjectInputStream(fis);
-			airplaneList = (AirplaneCollectionModel) is.readObject();
-			is.close();
-			return airplaneList;
-		} 
-		catch (Exception e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return airplaneList;
-		
-	}
 	
 	private void launchLoadedProfileActivity(String label)
     {
