@@ -7,17 +7,22 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.example.navlog.calculator.R;
 import com.navlog.models.AirplaneCollectionModel;
 import com.navlog.models.AirplaneProfileModel;
-import com.navlog.support.MyListAdaptor;
+
 
 
 public class AirplaneListActivity extends ListActivity {
@@ -28,7 +33,7 @@ public class AirplaneListActivity extends ListActivity {
 	AirplaneCollectionModel list = new AirplaneCollectionModel();
 	ListView lv;
 
-	private String[] Airplanes;
+	private String[] airplanes;
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
@@ -38,21 +43,25 @@ public class AirplaneListActivity extends ListActivity {
 		if(loaded != null)
 		{
 			list = loaded;
-			Airplanes = loaded.getAllLabels();
+			airplanes = loaded.getAllLabels();
+			
+			setListAdapter(new ArrayAdapter<String>(this,
+	                android.R.layout.simple_list_item_activated_1, airplanes));
+			ListView lv = getListView();
+			lv.setFastScrollEnabled(true);
+			AirplaneListClickListener clickListener = new AirplaneListClickListener();
+			lv.setOnItemClickListener(clickListener);
+			lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+			lv.setMultiChoiceModeListener(new ModeCallback());
+			
 		}
-
-		LinkedList<String> mLinked = new LinkedList<String>();
-		for (int i = 0; i < Airplanes.length; i++) {
-			mLinked.add(Airplanes[i]);
-		}
-
-		setListAdapter(new MyListAdaptor(this, mLinked));
-
-		ListView lv = getListView();
-		lv.setFastScrollEnabled(true);
-		AirplaneListClickListener clickListener = new AirplaneListClickListener();
-		lv.setOnItemClickListener(clickListener);
 	}
+	
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        getActionBar().setSubtitle("Current: ");
+    }
 	
 	
 	@Override
@@ -64,12 +73,8 @@ public class AirplaneListActivity extends ListActivity {
 	
 	private void setListcontent()
 	{
-		LinkedList<String> mLinked = new LinkedList<String>();
-		for (int i = 0; i < Airplanes.length; i++) {
-			mLinked.add(Airplanes[i]);
-		}
-
-		setListAdapter(new MyListAdaptor(this, mLinked));
+		setListAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_activated_1, airplanes));
 	}
 	
 	
@@ -92,7 +97,7 @@ public class AirplaneListActivity extends ListActivity {
 	  		
 	  		
 	  		String[] labels = this.list.getAllLabels();;
-	  		this.Airplanes = labels;
+	  		this.airplanes = labels;
 	  		
 	  		
 	  		this.setListcontent();
@@ -161,6 +166,73 @@ public class AirplaneListActivity extends ListActivity {
 				}
 				
 			}
+			
+		    private class ModeCallback implements ListView.MultiChoiceModeListener {
+
+		        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+		            MenuInflater inflater = getMenuInflater();
+		            inflater.inflate(R.menu.airplane_list_contextual, menu);
+		            mode.setTitle("Select Items");
+		            return true;
+		        }
+
+		        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+		            return true;
+		        }
+
+		        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		            switch (item.getItemId()) {
+		            case R.id.delete_airplane:
+		                Toast.makeText(AirplaneListActivity.this, "Shared " + getListView().getCheckedItemCount() +
+		                        " items", Toast.LENGTH_SHORT).show();
+		                mode.finish();
+		                break;
+		            case R.id.set_airplane:
+		            	int count = getListView().getCheckedItemCount();
+		            	if(count < 2 && count > 0 )
+		            	{
+		            		String label ="stipid"; //(String)((TextView) getListView().getSelectedItem()).getText();
+		            		 getActionBar().setSubtitle("Current: "+ label);
+		            		
+		            	}
+		            	else
+		            	{
+		            		Toast.makeText(AirplaneListActivity.this, "Only one Plane must be selected" + item.getTitle(),
+			                        Toast.LENGTH_SHORT).show();
+		            	}
+		            	mode.finish();
+		                break;
+		                
+		            default:
+		                Toast.makeText(AirplaneListActivity.this, "Clicked " + item.getTitle(),
+		                        Toast.LENGTH_SHORT).show();
+		                mode.finish();
+		                break;
+		            }
+		            return true;
+		        }
+
+		        public void onDestroyActionMode(ActionMode mode) {
+		        }
+
+		        public void onItemCheckedStateChanged(ActionMode mode,
+		                int position, long id, boolean checked) {
+		            final int checkedCount = getListView().getCheckedItemCount();
+		            switch (checkedCount) {
+		                case 0:
+		                    mode.setSubtitle(null);
+		                    break;
+		                case 1:
+		                    mode.setSubtitle("One item selected");
+		                    break;
+		                default:
+		                    mode.setSubtitle("" + checkedCount + " items selected");
+		                    break;
+		            }
+		        }
+		        
+		    }
+
 	
 
 }

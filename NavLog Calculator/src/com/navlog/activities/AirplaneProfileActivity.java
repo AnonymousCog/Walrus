@@ -1,7 +1,5 @@
 package com.navlog.activities;
 
-import java.util.LinkedList;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -14,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -23,7 +22,7 @@ import android.widget.Toast;
 import com.example.navlog.calculator.R;
 import com.navlog.models.AirplaneProfileModel;
 import com.navlog.models.CruisePerformanceModel;
-import com.navlog.support.MyListAdaptor;
+
 
 
 public class AirplaneProfileActivity extends Activity {
@@ -169,14 +168,10 @@ public class AirplaneProfileActivity extends Activity {
 	
     public void populateList()
     {
-		LinkedList<String> mLinked = new LinkedList<String>();
-		String[] paramKeys  = profile.getAllLabels();
-		for (int i = 0; i < paramKeys.length; i++) {
-			mLinked.add(paramKeys[i]);
-		}
-		
+    	String[] paramKeys  = profile.getAllLabels();
 		lv = (ListView) findViewById(R.id.list);
-		lv.setAdapter(new MyListAdaptor(this, mLinked));
+		lv.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_activated_1, paramKeys));
 
 		lv.setFastScrollEnabled(true);
 		PerformanceParamsClickListener clickListener = new PerformanceParamsClickListener();

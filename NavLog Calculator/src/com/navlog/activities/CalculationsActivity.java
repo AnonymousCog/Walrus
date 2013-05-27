@@ -6,18 +6,26 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 
@@ -103,7 +111,8 @@ public class CalculationsActivity extends Activity {
 	{
 		boolean mDualPane;
 		int mCurCheckPosition;
-		FlightModel data;
+		private FlightModel data;
+		
 		
 		@Override
 		public void onCreate(Bundle savedInstanceState)
@@ -226,6 +235,48 @@ public class CalculationsActivity extends Activity {
 	}
 	
 	public static class DetailsFragment extends Fragment {
+		private EditText windsAloftDir; // Degrees
+		private TextView windsAloftDirLabel;
+		private EditText windsAloftVel; //MPH
+		private TextView windsAloftVelLabel;
+		private EditText windsAloftTemp; //F
+		private TextView windsAloftTempLabel;
+		private EditText altitude;
+		private TextView altitudeLabel;
+		private EditText tc; //true course
+		private TextView tcLabel; 
+		private EditText wca; //wind correction angle
+		private TextView wcaLabel;
+		private EditText th; //true heading
+		private TextView thLabel;
+		private EditText mh;//magnetic heading
+		private TextView mhLabel;
+		private EditText remainingLegDistance;
+		private TextView remainingLegDistanceLabel;
+		private EditText totalLegDistance;
+		private TextView totalLegDistanceLabel;
+		private EditText gsEst; //ground speed estimated
+		private TextView gsEstLabel;
+		private EditText gsAct; //ground speed actual
+		private TextView gsActLabel;
+		private TimePicker timeOff; //take off time
+		private TextView timeOffLabel;
+		private EditText ete; //estimated time en route
+		private TextView eteLabel;
+		private EditText eta; //estimated time of arrival
+		private TextView etaLabel;
+		private EditText ate; //actual time enroute
+		private TextView ateLabel;
+		private TimePicker ata; //actual time of arrival
+		private TextView ataLabel;
+		private EditText gph; //gallons per hour
+		private TextView gphLabel;
+		private EditText rpm; //gallons per hour
+		private TextView rpmLabel;
+		
+		
+		
+		
 		/**
 	     * Create a new instance of DetailsFragment, initialized to
 	     * show the text at 'index'.
@@ -244,6 +295,7 @@ public class CalculationsActivity extends Activity {
 	    public int getShownIndex() {
 	        return getArguments().getInt("index", 0);
 	    }
+	    
 
 	    @Override
 	    public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -260,17 +312,154 @@ public class CalculationsActivity extends Activity {
 	        }
 
 	        ScrollView scroller = new ScrollView(getActivity());
-	        TextView text = new TextView(getActivity());
-	        int padding = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-	                4, getActivity().getResources().getDisplayMetrics());
-	        text.setPadding(padding, padding, padding, padding);
-	        scroller.addView(text);
+	        
+	        // Grabbing the Application context
+	        Context context = getActivity();
+	         
+	        // Creating a new LinearLayout
+	        LinearLayout linearLayout = new LinearLayout(context);
+	         
+	        // Setting the orientation to vertical
+	        linearLayout.setOrientation(LinearLayout.VERTICAL);
+	         
+	        // Defining the LinearLayout layout parameters to fill the parent.
+	        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(
+	            LinearLayout.LayoutParams.MATCH_PARENT,
+	            LinearLayout.LayoutParams.WRAP_CONTENT);
+	        
+	        this.rpmLabel = initTextView("Engine Revolutions Per Minute:");
+	        this.windsAloftDirLabel = initTextView("Winds Aloft Direction:");
+	        this.windsAloftVelLabel = initTextView("Winds Aloft Velocity:");
+	        this.windsAloftTempLabel =initTextView("Winds Aloft Temperature:");
+	        this.altitudeLabel = initTextView("Altitude:");
+	        this.gphLabel = initTextView("Gallons Per Hour:");
+	        this.tcLabel = initTextView("True Course:");
+	        this.wcaLabel = initTextView("Wind Correction Angle:");
+	        this.thLabel = initTextView("True Heading:");
+	        this.mhLabel = initTextView("Magnetic Heading:");
+	        this.remainingLegDistanceLabel = initTextView("Remaining Leg Distance");
+	        this.totalLegDistanceLabel = initTextView("Total Leg Distance:");
+	        this.gsEstLabel = initTextView("Estimated Ground Speed:");
+	        this.gsActLabel = initTextView("Actual Ground Speed:");
+	        this.timeOffLabel = initTextView("Take off time:");
+	        this.eteLabel = initTextView("Estimated Time En Route:");
+	        this.etaLabel = initTextView("Estimated Time of Arrival:");
+	        this.ateLabel = initTextView("Actual Time En Route:");
+	        this.ataLabel = initTextView("Actual Time of Arrival:");
+	        
+	        this.rpm = initEditText("RPM");
+	        this.windsAloftDir = initEditText("Degrees");
+	        this.windsAloftVel = initEditText("MPH");
+	        this.windsAloftTemp = initEditText("Farenheit");
+	        this.altitude = initEditText("Feet");
+	        this.tc = initEditText("Degrees");
+	        this.wca = initEditText("Degrees");
+	        this.th = initEditText("Degrees");
+	        this.mh = initEditText("Degrees");
+	        this.gsEst = initEditText("Knots");
+	        this.gsAct = initEditText("Knots");
+	        this.eta = initEditTextDisabled("HHMM (Calculated)", true);
+	        this.ete = initEditTextDisabled("HHMM (Calculated)", true);
+	        this.ate = initEditText("HHMM (hours minutes)");
+	        this.gph = initEditText("Gallons");
+	        this.remainingLegDistance = initEditTextDisabled("Milles (Calculated)", true);
+	        this.totalLegDistance = initEditTextDisabled("Milles (Calculated)", true);
+	        
+	        this.timeOff = new TimePicker(context);
+	        this.ata = new TimePicker(context);
+
+          	         
+	        // Setting the parameters on the TextView
+	       
+	        linearLayout.addView(this.altitudeLabel);
+	        linearLayout.addView(this.altitude); 
+	        linearLayout.addView(this.rpmLabel);
+	        linearLayout.addView(this.rpm);
+	        linearLayout.addView(this.windsAloftDirLabel);
+	        linearLayout.addView(this.windsAloftDir);
+	        linearLayout.addView(this.windsAloftVelLabel);
+	        linearLayout.addView(this.windsAloftVel);
+	        linearLayout.addView(this.windsAloftTempLabel);
+	        linearLayout.addView(this.windsAloftTemp);
+	        linearLayout.addView(this.gphLabel);
+	        linearLayout.addView(this.gph);
+	        linearLayout.addView(this.tcLabel);
+	        linearLayout.addView(this.tc);
+	        linearLayout.addView(this.wcaLabel);
+	        linearLayout.addView(this.wca);
+	        linearLayout.addView(this.thLabel);
+	        linearLayout.addView(this.th);
+	        linearLayout.addView(this.mhLabel);
+	        linearLayout.addView(this.mh);
+	        linearLayout.addView(this.remainingLegDistanceLabel);
+	        linearLayout.addView(this.remainingLegDistance);
+	        linearLayout.addView(this.totalLegDistanceLabel);
+	        linearLayout.addView(this.totalLegDistance);
+	        linearLayout.addView(this.gsEstLabel);
+	        linearLayout.addView(this.gsEst);
+	        linearLayout.addView(this.gsActLabel);
+	        linearLayout.addView(this.gsAct);
+	        linearLayout.addView(this.timeOffLabel);
+	        linearLayout.addView(this.timeOff);
+	        linearLayout.addView(this.eteLabel);
+	        linearLayout.addView(this.ete);
+	        linearLayout.addView(this.etaLabel);
+	        linearLayout.addView(this.eta);
+	        linearLayout.addView(this.ateLabel);
+	        linearLayout.addView(this.ate);
+	        linearLayout.addView(this.ataLabel);
+	        linearLayout.addView(this.ata);
 	        
 	        
-	        
-	        //text.setText();
+	        scroller.addView(linearLayout);
+	     	         
 	        return scroller;
 	    }
+	    
+	    private EditText initEditText(String hint)
+	    {
+	    	Context context = getActivity();
+	    	int padding = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+		                4, getActivity().getResources().getDisplayMetrics());
+	    	EditText edit = new EditText(context);
+	        //int windsId = 1;
+	        //windsAloftDir.setId(windsId);
+	    	edit.setLayoutParams(new LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT,
+                    1f));
+	    	edit.setWidth(100);
+	        //winds.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+	    	edit.setInputType(InputType.TYPE_CLASS_NUMBER);
+	    	edit.setHint(hint);
+	    	edit.setPadding(padding, padding, padding, padding);
+	    	return edit;
+	    	
+	    }
+	    
+	    private EditText initEditTextDisabled(String hint, boolean  disabled)
+	    {
+	    	EditText edit = initEditText(hint);
+	    	if(disabled == true)
+	    	{
+	    		edit.setKeyListener(null);
+	    	}
+	    	return edit;
+	    
+	    }
+	    
+	    private TextView initTextView(String text)
+	    {
+	    	Context context = getActivity();
+	    	TextView view = new TextView(context);
+	        //view.setBackgroundColor(0xFFFF00FF);
+	        //tv.setTextColor(0xFF000000);
+	        view.setTypeface(null, Typeface.BOLD);
+	        view.setText(text);
+	        //view.setGravity(Gravity.CENTER_HORIZONTAL);
+	        return view;
+	    	
+	    }
+	    
 	}
 
 

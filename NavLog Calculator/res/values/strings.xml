@@ -26,7 +26,9 @@
     <string name="map_center">Center Map</string>
     <string name="title_activity_map_download">Download Maps</string>
     <string name="title_activity_calculations">Flight Calculations</string>
+    <string name="select_airplane">Select Airplane</string>
     <string name="add_new_airplane">Add Airplane</string>
+    <string name="delete_airplane">Delete Airplane</string>
     <string name="title_activity_airplane_list">All Airplane Profiles</string>
     <string name="title_activity_airplane_profile">Airplane Profile</string>
     <string name="new_flight">New Flight</string>
