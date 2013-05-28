@@ -11,13 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.navlog.calculator.R;
 import com.navlog.models.AirplaneProfileModel;
@@ -87,9 +85,6 @@ public class AirplaneProfileActivity extends Activity {
 		super.onBackPressed();
 	}
 	
-	
-	
-	
 	public void launchLoadedCruisePerformanceActivity(String label)
     {
 		this.performanceToEdit = label;
@@ -114,11 +109,8 @@ public class AirplaneProfileActivity extends Activity {
 	    switch (item.getItemId()) {
 	        case R.id.save_profile:
 	        	returnDataToPreviousActivity();
-	        	
-	        	
+	        	 	
 	        	break;
-	        
-
 	        
 	        default:
 	            return super.onOptionsItemSelected(item);
@@ -288,27 +280,5 @@ public class AirplaneProfileActivity extends Activity {
 			//Toast.makeText(getApplicationContext(), label, Toast.LENGTH_SHORT).show();
 		}
 		
-	}
-	
-	public class ProfileSpinnerListener implements OnItemSelectedListener
-    {
-
-		@Override
-		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) 
-		{
-			TextView view = (TextView) arg1;
-			Toast.makeText(getApplicationContext(),"Selected : " + view.getText().toString(), Toast.LENGTH_SHORT).show();
-			launchLoadedCruisePerformanceActivity(view.getText().toString());
-		}
-
-		@Override
-		public void onNothingSelected(AdapterView<?> arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-    	
-    }
-
-
+	}	
 }

@@ -1,9 +1,6 @@
 package com.navlog.activities;
 
 import com.example.navlog.calculator.R;
-import com.example.navlog.calculator.R.layout;
-import com.example.navlog.calculator.R.menu;
-import com.navlog.models.AirplaneProfileModel;
 import com.navlog.models.CruisePerformanceModel;
 
 import android.os.Bundle;

@@ -43,8 +43,6 @@ public class NewFlightActivity extends Activity
     
     public void submitPressed(View view)
     {
-    	
-    	
     	 MapModel mapModel = new MapModel();
     	 try
     	 {
@@ -112,10 +110,6 @@ public class NewFlightActivity extends Activity
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
-    
-    	
-
     }
     
     public void populateSpinner()

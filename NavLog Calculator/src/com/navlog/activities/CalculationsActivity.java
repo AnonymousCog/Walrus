@@ -3,7 +3,6 @@ package com.navlog.activities;
 import android.app.Activity;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Context;
@@ -18,7 +17,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -30,7 +28,6 @@ import android.widget.Toast;
 
 
 import com.example.navlog.calculator.R;
-import com.example.navlog.calculator.R.id;
 import com.navlog.models.FlightModel;
 
 public class CalculationsActivity extends Activity {
@@ -322,10 +319,6 @@ public class CalculationsActivity extends Activity {
 	        // Setting the orientation to vertical
 	        linearLayout.setOrientation(LinearLayout.VERTICAL);
 	         
-	        // Defining the LinearLayout layout parameters to fill the parent.
-	        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(
-	            LinearLayout.LayoutParams.MATCH_PARENT,
-	            LinearLayout.LayoutParams.WRAP_CONTENT);
 	        
 	        this.rpmLabel = initTextView("Engine Revolutions Per Minute:");
 	        this.windsAloftDirLabel = initTextView("Winds Aloft Direction:");

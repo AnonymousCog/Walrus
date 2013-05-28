@@ -1,12 +1,10 @@
 package com.navlog.activities;
 
-import java.util.LinkedList;
-
-
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.navlog.calculator.R;
 import com.navlog.models.AirplaneCollectionModel;
 import com.navlog.models.AirplaneProfileModel;
@@ -33,7 +30,6 @@ public class AirplaneListActivity extends ListActivity {
 	AirplaneCollectionModel list = new AirplaneCollectionModel();
 	ListView lv;
 
-	private String[] airplanes;
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
@@ -43,7 +39,7 @@ public class AirplaneListActivity extends ListActivity {
 		if(loaded != null)
 		{
 			list = loaded;
-			airplanes = loaded.getAllLabels();
+			String[] airplanes = loaded.getAllLabels();
 			
 			setListAdapter(new ArrayAdapter<String>(this,
 	                android.R.layout.simple_list_item_activated_1, airplanes));
@@ -52,8 +48,7 @@ public class AirplaneListActivity extends ListActivity {
 			AirplaneListClickListener clickListener = new AirplaneListClickListener();
 			lv.setOnItemClickListener(clickListener);
 			lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-			lv.setMultiChoiceModeListener(new ModeCallback());
-			
+			lv.setMultiChoiceModeListener(new AirplaneListContextualtMenu());		
 		}
 	}
 	
@@ -73,8 +68,12 @@ public class AirplaneListActivity extends ListActivity {
 	
 	private void setListcontent()
 	{
-		setListAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_activated_1, airplanes));
+		String[] airplanes = list.getAllLabels();
+		if(airplanes != null)
+		{
+			setListAdapter(new ArrayAdapter<String>(this,
+	                android.R.layout.simple_list_item_activated_1, airplanes));
+		}
 	}
 	
 	
@@ -86,7 +85,6 @@ public class AirplaneListActivity extends ListActivity {
 	    case (0) : { 
 	      if (resultCode == Activity.RESULT_OK) 
 	      { 
-	    	
 	    	Bundle b = data.getExtras();
 	    	AirplaneProfileModel profile = new AirplaneProfileModel();
 	  		profile = (AirplaneProfileModel) b.getSerializable(airplaneProfileKey);
@@ -94,14 +92,7 @@ public class AirplaneListActivity extends ListActivity {
 	  		this.list.removeAirplaneProfile(this.profileToEdit);
 	  		this.list.addAirplaneProfile(label, profile);
 	  		list.saveAirplaneList(this.getApplicationContext());
-	  		
-	  		
-	  		String[] labels = this.list.getAllLabels();;
-	  		this.airplanes = labels;
-	  		
-	  		
 	  		this.setListcontent();
-	      
 	      } 
 	      break; 
 	    } 
@@ -114,11 +105,8 @@ public class AirplaneListActivity extends ListActivity {
 	    switch (item.getItemId()) {
 	        case R.id.add_airplane:
 	        	launchAirplaneProfileActivity();
-	        	
-	        	
 	        	break;
-	        
-	        
+	        	
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -143,31 +131,65 @@ public class AirplaneListActivity extends ListActivity {
     	b.putSerializable(airplaneProfileKey, profile);
     	intent.putExtras(b);
     	startActivityForResult(intent, 0);
-    	//startActivity(intent);
     }
 	
 	private void launchAirplaneProfileActivity()
 	{
 		Intent intent = new Intent(this, AirplaneProfileActivity.class);
 		startActivityForResult(intent, 0);
-		//startActivity(intent);
 	}
-	
+    private void setSelectedAirplane()
+    {
+    	String[] airplanes = list.getAllLabels();
+    	int count = getListView().getCheckedItemCount();
+    	if(count < 2 && count > 0 )
+    	{
+    		SparseBooleanArray checked = getListView().getCheckedItemPositions();
+    		int listSize = getListView().getCount();
+            for(int i = 0; i < listSize; i++){
+                if(checked.get(i))
+                	getActionBar().setSubtitle("Current: "+ airplanes[i]);
+                	//Must implement persistent storage of selected
+            }
+    			
+    	}
+    	else
+    	{
+    		Toast.makeText(AirplaneListActivity.this, "Only one Plane must be selected",
+                    Toast.LENGTH_SHORT).show();
+    	}
+    	
+    }
+    
+    private void deleteAirplanes()
+    {
+    	String[] airplanes = list.getAllLabels();
+    	int count = getListView().getCheckedItemCount();
+    	if(count > 0 )
+    	{
+    		SparseBooleanArray checked = getListView().getCheckedItemPositions();
+    		int listSize = getListView().getCount();
+            for(int i = 0; i < listSize; i++){
+                if(checked.get(i))
+                	//Must implement persistent storage of selected
+                	this.list.removeAirplaneProfile(airplanes[i]);
+            }
+	  		list.saveAirplaneList(this.getApplicationContext());	    	  		
+	  		this.setListcontent();		
+    	}
+    }
 
 			public class AirplaneListClickListener implements OnItemClickListener
 			{
-
 				public void onItemClick(AdapterView<?> parent, View view,
 						int position, long id) {
-					// When clicked, show a toast with the TextView text
 					String label = (String)((TextView) view).getText();
 					launchLoadedProfileActivity(label);
-					//Toast.makeText(getApplicationContext(), label, Toast.LENGTH_SHORT).show();
 				}
 				
 			}
 			
-		    private class ModeCallback implements ListView.MultiChoiceModeListener {
+		    public class AirplaneListContextualtMenu implements ListView.MultiChoiceModeListener {
 
 		        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 		            MenuInflater inflater = getMenuInflater();
@@ -183,34 +205,22 @@ public class AirplaneListActivity extends ListActivity {
 		        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		            switch (item.getItemId()) {
 		            case R.id.delete_airplane:
-		                Toast.makeText(AirplaneListActivity.this, "Shared " + getListView().getCheckedItemCount() +
-		                        " items", Toast.LENGTH_SHORT).show();
+		            	deleteAirplanes();
 		                mode.finish();
 		                break;
+		                
 		            case R.id.set_airplane:
-		            	int count = getListView().getCheckedItemCount();
-		            	if(count < 2 && count > 0 )
-		            	{
-		            		String label ="stipid"; //(String)((TextView) getListView().getSelectedItem()).getText();
-		            		 getActionBar().setSubtitle("Current: "+ label);
-		            		
-		            	}
-		            	else
-		            	{
-		            		Toast.makeText(AirplaneListActivity.this, "Only one Plane must be selected" + item.getTitle(),
-			                        Toast.LENGTH_SHORT).show();
-		            	}
+		            	setSelectedAirplane();
 		            	mode.finish();
 		                break;
 		                
 		            default:
-		                Toast.makeText(AirplaneListActivity.this, "Clicked " + item.getTitle(),
-		                        Toast.LENGTH_SHORT).show();
 		                mode.finish();
 		                break;
 		            }
 		            return true;
 		        }
+		        
 
 		        public void onDestroyActionMode(ActionMode mode) {
 		        }
@@ -232,7 +242,4 @@ public class AirplaneListActivity extends ListActivity {
 		        }
 		        
 		    }
-
-	
-
 }
