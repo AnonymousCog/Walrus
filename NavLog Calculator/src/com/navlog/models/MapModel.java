@@ -65,8 +65,6 @@ public class MapModel
 		InputStream stream = null;
 		try
 		{
-			
-			
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			AssetManager manager = appContext.getAssets();
@@ -141,8 +139,7 @@ public class MapModel
 	
 	//can get atribute values inside any tag
 	private String getAttributeValue(String sTag,String sAttribute, Element eElement)
-	{
-		
+	{		
 		String content;
 		NodeList nlList = eElement.getElementsByTagName(sTag);
 		Element attribute = (Element) nlList.item(0);
