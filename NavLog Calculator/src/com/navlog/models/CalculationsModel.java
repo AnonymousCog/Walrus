@@ -58,7 +58,7 @@ public class CalculationsModel
 			totalFuel = this.getTotalFuel();
 			
 			// We calculate the initial True Curse for later operations.
-			double[]tcs = this.calculateTrueCurse();
+			double[]tcs = this.calculateTrueCourse();
 									
 			// Iterate through the Leg Quantity
 			int i=0; double tte=0;
@@ -174,7 +174,7 @@ public class CalculationsModel
 		 /** Calculates True Course
 		 * @return (double)True Curse value
 		 **/
-		private double[] calculateTrueCurse()
+		private double[] calculateTrueCourse()
 		{
 			int length = this.points.size() + 1;
 			double[]TCs = new double[length];

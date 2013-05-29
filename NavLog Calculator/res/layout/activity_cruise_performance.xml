@@ -21,7 +21,7 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:ems="10"
         android:hint="@string/altitude"
-        android:inputType="number" >
+        android:inputType="numberDecimal" >
 			<requestFocus />
 	</EditText>
 	    <EditText
@@ -31,7 +31,7 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:ems="10"
         android:hint="@string/rpm"
-        android:inputType="number" >
+        android:inputType="numberDecimal" >
 	</EditText>
 
 	    <TextView

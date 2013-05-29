@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LegDataEntry
+public class LegDataEntry implements java.io.Serializable
 {		
 	/**
 	 * data es un Mapa con el total de la data. Tiene como llave el indice LEG de legDataEntry y como valor el mapa legDataEntry.
 	 * La llave del mapa data es igual a la llave LEG de un valor dentro de legDataEntry. Esta variable es parte del constructor de
 	 * Data Calculations y es necesario enviarla una vez este completa.
 	 */
-	public List<legData> allLegData;
+	private List<legData> allLegData;
 	
 	/**
 	 * Constructor clase para Data Entry para posterior uso de la ventana completa de calculos.
@@ -19,6 +19,11 @@ public class LegDataEntry
 	public LegDataEntry()
 	{
 		
+	}
+	
+	public List<legData> getLegDataList()
+	{
+		return this.allLegData;
 	}
 	
 	/**

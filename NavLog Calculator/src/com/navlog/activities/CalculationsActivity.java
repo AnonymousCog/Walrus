@@ -1,7 +1,6 @@
 package com.navlog.activities;
 
 import android.app.Activity;
-
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
@@ -26,9 +25,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-
 import com.example.navlog.calculator.R;
+import com.navlog.models.CalculationsModel;
 import com.navlog.models.FlightModel;
+import com.navlog.models.LegDataEntry;
 
 public class CalculationsActivity extends Activity {
 	
@@ -240,6 +240,8 @@ public class CalculationsActivity extends Activity {
 		private TextView windsAloftTempLabel;
 		private EditText altitude;
 		private TextView altitudeLabel;
+		private EditText tas;
+		private TextView tasLabel;
 		private EditText tc; //true course
 		private TextView tcLabel; 
 		private EditText wca; //wind correction angle
@@ -268,8 +270,14 @@ public class CalculationsActivity extends Activity {
 		private TextView ataLabel;
 		private EditText gph; //gallons per hour
 		private TextView gphLabel;
+		private EditText fuel; 
+		private TextView fuelLabel;
+		private EditText fuelRemaining; 
+		private TextView fuelRemainingLabel;
 		private EditText rpm; //gallons per hour
 		private TextView rpmLabel;
+		private EditText var; //gallons per hour
+		private TextView varLabel;
 		
 		
 		
@@ -325,6 +333,7 @@ public class CalculationsActivity extends Activity {
 	        this.windsAloftVelLabel = initTextView("Winds Aloft Velocity:");
 	        this.windsAloftTempLabel =initTextView("Winds Aloft Temperature:");
 	        this.altitudeLabel = initTextView("Altitude:");
+	        this.tasLabel = initTextView("True Air Speed");
 	        this.gphLabel = initTextView("Gallons Per Hour:");
 	        this.tcLabel = initTextView("True Course:");
 	        this.wcaLabel = initTextView("Wind Correction Angle:");
@@ -339,13 +348,17 @@ public class CalculationsActivity extends Activity {
 	        this.etaLabel = initTextView("Estimated Time of Arrival:");
 	        this.ateLabel = initTextView("Actual Time En Route:");
 	        this.ataLabel = initTextView("Actual Time of Arrival:");
+	        this.fuelLabel = initTextView("Fuel");
+	        this.fuelRemainingLabel = initTextView("Remainig Fuel");
+	        this.varLabel = initTextView("Varitation");
 	        
 	        this.rpm = initEditText("RPM");
 	        this.windsAloftDir = initEditText("Degrees");
-	        this.windsAloftVel = initEditText("MPH");
+	        this.windsAloftVel = initEditText("Knots");
 	        this.windsAloftTemp = initEditText("Farenheit");
 	        this.altitude = initEditText("Feet");
-	        this.tc = initEditText("Degrees");
+	        this.tas = initEditText("Knots");
+	        this.tc = initEditText("Degree");
 	        this.wca = initEditText("Degrees");
 	        this.th = initEditText("Degrees");
 	        this.mh = initEditText("Degrees");
@@ -354,20 +367,24 @@ public class CalculationsActivity extends Activity {
 	        this.eta = initEditTextDisabled("HHMM (Calculated)", true);
 	        this.ete = initEditTextDisabled("HHMM (Calculated)", true);
 	        this.ate = initEditText("HHMM (hours minutes)");
-	        this.gph = initEditText("Gallons");
+	        this.gph = initEditText("GPH");
+	        this.fuel= initEditText("Gallons");
+	        this.fuelRemaining= initEditText("Gallons");
 	        this.remainingLegDistance = initEditTextDisabled("Milles (Calculated)", true);
 	        this.totalLegDistance = initEditTextDisabled("Milles (Calculated)", true);
+	        this.var = initEditText("Degrees");
 	        
 	        this.timeOff = new TimePicker(context);
 	        this.ata = new TimePicker(context);
-
-          	         
-	        // Setting the parameters on the TextView
 	       
 	        linearLayout.addView(this.altitudeLabel);
 	        linearLayout.addView(this.altitude); 
 	        linearLayout.addView(this.rpmLabel);
 	        linearLayout.addView(this.rpm);
+	        linearLayout.addView(this.tasLabel);
+	        linearLayout.addView(this.tas);
+	        linearLayout.addView(this.varLabel);
+	        linearLayout.addView(this.var);
 	        linearLayout.addView(this.windsAloftDirLabel);
 	        linearLayout.addView(this.windsAloftDir);
 	        linearLayout.addView(this.windsAloftVelLabel);
@@ -376,6 +393,10 @@ public class CalculationsActivity extends Activity {
 	        linearLayout.addView(this.windsAloftTemp);
 	        linearLayout.addView(this.gphLabel);
 	        linearLayout.addView(this.gph);
+	        linearLayout.addView(this.fuelLabel);
+	        linearLayout.addView(this.fuel);
+	        linearLayout.addView(this.fuelRemainingLabel);
+	        linearLayout.addView(this.fuelRemaining);
 	        linearLayout.addView(this.tcLabel);
 	        linearLayout.addView(this.tc);
 	        linearLayout.addView(this.wcaLabel);
@@ -403,9 +424,7 @@ public class CalculationsActivity extends Activity {
 	        linearLayout.addView(this.ataLabel);
 	        linearLayout.addView(this.ata);
 	        
-	        
-	        scroller.addView(linearLayout);
-	     	         
+	        scroller.addView(linearLayout);	         
 	        return scroller;
 	    }
 	    
@@ -422,7 +441,7 @@ public class CalculationsActivity extends Activity {
                     1f));
 	    	edit.setWidth(100);
 	        //winds.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-	    	edit.setInputType(InputType.TYPE_CLASS_NUMBER);
+	    	edit.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 	    	edit.setHint(hint);
 	    	edit.setPadding(padding, padding, padding, padding);
 	    	return edit;
@@ -451,6 +470,44 @@ public class CalculationsActivity extends Activity {
 	        //view.setGravity(Gravity.CENTER_HORIZONTAL);
 	        return view;
 	    	
+	    }
+	    
+	    private void saveWaypointData()
+	    {
+	    	double windsAloftDirDouble = editTextToDouble(windsAloftDir); // rad
+			double windsAloftVelDouble = editTextToDouble(windsAloftVel); //MPH
+			double windsAloftTempDouble = editTextToDouble(windsAloftTemp); //MPH
+			double altitudeDouble = editTextToDouble(altitude);
+			double tasDouble = editTextToDouble(tas);
+			double tcDouble = editTextToDouble(tc);
+			double wcaDouble = editTextToDouble(wca);
+			double thDouble = editTextToDouble(th);
+			double mhDouble = editTextToDouble(mh);
+			double remLegDistDouble = editTextToDouble(remainingLegDistance);
+			double totalDistDouble = editTextToDouble(totalLegDistance);
+			double gsEstDouble = editTextToDouble(gsEst);
+			double gsActDouble = editTextToDouble(gsAct);
+			double rpmDouble = editTextToDouble(rpm);
+			double gphDouble = editTextToDouble(gph); //gallons per hour
+			double eteDouble =editTextToDouble(ete); //estimated time en route
+			double etaDouble =editTextToDouble(eta);
+			double ateDouble =editTextToDouble(ate);
+			//TimePicker timeOff; //take off time
+			//TimePicker ata; //actual time of arrival
+			
+			LegDataEntry legs = new LegDataEntry();
+			legs.addDataEntry(this.getShownIndex(), altitudeDouble, tasDouble, rpmDouble, windsAloftVelDouble, windsAloftDirDouble, windsAloftTempDouble);
+			//CalculationsModel calc = new CalculationsModel(flightModel, legs.getLegDataList());
+			//legs = calc.getData();
+			
+		
+ 	
+	    	
+	    }
+	    private double editTextToDouble(EditText edit)
+	    {
+	    	double d = Double.parseDouble(this.windsAloftDir.getText().toString());
+	    	return d;
 	    }
 	    
 	}
