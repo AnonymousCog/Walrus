@@ -5,31 +5,31 @@ import java.util.Stack;
 
 import android.widget.ImageView;
 
-public class FlightModel implements java.io.Serializable
+public class FlightWaypointsModel implements java.io.Serializable
 {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 620210547609466539L;
-	private Stack<Waypoint> points = new Stack<Waypoint>();
-	private Waypoint currentLocation;
-	private Waypoint departureLocation;
-	private Waypoint destinationLocation;
-	private String departureICAO;
-	private String destinationICAO;
+	protected Stack<Waypoint> points = new Stack<Waypoint>();
+	protected Waypoint currentLocation;
+	protected Waypoint departure;
+	protected Waypoint destination;
+	protected String departureICAO;
+	protected String destinationICAO;
 	
 	/**
 	 * Constructor Modelo Informacion de Vuelo.
 	 * @param depICAO codigo ICAO del aeropuerto de Salida
 	 * @param destICAO codigo ICAO del aeropuerto de Llegada
 	 */
-	public FlightModel(String depICAO, String destICAO)
+	public FlightWaypointsModel(String depICAO, String destICAO)
 	{
 		this.setDepartureICAO(depICAO);
 		this.setDestinationICAO(destICAO);			
 	}
 	
-	public FlightModel()
+	public FlightWaypointsModel()
 	{
 		
 	}
@@ -67,11 +67,11 @@ public class FlightModel implements java.io.Serializable
 	}
 	public Waypoint getDepartureLocation() 
 	{
-		return departureLocation;
+		return departure;
 	}
 	public Waypoint getArrivalLocation() 
 	{
-		return destinationLocation;
+		return destination;
 	}
 	public void setPoints(Stack<Waypoint> points) 
 	{
@@ -88,20 +88,20 @@ public class FlightModel implements java.io.Serializable
 	
 	public void setDepartureLocation(Waypoint departureLocation) 
 	{
-		this.departureLocation = departureLocation;
+		this.departure = departureLocation;
 	}
 	public void setDepartureLocation(ImageView m, double lat, double lon)
 	{
-		this.departureLocation = new Waypoint(m, lat, lon,0);
+		this.departure = new Waypoint(m, lat, lon,0);
 	}
 	
 	public void setArrivalLocation(Waypoint arrivalLocation) 
 	{
-		this.destinationLocation = arrivalLocation;
+		this.destination = arrivalLocation;
 	}
 	public void setArrivalLocation(ImageView m, double lat, double lon)
 	{
-		this.destinationLocation = new Waypoint(m, lat, lon,0);
+		this.destination = new Waypoint(m, lat, lon,0);
 	}
 	public double[] getAllWaypointLatitudes()
 	{
@@ -170,9 +170,6 @@ public class FlightModel implements java.io.Serializable
 
 	public class Waypoint implements java.io.Serializable
 	{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -5807655103001199853L;
 		private double latitude;
 		private double longitude;

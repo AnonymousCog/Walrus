@@ -11,7 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.navlog.models.FlightModel.Waypoint;
+import com.navlog.models.FlightWaypointsModel.Waypoint;
 
 public class AviationWeatherModel 
 {
@@ -26,7 +26,7 @@ public class AviationWeatherModel
 	 * Tambien debe incluir los ICAO para ambos aeropuertos. 
 	 *
 	 */
-	public AviationWeatherModel(FlightModel incInfo)
+	public AviationWeatherModel(FlightWaypointsModel incInfo)
 	{
 		List<String> allWeatherStations = null;	
 		allWeatherStations.add(incInfo.getDepartureICAO());		

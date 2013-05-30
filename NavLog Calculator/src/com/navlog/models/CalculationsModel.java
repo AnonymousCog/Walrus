@@ -1,13 +1,10 @@
 package com.navlog.models;
 
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Hashtable;
+
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import com.navlog.models.FlightModel.Waypoint;
+
 
 
 /**
@@ -18,24 +15,30 @@ import com.navlog.models.FlightModel.Waypoint;
 * @version 1.0
 */
 public class CalculationsModel
-    implements java.io.Serializable
+extends FlightWaypointsModel
+    implements java.io.Serializable 
     {
 		private static final long serialVersionUID = 1L;
-		private Waypoint departure;
-		private Waypoint destination;
-		private Stack<Waypoint> points=new Stack<Waypoint>();
 		private List<legData> listData;
 		
 		/**
 	   * Calculations Class Constructor 
 	   * @param incFlightModel class with Flight Information. It contains departure, destination and waypoints.
 	   * @param _dataEntry The List from LegDataEntry Class. It contains a List with leg by leg data entered by the user.*/
-		public CalculationsModel(FlightModel incFlightModel, List<legData> _dataEntry)
+		public CalculationsModel(FlightWaypointsModel incFlightModel, List<legData> _dataEntry)
 	    {		
 			destination = incFlightModel.getDepartureLocation();
 			departure = incFlightModel.getArrivalLocation();
 			points = incFlightModel.getPoints();
 			listData = _dataEntry;
+    	}
+		
+		
+		public CalculationsModel(FlightWaypointsModel incFlightModel)
+	    {		
+			destination = incFlightModel.getDepartureLocation();
+			departure = incFlightModel.getArrivalLocation();
+			points = incFlightModel.getPoints();
     	}
 		
 		/**
@@ -50,85 +53,99 @@ public class CalculationsModel
 		 * Method to retrieve data with all Calculations
 		 * @return
 		 */
+		public List<legData> getData(List<legData> _dataEntry)
+		{
+			listData = _dataEntry;
+			return getData();
+		}
+		
 		public List<legData> getData()
 		{
-			// Using the Fligh Model information we calculate the total values of Distance, Time and Fuel Consumption.
-			totalDistance = this.getDistance(this.departure, this.destination);
-			totalTime = this.getTotalTime();
-			totalFuel = this.getTotalFuel();
-			
-			// We calculate the initial True Curse for later operations.
-			double[]tcs = this.calculateTrueCourse();
+			if(listData != null)
+			{
+				// Using the Fligh Model information we calculate the total values of Distance, Time and Fuel Consumption.
+				totalDistance = this.getDistance(this.departure, this.destination);
+				totalTime = this.getTotalTime();
+				totalFuel = this.getTotalFuel();
+				
+				// We calculate the initial True Curse for later operations.
+				double[]tcs = this.calculateTrueCourse();
+										
+				// Iterate through the Leg Quantity
+				int i=0; double tte=0;
+				Iterator<com.navlog.models.legData> entries = listData.iterator();		
+				while (entries.hasNext()) 
+				{			
+					legData tmpData = listData.get(i);
+					
+					//Calculating Leg values
+					//WCA
+					double wca=this.calculateWCA(tmpData.getDIR(), tmpData.getSPD(), tcs[i] , tmpData.getTAS() , tmpData.getALT());
+					listData.get(i).setWCA(wca);
+					
+					//TH
+					double th= this.calculateTH(tcs[i], wca );
+					listData.get(i).setTH(th);
+					
+					//VAR
+					double var = this.calculateVariation(this.points.get(i).getAltitude(), this.points.get(i).getLongitude());
+					listData.get(i).setVAR(var);
+					
+					//MH
+					double mh = this.calculateMH(th, var);
+					
+					//LEG DISTANCE
+					double legDistance=0;
+					
+					if(i==0)
+						legDistance = this.getDistance(this.departure, this.points.get(i));
 									
-			// Iterate through the Leg Quantity
-			int i=0; double tte=0;
-			Iterator<com.navlog.models.legData> entries = listData.iterator();		
-			while (entries.hasNext()) 
-			{			
-				legData tmpData = listData.get(i);
-				
-				//Calculating Leg values
-				//WCA
-				double wca=this.calculateWCA(tmpData.getDIR(), tmpData.getSPD(), tcs[i] , tmpData.getTAS() , tmpData.getALT());
-				listData.get(i).setWCA(wca);
-				
-				//TH
-				double th= this.calculateTH(tcs[i], wca );
-				listData.get(i).setTH(th);
-				
-				//VAR
-				double var = this.calculateVariation(this.points.get(i).getAltitude(), this.points.get(i).getLongitude());
-				listData.get(i).setVAR(var);
-				
-				//MH
-				double mh = this.calculateMH(th, var);
-				
-				//LEG DISTANCE
-				double legDistance=0;
-				
-				if(i==0)
-					legDistance = this.getDistance(this.departure, this.points.get(i));
+					else if(this.points.size()-1 !=i)
+						legDistance = this.getDistance(this.points.get(i-1), this.points.get(i));
+					
+					
+					else 
+						legDistance = this.getDistance(this.points.get(i), this.destination);
+					
+					listData.get(i).setLEG_DIST(legDistance);
+					
+					
+					//LEG REMAINING DISTANCE
+					double legRemDistance = this.getDistance(this.points.get(i), this.destination);
+					listData.get(i).setLEG_DIST_REM(legRemDistance);
+					
+					//ESTIMATED GROUND SPEED
+					double gs = this.calculateGS(tmpData.getDIR(), tmpData.getSPD(), tcs[i], tmpData.getTAS());
+					listData.get(i).setEST_GS(gs);
+					
+					//ETE
+					double ete = this.calculateTE(legRemDistance, gs);
+					listData.get(i).setETE(ete);
+					tte =+ete;
 								
-				else if(this.points.size()-1 !=i)
-					legDistance = this.getDistance(this.points.get(i-1), this.points.get(i));
+					//LEG FUEL
+					double fuel=0;
+					listData.get(i).setLEG_FUEL(fuel);
+					
+					//FUEL REMAINING
+					double fuelRemaining=0;
+					listData.get(i).setLEG_FUEL_REM(fuelRemaining);
+					
+					//NEXT VALUE
+						i++;
+					
+				}
 				
+				// Add the Total Time Enroute
+				totalTE= tte;
 				
-				else 
-					legDistance = this.getDistance(this.points.get(i), this.destination);
-				
-				listData.get(i).setLEG_DIST(legDistance);
-				
-				
-				//LEG REMAINING DISTANCE
-				double legRemDistance = this.getDistance(this.points.get(i), this.destination);
-				listData.get(i).setLEG_DIST_REM(legRemDistance);
-				
-				//ESTIMATED GROUND SPEED
-				double gs = this.calculateGS(tmpData.getDIR(), tmpData.getSPD(), tcs[i], tmpData.getTAS());
-				listData.get(i).setEST_GS(gs);
-				
-				//ETE
-				double ete = this.calculateTE(legRemDistance, gs);
-				listData.get(i).setETE(ete);
-				tte =+ete;
-							
-				//LEG FUEL
-				double fuel=0;
-				listData.get(i).setLEG_FUEL(fuel);
-				
-				//FUEL REMAINING
-				double fuelRemaining=0;
-				listData.get(i).setLEG_FUEL_REM(fuelRemaining);
-				
-				//NEXT VALUE
-				i++;
+				// Devuelvo la lista
+				return listData;
 			}
-			
-			// Add the Total Time Enroute
-			totalTE= tte;
-			
-			// Devuelvo la lista
-			return listData;
+			else
+			{
+				return null;
+			}
 		}
 		
 		public double totalDistance;

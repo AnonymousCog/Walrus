@@ -27,12 +27,12 @@ import android.widget.Toast;
 
 import com.example.navlog.calculator.R;
 import com.navlog.models.CalculationsModel;
-import com.navlog.models.FlightModel;
+import com.navlog.models.FlightWaypointsModel;
 import com.navlog.models.LegDataEntry;
 
 public class CalculationsActivity extends Activity {
 	
-	private FlightModel flightData;
+	private FlightWaypointsModel flightData;
 
 
 	@Override
@@ -64,8 +64,8 @@ public class CalculationsActivity extends Activity {
 		Bundle b = new Bundle();
 		b = getIntent().getExtras();
 		
-		flightData = new FlightModel();
-		flightData = (FlightModel) b.getSerializable(MapActivity.flightModelDetails);
+		flightData = new FlightWaypointsModel();
+		flightData = (FlightWaypointsModel) b.getSerializable(MapActivity.flightModelDetails);
 		
 		String deptICAO = flightData.getDepartureICAO();
 		String destICAO = flightData.getDestinationICAO();
@@ -108,7 +108,7 @@ public class CalculationsActivity extends Activity {
 	{
 		boolean mDualPane;
 		int mCurCheckPosition;
-		private FlightModel data;
+		private FlightWaypointsModel data;
 		
 		
 		@Override
@@ -118,7 +118,7 @@ public class CalculationsActivity extends Activity {
 			Bundle args = getArguments();
 			if(args != null)
 			{
-				data = (FlightModel) getArguments().getSerializable(MapActivity.flightModelDetails);
+				data = (FlightWaypointsModel) getArguments().getSerializable(MapActivity.flightModelDetails);
 			}
 			
 			
@@ -177,7 +177,7 @@ public class CalculationsActivity extends Activity {
 		        showDetails(position);
 		    }
 		    
-		    public static TitlesFragment newInstance(FlightModel data) {
+		    public static TitlesFragment newInstance(FlightWaypointsModel data) {
 		    	TitlesFragment f = new TitlesFragment();
 		    	Bundle args = new Bundle();
 		        args.putSerializable(MapActivity.flightModelDetails, data);

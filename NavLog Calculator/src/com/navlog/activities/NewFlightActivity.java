@@ -88,6 +88,7 @@ public class NewFlightActivity extends Activity
 	    		intent.putExtra(destinationLatitude, destinationLat);
 	    		intent.putExtra(destinationLongitude, destinationLong);
 	    		intent.putExtra(destinationICAO, destICAO);
+	    		intent.putExtra("caller", "NewFlightActivity");
 	    		
 	    		startActivity(intent);
 	    	}

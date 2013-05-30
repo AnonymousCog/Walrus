@@ -52,8 +52,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.navlog.calculator.R;
-import com.navlog.models.FlightModel;
-import com.navlog.models.FlightModel.Waypoint;
+import com.navlog.models.CalculationsModel;
+import com.navlog.models.FlightWaypointsModel;
+import com.navlog.models.FlightWaypointsModel.Waypoint;
 import com.navlog.support.MapTileDecoderResource;
 import com.qozix.mapview.MapView;
 import com.qozix.mapview.MapView.MapEventListener;
@@ -75,7 +76,7 @@ public class MapActivity extends Activity
 	private String TAG = "MapActivity";
 	private MapView mapView;
 	private ImageView currentLocationMarker;
-	private FlightModel flightData;
+	private FlightWaypointsModel flightData;
 
 	
 	private MapEventListener myMapListener;
@@ -89,10 +90,7 @@ public class MapActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		
-		double top , left, right, bottom;
-		//marron test
-		
-		
+		double top , left, right, bottom;	
 		top = 19.659721;
 		right = -73.116667;//-73.270000;
 		bottom = 16;
@@ -110,7 +108,7 @@ public class MapActivity extends Activity
 		
 		super.onCreate(savedInstanceState);
 		
-		initFlightData();
+		
 		mapView = new MapView(this);
 		//mapView.registerGeolocator(19.659721, -74.979220 , 14.730666, -60.626548);//works but not 100% accurate
 		int mapWidth = 10310;
@@ -140,10 +138,60 @@ public class MapActivity extends Activity
         frame.addView(mapView, mapViewLayout);
 		setTitle("");
 		
-		
-		this.placeDepartureAirport();
-		this.placeDestinationAirport();
+		initFlightData();//depends on previous
 
+	}
+	
+	private void initFlightData()
+	{
+		Intent i = getIntent();
+		
+		
+		
+		String caller = i.getStringExtra("caller");
+		if(caller.equals("NewFlightActivity"))
+		{
+			setDataFromNewFlightActivity(i);
+		}
+		else if(caller.equals("SavedFlightsActivity"))
+		{
+			
+		}
+		
+		
+	}
+	
+	private void setDataFromNewFlightActivity(Intent i)
+	{
+		String  deptICAO = i.getStringExtra(NewFlightActivity.departureICAO);
+		String  destICAO = i.getStringExtra(NewFlightActivity.destinationICAO);
+		flightData = new FlightWaypointsModel(deptICAO ,destICAO);
+		flightData = new FlightWaypointsModel(deptICAO ,destICAO);
+		double deptLat = i.getDoubleExtra(NewFlightActivity.departureLatitude, 0);
+		double deptLon = i.getDoubleExtra(NewFlightActivity.departureLongitude, 0);
+		placeDepartureAirport(deptLat, deptLon);
+		double destLat = i.getDoubleExtra(NewFlightActivity.destinationLatitude, 0);
+		double destLon = i.getDoubleExtra(NewFlightActivity.destinationLongitude, 0);
+		placeDestinationAirport(destLat, destLon);
+		
+	}
+	
+	private void placeDepartureAirport(double lat, double lon)
+	{
+		ImageView marker = new ImageView(this);
+		marker.setImageResource(R.drawable.ic_departure_airport);
+		flightData.setDepartureLocation(marker, lat, lon);
+		mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
+    	mapView.moveToAndCenter(lat, lon);
+    	mapView.requestRender();
+	}
+	
+	private void placeDestinationAirport(double lat, double lon)
+	{
+		ImageView marker = new ImageView(this);
+		marker.setImageResource(R.drawable.ic_destination_airport);
+		flightData.setArrivalLocation(marker, lat, lon);
+		mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
 	}
 	
 	@Override
@@ -163,7 +211,6 @@ public class MapActivity extends Activity
         mySpinnerListener = new MapSpinnerListener();
         spinner.setOnItemSelectedListener(mySpinnerListener);// reference to a OnItemSelectedListener, that you can use to perform actions based on user selection
         
-	
 		return true;
 	}
 	
@@ -296,11 +343,7 @@ public class MapActivity extends Activity
     	mapView.requestRender();
 		
 	}
-	/*
-	 *  method below Temporarily using self generated numbers for altitude, this will later be populated
-	 * by the airplane profile's set altitudes
-	 */
-
+	
 
 	private void removeLastPlacedWaypointOnMap()
 	{
@@ -312,43 +355,7 @@ public class MapActivity extends Activity
 	
 	}
 	
-	private void initFlightData()
-	{
-		Intent i = getIntent();
-		String  deptICAO = i.getStringExtra(NewFlightActivity.departureICAO);
-				
-		String  destICAO = i.getStringExtra(NewFlightActivity.destinationICAO);
-		
-		flightData = new FlightModel(deptICAO ,destICAO);
-	}
 	
-	private void placeDepartureAirport()
-	{
-		Intent i = getIntent();
-		double lat = i.getDoubleExtra(NewFlightActivity.departureLatitude, 0);
-		double lon = i.getDoubleExtra(NewFlightActivity.departureLongitude, 0);
-		
-		ImageView marker = new ImageView(this);
-		marker.setImageResource(R.drawable.ic_departure_airport);
-		flightData.setDepartureLocation(marker, lat, lon);
-		mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
-    	mapView.moveToAndCenter(lat, lon);
-    	mapView.requestRender();
-		
-	}
-	
-	private void placeDestinationAirport()
-	{
-		Intent i = getIntent();
-		double lat = i.getDoubleExtra(NewFlightActivity.destinationLatitude, 0);
-		double lon = i.getDoubleExtra(NewFlightActivity.destinationLongitude, 0);
-		
-		ImageView marker = new ImageView(this);
-		marker.setImageResource(R.drawable.ic_destination_airport);
-		flightData.setArrivalLocation(marker, lat, lon);
-		mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
-		
-	}
 	
     private void placeWaypointOnMap(double lat, double lon, double alt)
 	{
