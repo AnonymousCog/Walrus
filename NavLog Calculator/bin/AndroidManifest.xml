@@ -22,7 +22,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.navlog.activities.MainNavLogActivity"
-            android:label="@string/title_activity_main_nav_log">
+            android:label="@string/title_activity_main_nav_log" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -61,8 +61,6 @@
             android:name="com.navlog.activities.CalculationsActivity"
             android:label="@string/title_activity_calculations" >
         </activity>
-        <activity android:name="com.navlog.activities.CalculationsActivity$DetailsActivity"
-     	/>
         <activity
             android:name="com.navlog.activities.AirplaneListActivity"
             android:label="@string/title_activity_airplane_list" >
@@ -74,6 +72,11 @@
         <activity
             android:name="com.navlog.activities.CruisePerformanceActivity"
             android:label="@string/title_activity_cruise_performance" >
+        </activity>
+        <activity
+            android:name="com.navlog.activities.DetailsActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_details" >
         </activity>
     </application>
 

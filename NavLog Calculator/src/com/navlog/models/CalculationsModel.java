@@ -19,13 +19,13 @@ extends FlightWaypointsModel
     implements java.io.Serializable 
     {
 		private static final long serialVersionUID = 1L;
-		private List<legData> listData;
+		private List<LegData> listData;
 		
 		/**
 	   * Calculations Class Constructor 
 	   * @param incFlightModel class with Flight Information. It contains departure, destination and waypoints.
 	   * @param _dataEntry The List from LegDataEntry Class. It contains a List with leg by leg data entered by the user.*/
-		public CalculationsModel(FlightWaypointsModel incFlightModel, List<legData> _dataEntry)
+		public CalculationsModel(FlightWaypointsModel incFlightModel, List<LegData> _dataEntry)
 	    {		
 			destination = incFlightModel.getDepartureLocation();
 			departure = incFlightModel.getArrivalLocation();
@@ -53,13 +53,13 @@ extends FlightWaypointsModel
 		 * Method to retrieve data with all Calculations
 		 * @return
 		 */
-		public List<legData> getData(List<legData> _dataEntry)
+		public List<LegData> getData(List<LegData> _dataEntry)
 		{
 			listData = _dataEntry;
 			return getData();
 		}
 		
-		public List<legData> getData()
+		public List<LegData> getData()
 		{
 			if(listData != null)
 			{
@@ -73,10 +73,10 @@ extends FlightWaypointsModel
 										
 				// Iterate through the Leg Quantity
 				int i=0; double tte=0;
-				Iterator<com.navlog.models.legData> entries = listData.iterator();		
+				Iterator<com.navlog.models.LegData> entries = listData.iterator();		
 				while (entries.hasNext()) 
 				{			
-					legData tmpData = listData.get(i);
+					LegData tmpData = listData.get(i);
 					
 					//Calculating Leg values
 					//WCA

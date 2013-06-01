@@ -76,7 +76,7 @@ public class MapActivity extends Activity
 	private String TAG = "MapActivity";
 	private MapView mapView;
 	private ImageView currentLocationMarker;
-	private FlightWaypointsModel flightData;
+	private CalculationsModel flightData;
 
 	
 	private MapEventListener myMapListener;
@@ -155,6 +155,8 @@ public class MapActivity extends Activity
 		}
 		else if(caller.equals("SavedFlightsActivity"))
 		{
+			mapView.removeMapEventListener(myMapListener);
+			//disable remove from overflow
 			
 		}
 		
@@ -165,8 +167,9 @@ public class MapActivity extends Activity
 	{
 		String  deptICAO = i.getStringExtra(NewFlightActivity.departureICAO);
 		String  destICAO = i.getStringExtra(NewFlightActivity.destinationICAO);
-		flightData = new FlightWaypointsModel(deptICAO ,destICAO);
-		flightData = new FlightWaypointsModel(deptICAO ,destICAO);
+		flightData = new CalculationsModel();
+		flightData.setDepartureICAO(deptICAO);
+		flightData.setDestinationICAO(destICAO);
 		double deptLat = i.getDoubleExtra(NewFlightActivity.departureLatitude, 0);
 		double deptLon = i.getDoubleExtra(NewFlightActivity.departureLongitude, 0);
 		placeDepartureAirport(deptLat, deptLon);
