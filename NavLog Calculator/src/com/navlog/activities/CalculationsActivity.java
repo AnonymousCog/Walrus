@@ -1,17 +1,18 @@
 package com.navlog.activities;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
-import android.widget.Toast;
 
 import com.example.navlog.calculator.R;
-import com.navlog.models.AirplaneProfileModel;
 import com.navlog.models.CalculationsModel;
-import com.navlog.models.FlightWaypointsModel;
+import com.navlog.models.LegData;
 import com.navlog.models.LegDataEntry;
 
 
@@ -22,45 +23,25 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 	private LegDataEntry legs;
 	public static final String legKey = "legs";
 	public static final String indexKey = "index";
-	int index = 0;
+	int lastIndex = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_layout);
 		loadPreviousActivityFlightData();
-		legs = new LegDataEntry();
-       if (savedInstanceState == null) {
-    	   replaceFragment();
-        }
+		
+		restoreLegsState(savedInstanceState);
+	    replaceListFragment();
+        
 	}
 	
 	
-	@Override 
-	public void onActivityResult(int requestCode, int resultCode, Intent data) 
-	{     
-	  super.onActivityResult(requestCode, resultCode, data); 
-	  switch(requestCode) { 
-	    case (0) : { 
-	      if (resultCode == Activity.RESULT_OK) 
-	      { 
-	    	Bundle b = data.getExtras();
-			legs = new LegDataEntry();
-			legs = (LegDataEntry) b.getSerializable(CalculationsActivity.legKey);
-	  		
-	      } 
-	      break; 
-	    } 
-	  } 
-	}
-	
-	public void replaceFragment()
+	public void replaceListFragment()
 	{
-        // First-time init; create fragment to embed in activity.
     	FragmentTransaction ft = getFragmentManager().beginTransaction();
-        Fragment newFragment = TitlesFragment.newInstance(flightData, legs, index); 
-        ft.add(R.id.titles, newFragment);
-        //ft.addToBackStack(null);
+        Fragment newFragment = TitlesFragment.newInstance(flightData); 
+        ft.replace(R.id.titles, newFragment);
         ft.commit();
 	}
 	
@@ -77,76 +58,110 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		b = getIntent().getExtras();
 		
 		flightData = new CalculationsModel();
-		flightData = (CalculationsModel) b.getSerializable(MapActivity.flightModelDetails);
-		
-		String deptICAO = flightData.getDepartureICAO();
-		String destICAO = flightData.getDestinationICAO();
-		//Toast.makeText(getApplicationContext(), "deptICAO : "+deptICAO+ " Dest ICAO : "+destICAO, Toast.LENGTH_SHORT).show();
-		
-		
+		flightData = (CalculationsModel) b.getSerializable(MapActivity.flightModelDetails);	
 	}
 
 	@Override
-	public void onDetailsSet(int legIndex, double altitude, double TAS, double rpms,
-			double windSpeed, double windDir, double windTemp) 
+	public void onDetailsSet(LegData aLeg) 
+	{
+		addOrUpdateLeg(aLeg);
+	}
+	
+	public void addOrUpdateLeg(LegData aLeg)
 	{
 		Boolean added;
-		 added = legs.addDataEntry(legIndex, altitude, TAS, rpms, windSpeed, windDir, windTemp);
+		 added = legs.addDataEntry(aLeg);
 		 if(added == false)
 		 {
-			 legs.updateLeg(legIndex, altitude, TAS, rpms, windSpeed, windDir, windTemp);
+			 legs.updateLeg(aLeg);
 		 }
-		TitlesFragment details = (TitlesFragment) getFragmentManager().findFragmentById(R.id.titles);
-		details.setLegData(legs);
+	}
 	
+	public LegData getLegData(int index)
+	{
+		LegData leg;
+		try
+		{
+			leg = legs.getLegDataList().get(index);
+			return leg;
+		}
+		catch(Exception e)
+		{
+			leg = new LegData();
+			//Log.e("Calculations Activity", "Specified leg is null", e);
+			return leg;
+		}
 		
 	}
 	
 	@Override
-    public void displayDetailsFragment(DetailsFragment details, int index)
+    public void displayDetailsFragment(int index)
     {
-    	details = DetailsFragment.newInstance(index, legs);
+		if(index != this.lastIndex)
+		{
+			lastIndex = index;
+			LegData leg = getLegData(index);
+			DetailsFragment details = DetailsFragment.newInstance(index, leg);
+			//Execute a transaction, replaceing any existing fragment
+			//with the new one inside the frame
+			
+			 FragmentTransaction ft = getFragmentManager().beginTransaction();
+	         ft.replace(R.id.details, details);
+	         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+	         ft.commit();
+		}
+			
 		
-		//Execute a transaction, replaceing any existing fragment
-		//with the new one inside the frame
-		
-		 FragmentTransaction ft = getFragmentManager().beginTransaction();
-         ft.replace(R.id.details, details);
-         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-         ft.commit();
     
     }
     
-	@Override
-    public void displayDetailsActivity(int index)
-    {   	
-    	Intent intent = new Intent();
-		intent.setClass(this, DetailsActivity.class);	
-		Bundle b = new Bundle();
-		b.putInt("index", index);
-    	b.putSerializable(CalculationsActivity.legKey, legs);
-    	intent.putExtras(b);
-		//startActivity(intent);
-    	startActivityForResult(intent, 0);
-    	
-    }
-	
 	
 	@Override
 	protected void onSaveInstanceState(Bundle out)
 	{
 		super.onSaveInstanceState(out);
 		out.putSerializable(legKey, legs);
+		out.putInt(indexKey, lastIndex);
 	}
 	
-	@Override
-	protected void onRestoreInstanceState(Bundle in)
+	
+	private void restoreLegsState(Bundle in)
 	{
-		super.onRestoreInstanceState(in);	
-		this.legs = (LegDataEntry) in.getSerializable(legKey);
+		Boolean flightDataContainsLegs = !(flightData.getLegsData() == null);
+		Boolean bundleContainsLegs;
+		if(in == null)
+		{
+			bundleContainsLegs = false;
+		}
+		else
+		{
+			bundleContainsLegs = in.containsKey(legKey);
+		}
+		
+		if(flightDataContainsLegs == false && bundleContainsLegs == false )
+		{
+			legs = new LegDataEntry();	
+		}
+		else if(flightDataContainsLegs == false && bundleContainsLegs == true )
+		{
+			legs = (LegDataEntry) in.getSerializable(legKey);
+			
+		}
+		else if(flightDataContainsLegs == true && bundleContainsLegs == false )
+		{
+			ArrayList<LegData> d = flightData.getLegsData(); 
+			legs.setLegDataList(d);
+		}
+		else if(flightDataContainsLegs == true && bundleContainsLegs == true )
+		{
+			legs = (LegDataEntry) in.getSerializable(legKey);
+			
+		}
+		/*in the future when data has been calculated it is likely that on screen rotation 
+		 * calculations will be lost until performed again. A Boolean value in calculations to
+		 * identify if calc has been performed may be necesary in the future.
+		 */
 	}
 	
-
-
 
 }

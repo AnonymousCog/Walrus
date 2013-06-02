@@ -53,7 +53,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.navlog.calculator.R;
 import com.navlog.models.CalculationsModel;
-import com.navlog.models.FlightWaypointsModel;
 import com.navlog.models.FlightWaypointsModel.Waypoint;
 import com.navlog.support.MapTileDecoderResource;
 import com.qozix.mapview.MapView;

@@ -9,6 +9,7 @@ import com.navlog.models.MapModel;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -30,9 +31,7 @@ public class NewFlightActivity extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_flight);
-        populateSpinner();
-        
+        setContentView(R.layout.activity_new_flight); 
     }
 
     @Override
@@ -41,8 +40,31 @@ public class NewFlightActivity extends Activity
         return true;
     }
     
+    public Boolean planeSelected()
+    {
+    	
+    	SharedPreferences settings = getSharedPreferences(AirplaneListActivity.selected_plane_pref, 0);
+        String plane = settings.getString(AirplaneListActivity.selected, "None");
+        Boolean selected = !plane.equals("None");
+        return selected;
+    }
+    
     public void submitPressed(View view)
     {
+    	if(planeSelected())
+    	{
+    		findAirports();
+    	}
+    	else
+    	{
+    		Toast.makeText(getApplicationContext(), "You must first select a plane", Toast.LENGTH_SHORT).show();
+    	}
+    }
+    
+    
+    public void findAirports()
+    {
+    	
     	 MapModel mapModel = new MapModel();
     	 try
     	 {
@@ -111,16 +133,5 @@ public class NewFlightActivity extends Activity
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    }
-    
-    public void populateSpinner()
-    {
-    	String[] maps = {"Flight #1", "Flight #2","Flight #3"}; //This should be replaced by the contents of the MAPS XML FILE
-        Spinner spinner = (Spinner) findViewById(R.id.spinner1);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-        	(this, android.R.layout.simple_spinner_item, maps);
-        
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
     }
 }

@@ -2,7 +2,7 @@ package com.navlog.activities;
 
 
 import com.navlog.models.LegData;
-import com.navlog.models.LegDataEntry;
+
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -24,8 +24,7 @@ import android.widget.TimePicker;
 public class DetailsFragment extends Fragment {
 	
 	public interface OnDetailsSetListener{
-		public void onDetailsSet(int legIndex, double altitude, double TAS,
-				double rpms, double windSpeed, double windDir, double windTemp);
+		public void onDetailsSet(LegData leg);
 	}
 	
 	private OnDetailsSetListener callBack;
@@ -95,17 +94,13 @@ public class DetailsFragment extends Fragment {
 	}
 	
 	
-	/**
-     * Create a new instance of DetailsFragment, initialized to
-     * show the text at 'index'.
-     */
-    public static DetailsFragment newInstance(int index, LegDataEntry legs) {
-        DetailsFragment f = new DetailsFragment();
 
-        // Supply index input as an argument.
+    public static DetailsFragment newInstance(int index, LegData leg) {
+        
+    	DetailsFragment f = new DetailsFragment();
         Bundle args = new Bundle();
         args.putInt("index", index);
-        args.putSerializable(CalculationsActivity.legKey, legs);
+        args.putSerializable(CalculationsActivity.legKey, leg);
         f.setArguments(args);
 
         return f;
@@ -120,32 +115,19 @@ public class DetailsFragment extends Fragment {
     	LegData leg;
     	try
     	{
-    		LegDataEntry legs =(LegDataEntry) getArguments().getSerializable(CalculationsActivity.legKey);
-	    	leg = legs.getLegDataList().get(getShownIndex());
+    		leg =(LegData) getArguments().getSerializable(CalculationsActivity.legKey);
 	    	return leg;
     	}
     	catch(Exception e)
     	{
     		return null;
     	}
-    	
-    	
     }
     
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        if (container == null) {
-            // We have different layouts, and in one of them this
-            // fragment's containing frame doesn't exist.  The fragment
-            // may still be created from its saved state, but there is
-            // no reason to try to create its view hierarchy because it
-            // won't be displayed.  Note this is not needed -- we could
-            // just run the code below, where we would create and return
-            // the view hierarchy; it would just never be used.
-            return null;
-        }
 
         ScrollView scroller = new ScrollView(getActivity());
         
@@ -334,8 +316,9 @@ public class DetailsFragment extends Fragment {
 		double windsAloftVelDouble = editTextToDouble(windsAloftVel); //MPH
 		double windsAloftTempDouble = editTextToDouble(windsAloftTemp); //MPH
 		double altitudeDouble = editTextToDouble(altitude);
+		double rpmDouble = editTextToDouble(rpm);
 		double tasDouble = editTextToDouble(tas);
-		double tcDouble = editTextToDouble(tc);
+		/*double tcDouble = editTextToDouble(tc);
 		double wcaDouble = editTextToDouble(wca);
 		double thDouble = editTextToDouble(th);
 		double mhDouble = editTextToDouble(mh);
@@ -343,23 +326,28 @@ public class DetailsFragment extends Fragment {
 		double totalDistDouble = editTextToDouble(totalLegDistance);
 		double gsEstDouble = editTextToDouble(gsEst);
 		double gsActDouble = editTextToDouble(gsAct);
-		double rpmDouble = editTextToDouble(rpm);
 		double gphDouble = editTextToDouble(gph); //gallons per hour
 		double eteDouble =editTextToDouble(ete); //estimated time en route
 		double etaDouble =editTextToDouble(eta);
-		double ateDouble =editTextToDouble(ate);
+		double ateDouble =editTextToDouble(ate);*/
 		//TimePicker timeOff; //take off time
 		//TimePicker ata; //actual time of arrival
 		
 		int i = this.getShownIndex();
 		
-		callBack.onDetailsSet(i, altitudeDouble, 
+		LegData leg = new LegData(i, altitudeDouble, 
 				tasDouble, rpmDouble, windsAloftVelDouble, 
 				windsAloftDirDouble, windsAloftTempDouble);
-	
-	
+		callBack.onDetailsSet(leg);
+		
+    }
+    
+    @Override
+	public void onSaveInstanceState(Bundle out){
+    	saveLegData();
     	
     }
+    
     private double editTextToDouble(EditText edit)
     {
     	try
