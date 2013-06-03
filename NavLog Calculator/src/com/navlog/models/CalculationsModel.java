@@ -2,6 +2,7 @@ package com.navlog.models;
 
 import java.text.DecimalFormat;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,13 +20,13 @@ extends FlightWaypointsModel
     implements java.io.Serializable 
     {
 		private static final long serialVersionUID = 1L;
-		private List<LegData> listData;
+		private ArrayList<LegData> listData;
 		
 		/**
 	   * Calculations Class Constructor 
 	   * @param incFlightModel class with Flight Information. It contains departure, destination and waypoints.
 	   * @param _dataEntry The List from LegDataEntry Class. It contains a List with leg by leg data entered by the user.*/
-		public CalculationsModel(FlightWaypointsModel incFlightModel, List<LegData> _dataEntry)
+		public CalculationsModel(FlightWaypointsModel incFlightModel, ArrayList<LegData> _dataEntry)
 	    {		
 			destination = incFlightModel.getDepartureLocation();
 			departure = incFlightModel.getArrivalLocation();
@@ -48,18 +49,29 @@ extends FlightWaypointsModel
 		{			
 		}
 		
+		public void setLegsData(ArrayList<LegData> aLegs)
+		{
+			this.listData = aLegs;
+		}
+		
+		public ArrayList<LegData> getLegsData()
+		{
+			return this.listData;
+		}
+		
 		
 		/**
 		 * Method to retrieve data with all Calculations
 		 * @return
 		 */
-		public List<LegData> getData(List<LegData> _dataEntry)
+		public ArrayList<LegData> getCalculatedData(ArrayList<LegData> _dataEntry)
 		{
 			listData = _dataEntry;
-			return getData();
+			 ArrayList<LegData> list = getCalculatedData();
+			return list;
 		}
 		
-		public List<LegData> getData()
+		public ArrayList<LegData> getCalculatedData()
 		{
 			if(listData != null)
 			{
@@ -73,8 +85,9 @@ extends FlightWaypointsModel
 										
 				// Iterate through the Leg Quantity
 				int i=0; double tte=0;
-				Iterator<com.navlog.models.LegData> entries = listData.iterator();		
-				while (entries.hasNext()) 
+				//Iterator<com.navlog.models.LegData> entries = listData.iterator();
+				int size = listData.size();
+				while (i <= size-1) 
 				{			
 					LegData tmpData = listData.get(i);
 					
@@ -88,7 +101,13 @@ extends FlightWaypointsModel
 					listData.get(i).setTH(th);
 					
 					//VAR
-					double var = this.calculateVariation(this.points.get(i).getAltitude(), this.points.get(i).getLongitude());
+					double var=0;
+					
+					if(this.points.size() == i)
+						var = this.calculateVariation(this.destination.getLatitude(), this.destination.getLongitude());
+					else		
+						var = this.calculateVariation(this.points.get(i).getLatitude(), this.points.get(i).getLongitude());
+					
 					listData.get(i).setVAR(var);
 					
 					//MH
@@ -99,19 +118,26 @@ extends FlightWaypointsModel
 					
 					if(i==0)
 						legDistance = this.getDistance(this.departure, this.points.get(i));
+					
+					else if(this.points.size() == i)
+						legDistance = this.getDistance(this.points.get(i-1), this.destination);
 									
-					else if(this.points.size()-1 !=i)
+					else
 						legDistance = this.getDistance(this.points.get(i-1), this.points.get(i));
 					
 					
-					else 
-						legDistance = this.getDistance(this.points.get(i), this.destination);
 					
 					listData.get(i).setLEG_DIST(legDistance);
 					
 					
 					//LEG REMAINING DISTANCE
-					double legRemDistance = this.getDistance(this.points.get(i), this.destination);
+					double legRemDistance = 0;
+					if(this.points.size() == i)
+						legRemDistance = 0; //check
+						
+					else
+						legRemDistance = this.getDistance(this.points.get(i), this.destination);
+					
 					listData.get(i).setLEG_DIST_REM(legRemDistance);
 					
 					//ESTIMATED GROUND SPEED
@@ -139,13 +165,10 @@ extends FlightWaypointsModel
 				// Add the Total Time Enroute
 				totalTE= tte;
 				
-				// Devuelvo la lista
-				return listData;
+			
 			}
-			else
-			{
-				return null;
-			}
+			return listData;
+
 		}
 		
 		public double totalDistance;
@@ -193,8 +216,8 @@ extends FlightWaypointsModel
 		 **/
 		private double[] calculateTrueCourse()
 		{
-			int length = this.points.size() + 1;
-			double[]TCs = new double[length];
+			int length = this.points.size();
+			double[]TCs = new double[length+1];
 					
 			double lat1, lat2, lon1, lon2;
 			
@@ -224,8 +247,10 @@ extends FlightWaypointsModel
 			}
 						
 			//Calculamos Waypoint N -> Llegada
-			lat1 = Math.toRadians(this.points.get(length).getLatitude());
-			lon1 = Math.toRadians(this.points.get(length).getLongitude());
+			lat1 = Math.toRadians(this.points.lastElement().getLatitude());
+			//lat1 = Math.toRadians(this.points.get(this.points.size()-1).getLatitude());
+			lon1 = Math.toRadians(this.points.lastElement().getLongitude());
+			//lon1 = Math.toRadians(this.points.get(this.points.size()-1).getLongitude());
 			lat2 = Math.toRadians(this.destination.getLatitude());
 			lon2 =  Math.toRadians(this.destination.getLongitude());
 			if (Math.sin(lon2-lon1)<0)       
@@ -272,9 +297,9 @@ extends FlightWaypointsModel
 		private double calculateVariation(double lat, double lon)
 		{			
 			double var = -65.6811 + (0.99*lat) + (0.0128899*Math.pow(lat,2)) - 0.0000905928*Math.pow(lat, 3)+ 2.87622*lon - 
-				        0.0116268*lat*lon - 0.00000603925*(Math.pow(lat,3))*lon - 0.0389806*(Math.pow(lon, 2)) - 
+				        0.0116268*lat*lon - 0.00000603925*(Math.pow(lat,2))*lon - 0.0389806*(Math.pow(lon, 2)) - 
 				        0.0000403488*lat*(Math.pow(lon,2)) + 0.000168556*(Math.pow(lon,3));
-			return var;
+			return 13;
 		}
 		
 		/**

@@ -1,6 +1,7 @@
 package com.navlog.models;
 
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import android.widget.ImageView;
@@ -127,7 +128,7 @@ public class FlightWaypointsModel implements java.io.Serializable
 		return longitudes;
 	}
 	
-	public String[] getAllLabels()
+	public String[] getAllWaypointsOnlyLabels()
 	{
 		double[] latitudes = this.getAllWaypointLatitudes();
 		double[] longitudes = this.getAllWaypointLongitudes();
@@ -141,6 +142,39 @@ public class FlightWaypointsModel implements java.io.Serializable
 		}
 		labels[length+1] = this.getDestinationICAO();
 		return labels;
+	}
+	
+	public String[] getAllLabels()
+	{
+		double[] latitudes = this.getAllWaypointLatitudes();
+		double[] longitudes = this.getAllWaypointLongitudes();
+		int length = latitudes.length;
+		ArrayList<String> tempLabel = new ArrayList<String>();
+		tempLabel.add(this.getDepartureICAO());
+		for(int i=0; i< length; i++)
+		{
+			String  lat = Double.toString(latitudes[i]);
+			lat = lat.substring(0, 5);
+			String lon = Double.toString(longitudes[i]);
+			lon = lon.substring(0, 6);
+			String label = lat+","+lon;
+			tempLabel.add(label);
+		}
+		tempLabel.add(this.getDestinationICAO());
+		ArrayList<String> legsLabel = new ArrayList<String>();
+		int totalLegs = tempLabel.size()+1;
+		legsLabel.add(tempLabel.get(0));
+		for(int j=1; j<totalLegs-1;j++)
+		{
+			String p1 = tempLabel.get(j-1);
+			String p2 = tempLabel.get(j);
+			String whole = p1 +" To "+ p2;
+			legsLabel.add(whole);
+		}
+		legsLabel.add(this.getDestinationICAO());
+		String[]completeLegLabels = legsLabel.toArray(new String[legsLabel.size()]);
+		return completeLegLabels;
+		
 	}
 	
 	public double[] getAllWaypointAltitudes()

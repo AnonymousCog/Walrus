@@ -39,6 +39,29 @@ package com.navlog.models;
 			setTMP(windTemp);
 		}
 		
+		public String toString()
+		{
+			String values = "Leg# " + LEG +"\n" 
+							+"ALT " + ALT +"\n"
+							+ "RPM " + RPM+"\n"
+							+ "TAS " + TAS+"\n"
+							+ "DIR " + DIR+"\n"
+							+ "SPD " + SPD+"\n"
+							+ "TMP " + TMP+"\n"
+							+ "TC " + TC+"\n"
+							+"WCA " + WCA+"\n"
+							+ "TH " + TH+"\n"
+							+ "VAR " + VAR+"\n"
+							+ "MH " + MH+"\n"
+							+ "LEGDIST " + LEG_DIST +"\n"
+							+ "LEG_DIST_REM " + LEG_DIST_REM +"\n"
+							+ "EST_GS " + EST_GS +"\n"
+							+ "ACT_GS " + ACT_GS +"\n"
+							+ "ETE " + ETE;
+			return values;
+					
+		}
+		
 		public int getLEG() {
 			return LEG;
 		}

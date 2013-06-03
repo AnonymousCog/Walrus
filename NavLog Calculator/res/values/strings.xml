@@ -51,6 +51,7 @@
     <string name="above20cStdTemp">Above 20C Standard Temperature</string>
     <string name="ktas">KTAS</string>
     <string name="gph">GPH</string>
+    <string name="perform_calculations">Do Calculations</string>
     <string name="title_activity_details">DetailsActivity</string>
 
 </resources>

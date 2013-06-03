@@ -27,10 +27,16 @@ public class LegDataEntry implements java.io.Serializable
 		allLegData = new ArrayList<LegData>();
 	}
 	
-	public List<LegData> getLegDataList()
+	public ArrayList<LegData> getLegDataList()
 	{
 		return this.allLegData;
 	}
+	
+	public void setLegDataList(ArrayList<LegData> aLegs)
+	{
+		this.allLegData = aLegs;
+	}
+	
 	
 	public Boolean isEditable()
 	{
@@ -39,6 +45,16 @@ public class LegDataEntry implements java.io.Serializable
 	public void setEditable(Boolean value)
 	{
 		editable = value;
+	}
+	
+	
+	public boolean addDataEntry(LegData aLeg)
+	{
+		if(!isNewEntryValid(aLeg.getLEG()))
+			return false;
+
+		allLegData.add(aLeg);
+		return true;
 	}
 	
 	
@@ -69,6 +85,16 @@ public class LegDataEntry implements java.io.Serializable
 		aLeg.setTMP(windTemp);
 		allLegData.add(aLeg);
 		return true;
+	}
+	
+	
+	public void updateLeg(LegData aLeg)
+	{
+		int legIndex = aLeg.getLEG();
+		if(!this.isUpdateValid(legIndex))
+			return;		
+		
+		allLegData.set(legIndex, aLeg);
 	}
 		
 	/**
