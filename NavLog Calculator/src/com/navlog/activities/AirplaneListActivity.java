@@ -217,7 +217,7 @@ public class AirplaneListActivity extends ListActivity {
 				}
 				
 			}
-			
+		
 		    public class AirplaneListContextualtMenu implements ListView.MultiChoiceModeListener {
 
 		        public boolean onCreateActionMode(ActionMode mode, Menu menu) {

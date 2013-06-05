@@ -152,11 +152,11 @@ public class MapActivity extends Activity
 		{
 			setDataFromNewFlightActivity(i);
 		}
-		else if(caller.equals("SavedFlightsActivity"))
+		else //if(caller.equals("CalculationsHistoryActivity"))
 		{
 			mapView.removeMapEventListener(myMapListener);
 			//disable remove from overflow
-			
+			setDataFromHistory(i);
 		}
 		
 		
@@ -175,6 +175,31 @@ public class MapActivity extends Activity
 		double destLat = i.getDoubleExtra(NewFlightActivity.destinationLatitude, 0);
 		double destLon = i.getDoubleExtra(NewFlightActivity.destinationLongitude, 0);
 		placeDestinationAirport(destLat, destLon);
+		
+	}
+	
+	private void setDataFromHistory(Intent in)
+	{
+		Bundle b = in.getExtras();
+		this.flightData = (CalculationsModel) b.getSerializable(CalculationsHistoryActivity.flightKey);
+		
+		double[] latitudes = flightData.getAllWaypointLatitudes();
+		double[] longitudes = flightData.getAllWaypointLongitudes();
+		double[] altitudes = flightData.getAllWaypointAltitudes();
+		int waypointCount = latitudes.length;
+		
+		this.placeDepartureAirport(flightData.getDepartureLocation().getLatitude(), flightData.getDepartureLocation().getLongitude());
+		this.placeDestinationAirport(flightData.getArrivalLocation().getLatitude(), flightData.getArrivalLocation().getLongitude());
+		
+		if(waypointCount > 0)
+		{
+			for(int i=0;i<waypointCount;i++)
+			{
+				placeWaypointOnMap(latitudes[i], longitudes[i], altitudes[i]);
+			}
+		}
+		
+		
 		
 	}
 	

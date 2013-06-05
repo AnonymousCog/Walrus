@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
-
 /**
 * Calculations Model Class. All formulas evaluate using radians.
 * There are 2 constructors available. There are also 4 conversion methods for degrees, nautical
@@ -59,33 +57,27 @@ extends FlightWaypointsModel
 			return this.listData;
 		}
 		
-		
 		/**
 		 * Method to retrieve data with all Calculations
-		 * @return
+		 * 
+		 * @return ArrayList with calculations
 		 */
 		public ArrayList<LegData> getCalculatedData(ArrayList<LegData> _dataEntry)
 		{
 			listData = _dataEntry;
-			 ArrayList<LegData> list = getCalculatedData();
-			return list;
-		}
-		
-		public ArrayList<LegData> getCalculatedData()
-		{
-			if(listData != null)
-			{
-				// Using the Fligh Model information we calculate the total values of Distance, Time and Fuel Consumption.
-				totalDistance = this.getDistance(this.departure, this.destination);
-				totalTime = this.getTotalTime();
-				totalFuel = this.getTotalFuel();
+			double tte=0;
+			// Using the Fligh Model information we calculate the total values of Distance, Time and Fuel Consumption.
+			totalDistance = getTotalDistance();
+			totalTime = this.getTotalTime();
+			totalFuel = this.getTotalFuel();
 				
-				// We calculate the initial True Curse for later operations.
-				double[]tcs = this.calculateTrueCourse();
-										
+			// We calculate the initial True Curse for later operations.
+			double[]tcs = this.calculateTrueCourse();
+			
+			if(listData.size() >1)
+			{	
 				// Iterate through the Leg Quantity
-				int i=0; double tte=0;
-				//Iterator<com.navlog.models.LegData> entries = listData.iterator();
+				int i=0; 
 				int size = listData.size();
 				while (i <= size-1) 
 				{			
@@ -124,11 +116,8 @@ extends FlightWaypointsModel
 									
 					else
 						legDistance = this.getDistance(this.points.get(i-1), this.points.get(i));
-					
-					
-					
+										
 					listData.get(i).setLEG_DIST(legDistance);
-					
 					
 					//LEG REMAINING DISTANCE
 					double legRemDistance = 0;
@@ -159,22 +148,106 @@ extends FlightWaypointsModel
 					
 					//NEXT VALUE
 						i++;
-					
 				}
 				
 				// Add the Total Time Enroute
-				totalTE= tte;
-				
-			
+				totalTE= tte;		
 			}
+			else if(listData.size()==1)
+			{
+				//No waypoints
+				//Just 1 leg available
+				
+				LegData tmpData = listData.get(0);
+				//WCA
+				double wca=this.calculateWCA(tmpData.getDIR(), tmpData.getSPD(), tcs[0] , tmpData.getTAS() , tmpData.getALT());
+				listData.get(0).setWCA(wca);
+				
+				//TH
+				double th= this.calculateTH(tcs[0], wca );
+				listData.get(0).setTH(th);
+				
+				//VAR
+				double var= this.calculateVariation(this.destination.getLatitude(), this.destination.getLongitude());
+				listData.get(0).setVAR(var);
+				
+				//MH
+				double mh = this.calculateMH(th, var);
+				
+				//LEG DISTANCE
+				double legDistance = this.getDistance(this.departure, this.destination);
+				listData.get(0).setLEG_DIST(legDistance);
+				
+				//REMAINING DISTANCE
+				listData.get(0).setLEG_DIST_REM(legDistance);
+				
+				//ESTIMATED GROUND SPEED
+				double gs = this.calculateGS(tmpData.getDIR(), tmpData.getSPD(), tcs[0], tmpData.getTAS());
+				listData.get(0).setEST_GS(gs);
+				
+				//ETE
+				double ete = this.calculateTE(legDistance, gs);
+				listData.get(0).setETE(ete);
+				tte =+ete;
+							
+				//LEG FUEL
+				double fuel=0;
+				listData.get(0).setLEG_FUEL(fuel);
+				
+				//FUEL REMAINING
+				double fuelRemaining=0;
+				listData.get(0).setLEG_FUEL_REM(fuelRemaining);
+				
+				// Add the Total Time Enroute
+				totalTE= tte;
+					
+			}
+			else
+			{
+				//some error
+			}
+			
 			return listData;
-
 		}
 		
-		public double totalDistance;
-		public double totalTime;
-		public double totalFuel;
-		public double totalTE;
+		private double totalDistance;
+		private double totalTime;
+		private double totalFuel;
+		private double totalTE;
+		
+		/**
+		* Total distance
+		*/
+		private double getTotalDistance()
+		{
+			double distance=0;
+			if(points.size()>0)
+			{
+				//Calculate from Departure -> Waypoint 1
+				distance = this.getDistance(departure, this.points.get(0));
+				
+				//Calculate from Waypoint 1 -> Waypoint N if N>1
+				int size=this.points.size();
+				if(size>1)
+				{
+					for(int i=0;i<size-1;i++)
+					{
+						double tmp = this.getDistance(this.points.get(i), this.points.get(i+1));
+						distance = distance+tmp;
+					}
+				}
+				
+				//Calculate from Waypoint N -> Destination
+				distance = distance + this.getDistance(this.points.get(size-1), destination);
+			}
+			else
+			{
+				distance = this.getDistance(departure, destination);
+				//Calculate from Departure -> Destination
+			}
+			
+			return distance;
+		}
 		
 		/**
 		 * haversine formula to calculate distance between 2 Waypoints.
@@ -185,7 +258,7 @@ extends FlightWaypointsModel
 		private double getDistance(Waypoint A, Waypoint B)
 		{ 
 			double R = 6371.0087714; 		// Earch radius in Kilometers
-			double dLat = this.degToRadians(B.getLatitude()-B.getLatitude());
+			double dLat = this.degToRadians(B.getLatitude()-A.getLatitude());
 			double dLon = this.degToRadians(B.getLongitude()-A.getLongitude());
 			double lat1 = this.degToRadians(A.getLatitude());
 			double lat2 = this.degToRadians(B.getLatitude());					
@@ -221,43 +294,60 @@ extends FlightWaypointsModel
 					
 			double lat1, lat2, lon1, lon2;
 			
-			//Calculamos salida -> Waypoint1
-			lat1 = Math.toRadians(this.departure.getLatitude());
-			lon1 = Math.toRadians(this.departure.getLongitude());
-			lat2 = Math.toRadians(this.points.get(0).getLatitude());
-			lon2 = Math.toRadians(this.points.get(0).getLongitude());
-			
-			if (Math.sin(lon2-lon1)<0)       
-				   TCs[0]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
-			    else       
-				   TCs[0]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));
-			
-			//Calculamos Waypoint 1 -> Waypoint N
-			for(int i=0; i<this.points.size()-1; i++)
-			{				
-				lat1 = Math.toRadians(this.points.get(i).getLatitude());
-				lon1 = Math.toRadians(this.points.get(i).getLongitude());
-				lat2 = Math.toRadians(this.points.get(i+1).getLatitude());
-				lon2 = Math.toRadians(this.points.get(i+1).getLongitude());
+			if(length>0)
+			{
+				//Hay al menos 1 waypoint
+				
+				//Calculamos salida -> Waypoint1
+				lat1 = Math.toRadians(this.departure.getLatitude());
+				lon1 = Math.toRadians(this.departure.getLongitude());
+				lat2 = Math.toRadians(this.points.get(0).getLatitude());
+				lon2 = Math.toRadians(this.points.get(0).getLongitude());
 				
 				if (Math.sin(lon2-lon1)<0)       
-					   TCs[i+1]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
-				    else       
-					   TCs[i+1]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
-			}
-						
-			//Calculamos Waypoint N -> Llegada
-			lat1 = Math.toRadians(this.points.lastElement().getLatitude());
-			//lat1 = Math.toRadians(this.points.get(this.points.size()-1).getLatitude());
-			lon1 = Math.toRadians(this.points.lastElement().getLongitude());
-			//lon1 = Math.toRadians(this.points.get(this.points.size()-1).getLongitude());
-			lat2 = Math.toRadians(this.destination.getLatitude());
-			lon2 =  Math.toRadians(this.destination.getLongitude());
-			if (Math.sin(lon2-lon1)<0)       
+					   TCs[0]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+					else       
+					   TCs[0]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));
+				
+				//Calculamos Waypoint 1 -> Waypoint N
+				for(int i=0; i<this.points.size()-1; i++)
+				{				
+					lat1 = Math.toRadians(this.points.get(i).getLatitude());
+					lon1 = Math.toRadians(this.points.get(i).getLongitude());
+					lat2 = Math.toRadians(this.points.get(i+1).getLatitude());
+					lon2 = Math.toRadians(this.points.get(i+1).getLongitude());
+					
+					if (Math.sin(lon2-lon1)<0)       
+						   TCs[i+1]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+						else       
+						   TCs[i+1]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+				}
+							
+				//Calculamos Waypoint N -> Llegada
+				lat1 = Math.toRadians(this.points.lastElement().getLatitude());
+				//lat1 = Math.toRadians(this.points.get(this.points.size()-1).getLatitude());
+				lon1 = Math.toRadians(this.points.lastElement().getLongitude());
+				//lon1 = Math.toRadians(this.points.get(this.points.size()-1).getLongitude());
+				lat2 = Math.toRadians(this.destination.getLatitude());
+				lon2 =  Math.toRadians(this.destination.getLongitude());
+				if (Math.sin(lon2-lon1)<0)       
 				   TCs[length]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
-			    else       
+				else       
 				   TCs[length]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));
-			
+			}
+			else
+			{
+				//No hay waypoints
+				lat1 = Math.toRadians(this.departure.getLatitude());
+				lon1 = Math.toRadians(this.departure.getLongitude());
+				lat2 = Math.toRadians(this.destination.getLatitude());
+				lon2 = Math.toRadians(this.destination.getLongitude());
+				
+				if (Math.sin(lon2-lon1)<0)       
+				   TCs[0]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.destination)))/(Math.sin(getDistance(this.departure,this.destination))*Math.cos(lat1)));    
+				else       
+				   TCs[0]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.destination)))/(Math.sin(getDistance(this.departure,this.destination))*Math.cos(lat1)));
+			}
 			return TCs;
 		}
 		
@@ -381,6 +471,5 @@ extends FlightWaypointsModel
 		}
 							
    }
-
 
 

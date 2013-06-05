@@ -19,13 +19,14 @@ import android.widget.TextView;
 
 public class AirportFragment extends Fragment {
    
-    public static AirportFragment newInstance(String weather, String freq ) {
+    public static AirportFragment newInstance(String weather, String freq, String runway ) {
     	AirportFragment f = new AirportFragment();
 
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putString("weather", weather);
         args.putString("freq", freq);
+        args.putString("runway", runway);
         f.setArguments(args);
 
         return f;
@@ -38,6 +39,10 @@ public class AirportFragment extends Fragment {
     public String getFreq() {
         return getArguments().getString("freq");
     }
+    public String getRunway()
+    {
+    	return getArguments().getString("runway");
+    }
     
   
 
@@ -47,20 +52,21 @@ public class AirportFragment extends Fragment {
     	
     	String weather = getWeather();
     	String freq = getFreq();
+    	String run = getRunway();
         ScrollView scroller = new ScrollView(getActivity());
-        TextView text = initTextView(weather, freq);
+        TextView text = initTextView(weather, freq, run);
         scroller.addView(text);
         return scroller;
     }
     
-    public TextView initTextView(String upper, String lower)
+    public TextView initTextView(String upper, String middle , String lower)
     {
     	TextView text = new TextView(getActivity());
         int padding = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 4, getActivity().getResources().getDisplayMetrics());
         text.setPadding(padding, padding, padding, padding);
        
-        String content = upper + "\n" + lower;
+        String content = upper + "\n" +middle + "\n" + lower;
         text.setText(content);
         return text;
     	

@@ -28,6 +28,8 @@ import com.navlog.models.Frequencies;
 import com.navlog.models.Frequencies.freqStruct;
 import com.navlog.models.LegData;
 import com.navlog.models.LegDataEntry;
+import com.navlog.models.Runways;
+import com.navlog.models.Runways.RunwayStruct;
 import com.navlog.models.WeatherStation;
 
 
@@ -35,16 +37,18 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 , TitlesFragment.ViewHandler,OnWeatherObtainedListener{
 	
 	private CalculationsModel flightData;
-	private LegDataEntry legs;
+	private LegDataEntry legs = new LegDataEntry();
 	public static final String legKey = "legs";
 	public static final String indexKey = "index";
 	public static final String departureConditions = "deptCond";
 	public static final String destinationConditions = "destCond";
 	int lastIndex = -1;
-	private String DepartureWeather;
-	private String DestinationWeather;
+	private String departureWeather;
+	private String destinationWeather;
 	private String deptartureFreq;
 	private String destinationFreq;
+	private String departureRunways;
+	private String destinationRunways;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,41 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		restoreWeatherState(savedInstanceState);
 		loadAirportFreq();
 	    replaceListFragment();
+	    loadAirportRunway();
         
+	}
+	
+	
+	
+	public void loadAirportRunway()
+	{
+		departureRunways = searchRunwaysInFile(this.flightData.getDepartureICAO());
+		destinationRunways = searchRunwaysInFile(this.flightData.getDestinationICAO());
+		
+	}
+	
+	public String searchRunwaysInFile(String ICAO)
+	{
+		String label;
+		Runways rw= new Runways();
+		rw.getData(ICAO, this);
+		
+		ArrayList<RunwayStruct> runList = rw.getData(ICAO, this);
+		if(runList.size() == 0)
+		{
+			label = "No Runway information for this Aiport was found";
+			
+		}
+		else
+		{
+			label = "Airport Runways: \n";
+			for(int i=0; i<runList.size(); i++)
+			{
+				label+=runList.get(i).toString();
+			}
+		}
+		return label;
+		
 	}
 	
 	public void loadAirportFreq()
@@ -64,7 +102,6 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		deptartureFreq =searchFreqInFile(flightData.getDepartureICAO());
 		destinationFreq = searchFreqInFile(flightData.getDestinationICAO());
 	}
-	
 	
 	public String searchFreqInFile(String ICAO)
 	{
@@ -175,7 +212,8 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 			lastIndex = index;
 			String weather = getWeatherString(index);
 			String freq = getFreqString(index);
-			AirportFragment details = AirportFragment.newInstance(weather, freq );
+			String runway = getRunwayString(index);
+			AirportFragment details = AirportFragment.newInstance(weather, freq, runway );
 			//Execute a transaction, replaceing any existing fragment
 			//with the new one inside the frame
 			
@@ -229,16 +267,16 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		super.onSaveInstanceState(out);
 		out.putSerializable(legKey, legs);
 		out.putInt(indexKey, lastIndex);
-		out.putString(departureConditions, this.DepartureWeather);
-		out.putString(destinationConditions, DestinationWeather);
+		out.putString(departureConditions, this.departureWeather);
+		out.putString(destinationConditions, destinationWeather);
 	}
 	
 	private void restoreWeatherState(Bundle in)
 	{
 		if(in != null && in.containsKey(departureConditions) &&  in .containsKey(destinationConditions))
 		{
-			this.DepartureWeather = in.getString(departureConditions);
-			this.DestinationWeather = in.getString(destinationConditions);
+			this.departureWeather = in.getString(departureConditions);
+			this.destinationWeather = in.getString(destinationConditions);
 		}
 		else
 		{
@@ -293,18 +331,18 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 	@Override
 	public void WeatherObtained(List<WeatherStation> w) {
 		String notAvailable = "This weather station has not reported weather data for the last week.\n";
-		DepartureWeather = notAvailable;
-		DestinationWeather = notAvailable;
+		departureWeather = notAvailable;
+		destinationWeather = notAvailable;
 		int size = w.size();
 		for(int i=0; i<size; i++)
 		{
 			if(w.get(i).getICAO().equals(this.flightData.getDepartureICAO()))
 			{
-				DepartureWeather = this.getWeatherString(w.get(i));
+				departureWeather = this.getWeatherString(w.get(i));
 			}
 			else if(w.get(i).getICAO().equals(this.flightData.getDestinationICAO()))
 			{
-				DestinationWeather = this.getWeatherString(w.get(i));
+				destinationWeather = this.getWeatherString(w.get(i));
 			}
 			
 		}
@@ -331,15 +369,15 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 	public String getWeatherString(int index)
 	{
 		 String weather = "Getting weather data...";
-		 if(DepartureWeather != null && DestinationWeather != null)
+		 if(departureWeather != null && destinationWeather != null)
 		 {
 			 if(index == 0)
 			 {
-				 return DepartureWeather;
+				 return departureWeather;
 			 }
 			 else
 			 {
-				 return DestinationWeather;
+				 return destinationWeather;
 				 
 			 }
 		 } 
@@ -349,7 +387,7 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 	public String getFreqString(int index)
 	{
 		 String weather = "Getting Frequency data...";
-		 if(DepartureWeather != null && DestinationWeather != null)
+		 if(departureWeather != null && destinationWeather != null)
 		 {
 			 if(index == 0)
 			 {
@@ -363,6 +401,26 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		 } 
 		 return weather;	 
 	}
+	
+	public String getRunwayString(int index)
+	{
+		 String runways = "Getting Runway data...";
+		 if(departureRunways != null && destinationRunways != null)
+		 {
+			 if(index == 0)
+			 {
+				 return this.departureRunways;
+			 }
+			 else
+			 {
+				 return this.departureRunways;
+				 
+			 }
+		 } 
+		 return runways;	 
+	}
+	
+	
 	
 	private void enterFlightName()
 	{
@@ -403,7 +461,7 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		}
 		else if(storage.containsKey(flightName))
 		{
-			Toast.makeText(getApplicationContext(), "A Flight named"+ flightName + "already exists, try again.", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "A Flight named "+ flightName + "already exists, try again.", Toast.LENGTH_LONG).show();
 			
 		}
 		else
