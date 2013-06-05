@@ -46,7 +46,7 @@ public class AirplaneListActivity extends ListActivity {
 			
 			setListAdapter(new ArrayAdapter<String>(this,
 	                android.R.layout.simple_list_item_activated_1, airplanes));
-			ListView lv = getListView();
+			lv = getListView();
 			lv.setFastScrollEnabled(true);
 			AirplaneListClickListener clickListener = new AirplaneListClickListener();
 			lv.setOnItemClickListener(clickListener);

@@ -19,11 +19,11 @@ public class AirplaneCollectionModel implements java.io.Serializable
 	 */
 	public static final String fileName = "AirplaneList.ser";
 	private static final long serialVersionUID = -8448042904958822051L;
-	private Map<String ,AirplaneProfileModel> profiles = new HashMap<String,AirplaneProfileModel>();
+	private Map<String ,AirplaneProfileModel> profiles;
 	
 	public AirplaneCollectionModel()
 	{
-		
+		profiles = new HashMap<String,AirplaneProfileModel>();
 	}
 	
 	public void addAirplaneProfile(String label, AirplaneProfileModel profile)

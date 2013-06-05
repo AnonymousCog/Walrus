@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -13,11 +15,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.navlog.calculator.R;
 import com.navlog.models.AviationWeatherModel;
 import com.navlog.models.AviationWeatherModel.OnWeatherObtainedListener;
+import com.navlog.models.CalculationsCollectionModel;
 import com.navlog.models.CalculationsModel;
 import com.navlog.models.FlightWaypointsModel;
 import com.navlog.models.Frequencies;
@@ -50,30 +54,37 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		loadPreviousActivityFlightData();
 		restoreLegsState(savedInstanceState);
 		restoreWeatherState(savedInstanceState);
-		getAirportFreq();
+		loadAirportFreq();
 	    replaceListFragment();
         
 	}
 	
-	public void getAirportFreq()
+	public void loadAirportFreq()
 	{
+		deptartureFreq =searchFreqInFile(flightData.getDepartureICAO());
+		destinationFreq = searchFreqInFile(flightData.getDestinationICAO());
+	}
+	
+	
+	public String searchFreqInFile(String ICAO)
+	{
+		String label;
 		Frequencies freq = new Frequencies();
-		ArrayList<freqStruct> deptFreq = freq.getData(flightData.getDepartureICAO(), this);
-		
-		deptartureFreq = "Airport Frequencies: \n";
-		for(int i=0; i<deptFreq.size(); i++)
+		ArrayList<freqStruct> freqList = freq.getData(ICAO, this);
+		if(freqList.size() == 0)
 		{
-			deptartureFreq+=deptFreq.get(i).toString();
+			label = "No Frequency information for this Aiport was found";
+			
 		}
-		
-		ArrayList<freqStruct> destFreq = freq.getData(flightData.getDestinationICAO(), this);
-		destinationFreq = "Airport Frequencies: \n";
-		for(int i=0; i<destFreq.size(); i++)
+		else
 		{
-			destinationFreq+=destFreq.get(i).toString();
+			label = "Airport Frequencies: \n";
+			for(int i=0; i<freqList.size(); i++)
+			{
+				label+=freqList.get(i).toString();
+			}
 		}
-		
-
+		return label;
 		
 	}
 	
@@ -99,6 +110,10 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 	    switch (item.getItemId()) {
 	        case R.id.perform_calculations:
 	        	performCalculations();
+	        	
+	        	break;
+	        case R.id.save_calculations:
+	        	enterFlightName();
 	        	
 	        	break;
 	        	
@@ -207,23 +222,7 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 	    	}
 	    	
 	    }
-	    
-	    private String getWeatherString(WeatherStation w)
-	    {
-	    	String elev = "Elevation : " + Double.toString(w.getElevation())+" Meters";
-	    	String observationTime = "Observation Time: " + w.getObservationTime();
-	    	String temp ="Temperature: " + Double.toString(w.getTemperature())+" Celsius";
-	    	String visibility = "Visibility: " + Double.toString(w.getVisibility())+" Statute Miles";
-	    	String dir ="Direction: " + Double.toString(w.getWindDirection())+" Degrees";
-	    	String speed = "Speed: " + Double.toString(w.getWindSpeed())+" Knots";
-	    	
-	    	String output = elev + "\n" + observationTime + "\n"
-	    			+ temp + "\n" + visibility + "\n" + dir + "\n"
-	    			+ speed + "\n";
-	    	return output;
-	    }
-    
-	
+	   	
 	@Override
 	protected void onSaveInstanceState(Bundle out)
 	{
@@ -293,12 +292,41 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 
 	@Override
 	public void WeatherObtained(List<WeatherStation> w) {
-		DepartureWeather = this.getWeatherString(w.get(0));
-		DestinationWeather = this.getWeatherString(w.get(1));
+		String notAvailable = "This weather station has not reported weather data for the last week.\n";
+		DepartureWeather = notAvailable;
+		DestinationWeather = notAvailable;
+		int size = w.size();
+		for(int i=0; i<size; i++)
+		{
+			if(w.get(i).getICAO().equals(this.flightData.getDepartureICAO()))
+			{
+				DepartureWeather = this.getWeatherString(w.get(i));
+			}
+			else if(w.get(i).getICAO().equals(this.flightData.getDestinationICAO()))
+			{
+				DestinationWeather = this.getWeatherString(w.get(i));
+			}
+			
+		}
 		Toast.makeText(getApplicationContext(), "Weather data obtained, refresh tab if needed", Toast.LENGTH_SHORT).show();
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 		
 	}
+	
+    private String getWeatherString(WeatherStation w)
+    {
+    	String elev = "Elevation : " + Double.toString(w.getElevation())+" Meters";
+    	String observationTime = "Observation Time: " + w.getObservationTime();
+    	String temp ="Temperature: " + Double.toString(w.getTemperature())+" Celsius";
+    	String visibility = "Visibility: " + Double.toString(w.getVisibility())+" Statute Miles";
+    	String dir ="Direction: " + Double.toString(w.getWindDirection())+" Degrees";
+    	String speed = "Speed: " + Double.toString(w.getWindSpeed())+" Knots";
+    	
+    	String output = elev + "\n" + observationTime + "\n"
+    			+ temp + "\n" + visibility + "\n" + dir + "\n"
+    			+ speed + "\n";
+    	return output;
+    }
 	
 	public String getWeatherString(int index)
 	{
@@ -334,6 +362,55 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 			 }
 		 } 
 		 return weather;	 
+	}
+	
+	private void enterFlightName()
+	{
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		alert.setTitle("Saving Flight Data");
+		alert.setMessage("Name your Flight");
+
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(this);
+		alert.setView(input);
+
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		  String value =input.getText().toString();
+		  serializeCalculationsModel(value);
+		  }
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		  public void onClick(DialogInterface dialog, int whichButton) {
+		    // Canceled.
+		  }
+		});
+
+		alert.show();
+		
+	}
+	
+	
+	private void serializeCalculationsModel(String flightName)
+	{
+		CalculationsCollectionModel storage = CalculationsCollectionModel.loadCalculationsList(this);
+		if(flightName.isEmpty())
+		{
+			Toast.makeText(getApplicationContext(), "Flight must have a name, try again", Toast.LENGTH_LONG).show();
+		
+		}
+		else if(storage.containsKey(flightName))
+		{
+			Toast.makeText(getApplicationContext(), "A Flight named"+ flightName + "already exists, try again.", Toast.LENGTH_LONG).show();
+			
+		}
+		else
+		{
+			storage.addCalculationModel(flightName, this.flightData);
+			storage.saveCalculationsList(this);
+		}
 	}
 	
 	

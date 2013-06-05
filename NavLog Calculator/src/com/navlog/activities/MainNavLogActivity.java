@@ -38,4 +38,11 @@ public class MainNavLogActivity extends Activity {
     	Intent intent = new Intent(this, MapDownloadActivity.class);
     	startActivity(intent);
     }
+    
+    public void goToHistory(View view)
+    {
+    	Intent intent = new Intent(this, CalculationsHistoryActivity.class);
+    	startActivity(intent);
+    	
+    }
 }
