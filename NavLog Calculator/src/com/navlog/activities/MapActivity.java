@@ -144,9 +144,6 @@ public class MapActivity extends Activity
 	private void initFlightData()
 	{
 		Intent i = getIntent();
-		
-		
-		
 		String caller = i.getStringExtra("caller");
 		if(caller.equals("NewFlightActivity"))
 		{
@@ -193,6 +190,11 @@ public class MapActivity extends Activity
 		
 		if(waypointCount > 0)
 		{
+			for(int j=0;j<waypointCount;j++)
+			{
+				flightData.removeLastWaypoint();
+			}
+			
 			for(int i=0;i<waypointCount;i++)
 			{
 				placeWaypointOnMap(latitudes[i], longitudes[i], altitudes[i]);
@@ -330,7 +332,17 @@ public class MapActivity extends Activity
 	        	break;
 	        
 	        case R.id.waypoint_remove_setting:
-	        	removeLastPlacedWaypointOnMap();
+	        	Intent i = getIntent();
+				String caller = i.getStringExtra("caller");
+	        	if(caller.equals("NewFlightActivity"))
+				{
+	        		removeLastPlacedWaypointOnMap();
+				}
+				else
+				{
+					Toast.makeText(getApplicationContext(), "Waypoints may not be removed from a previously saved flight.", Toast.LENGTH_SHORT).show();
+				}
+	        	
 	        	
 	        	break;
 	        	
@@ -459,10 +471,19 @@ public class MapActivity extends Activity
 		@Override
 		public void onDoubleTap(int arg0, int arg1) 
 		{
+			Intent i = getIntent();
+			String caller = i.getStringExtra("caller");
+			if(caller.equals("NewFlightActivity"))
+			{
+				double latLong[] = new double[2];
+				latLong = mapView.pixelsToLatLng(arg0, arg1);
+				placeWaypointOnMap(latLong[0],latLong[1],0);
+			}
+			else
+			{
+				Toast.makeText(getApplicationContext(), "Waypoints may not be added to a previously saved flight.", Toast.LENGTH_SHORT).show();
+			}
 			
-			double latLong[] = new double[2];
-			latLong = mapView.pixelsToLatLng(arg0, arg1);
-			placeWaypointOnMap(latLong[0],latLong[1],0);
 		}
 
 		@Override

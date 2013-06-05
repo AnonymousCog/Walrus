@@ -342,6 +342,23 @@ public class DetailsFragment extends Fragment {
 		
     }
     
+    public LegData getEditedLegData()
+    {
+    	int i = this.getShownIndex();
+    	double windsAloftDirDouble = editTextToDouble(windsAloftDir); // rad
+		double windsAloftVelDouble = editTextToDouble(windsAloftVel); //MPH
+		double windsAloftTempDouble = editTextToDouble(windsAloftTemp); //MPH
+		double altitudeDouble = editTextToDouble(altitude);
+		double rpmDouble = editTextToDouble(rpm);
+		double tasDouble = editTextToDouble(tas);
+		LegData leg = new LegData(i, altitudeDouble, 
+				tasDouble, rpmDouble, windsAloftVelDouble, 
+				windsAloftDirDouble, windsAloftTempDouble);
+		return leg;
+	
+    	
+    }
+    
     @Override
 	public void onSaveInstanceState(Bundle out){
     	saveLegData();

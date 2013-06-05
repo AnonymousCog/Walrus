@@ -60,104 +60,7 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		restoreWeatherState(savedInstanceState);
 		loadAirportFreq();
 	    replaceListFragment();
-	    loadAirportRunway();
-        
-	}
-	
-	
-	
-	public void loadAirportRunway()
-	{
-		departureRunways = searchRunwaysInFile(this.flightData.getDepartureICAO());
-		destinationRunways = searchRunwaysInFile(this.flightData.getDestinationICAO());
-		
-	}
-	
-	public String searchRunwaysInFile(String ICAO)
-	{
-		String label;
-		Runways rw= new Runways();
-		rw.getData(ICAO, this);
-		
-		ArrayList<RunwayStruct> runList = rw.getData(ICAO, this);
-		if(runList.size() == 0)
-		{
-			label = "No Runway information for this Aiport was found";
-			
-		}
-		else
-		{
-			label = "Airport Runways: \n";
-			for(int i=0; i<runList.size(); i++)
-			{
-				label+=runList.get(i).toString();
-			}
-		}
-		return label;
-		
-	}
-	
-	public void loadAirportFreq()
-	{
-		deptartureFreq =searchFreqInFile(flightData.getDepartureICAO());
-		destinationFreq = searchFreqInFile(flightData.getDestinationICAO());
-	}
-	
-	public String searchFreqInFile(String ICAO)
-	{
-		String label;
-		Frequencies freq = new Frequencies();
-		ArrayList<freqStruct> freqList = freq.getData(ICAO, this);
-		if(freqList.size() == 0)
-		{
-			label = "No Frequency information for this Aiport was found";
-			
-		}
-		else
-		{
-			label = "Airport Frequencies: \n";
-			for(int i=0; i<freqList.size(); i++)
-			{
-				label+=freqList.get(i).toString();
-			}
-		}
-		return label;
-		
-	}
-	
-	
-	public void replaceListFragment()
-	{
-    	FragmentTransaction ft = getFragmentManager().beginTransaction();
-        Fragment newFragment = TitlesFragment.newInstance(flightData); 
-        ft.replace(R.id.titles, newFragment);
-        ft.commit();
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.calculations, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) 
-	{
-	    switch (item.getItemId()) {
-	        case R.id.perform_calculations:
-	        	performCalculations();
-	        	
-	        	break;
-	        case R.id.save_calculations:
-	        	enterFlightName();
-	        	
-	        	break;
-	        	
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
-	    return true;
+	    loadAirportRunway();    
 	}
 	
 	private void loadPreviousActivityFlightData()
@@ -168,126 +71,6 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		flightData = new CalculationsModel();
 		flightData = (CalculationsModel) b.getSerializable(MapActivity.flightModelDetails);	
 	}
-
-	@Override
-	public void onDetailsSet(LegData aLeg) 
-	{
-		addOrUpdateLeg(aLeg);
-	}
-	
-	public void addOrUpdateLeg(LegData aLeg)
-	{
-		Boolean added;
-		 added = legs.addDataEntry(aLeg);
-		 if(added == false)
-		 {
-			 legs.updateLeg(aLeg);
-		 }
-	}
-	
-	public LegData getLegData(int index)
-	{
-		LegData leg;
-		try
-		{
-			leg = legs.getLegDataList().get(index);
-			return leg;
-		}
-		catch(Exception e)
-		{
-			leg = new LegData();
-			//Log.e("Calculations Activity", "Specified leg is null", e);
-			return leg;
-		}
-		
-	}
-	
-	@Override
-    public void displayDetailsFragment(int index)
-    {
-		int labelCount = this.flightData.getAllLabels().length;
-		
-		if(index == 0 || index == labelCount-1 )
-		{
-			lastIndex = index;
-			String weather = getWeatherString(index);
-			String freq = getFreqString(index);
-			String runway = getRunwayString(index);
-			AirportFragment details = AirportFragment.newInstance(weather, freq, runway );
-			//Execute a transaction, replaceing any existing fragment
-			//with the new one inside the frame
-			
-			 FragmentTransaction ft = getFragmentManager().beginTransaction();
-	         ft.replace(R.id.details, details);
-	         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-	         ft.commit();	
-		}
-		else
-		{
-			//Only replace the fragment when a different item is selected
-			if(index != this.lastIndex)
-			{
-				lastIndex = index;
-				LegData leg = getLegData(index-1);
-				DetailsFragment details = DetailsFragment.newInstance(index-1, leg);
-				//Execute a transaction, replaceing any existing fragment
-				//with the new one inside the frame
-				
-				 FragmentTransaction ft = getFragmentManager().beginTransaction();
-		         ft.replace(R.id.details, details);
-		         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-		         ft.commit();
-			}
-		}
-			
-		
-    
-    }
-	
-
-	 private void getWeatherFromAWC(FlightWaypointsModel waypoints)
-	    {
-	    	
-	    	try
-	    	{
-		    	AviationWeatherModel weather = new AviationWeatherModel(this);
-		    	weather.execute(waypoints);
-
-	    	}
-	    	catch(Exception e)
-	    	{
-	    		System.out.println("Error getting weather data = " + e);
-	    	}
-	    	
-	    }
-	   	
-	@Override
-	protected void onSaveInstanceState(Bundle out)
-	{
-		super.onSaveInstanceState(out);
-		out.putSerializable(legKey, legs);
-		out.putInt(indexKey, lastIndex);
-		out.putString(departureConditions, this.departureWeather);
-		out.putString(destinationConditions, destinationWeather);
-	}
-	
-	private void restoreWeatherState(Bundle in)
-	{
-		if(in != null && in.containsKey(departureConditions) &&  in .containsKey(destinationConditions))
-		{
-			this.departureWeather = in.getString(departureConditions);
-			this.destinationWeather = in.getString(destinationConditions);
-		}
-		else
-		{
-			setRequestedOrientation(this.getResources().getConfiguration().orientation);
-			FlightWaypointsModel wp = (FlightWaypointsModel)flightData;
-			getWeatherFromAWC(wp);
-			
-		}
-		
-	}
-	
 	
 	private void restoreLegsState(Bundle in)
 	{
@@ -326,8 +109,215 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		 * identify if calc has been performed may be necesary in the future.
 		 */
 	}
+	
+	private void restoreWeatherState(Bundle in)
+	{
+		if(in != null && in.containsKey(departureConditions) &&  in .containsKey(destinationConditions))
+		{
+			this.departureWeather = in.getString(departureConditions);
+			this.destinationWeather = in.getString(destinationConditions);
+		}
+		else
+		{
+			setRequestedOrientation(this.getResources().getConfiguration().orientation);
+			FlightWaypointsModel wp = (FlightWaypointsModel)flightData;
+			getWeatherFromAWC(wp);	
+		}
+	}
+	
+	
+	public void loadAirportFreq()
+	{
+		deptartureFreq =searchFreqInFile(flightData.getDepartureICAO());
+		destinationFreq = searchFreqInFile(flightData.getDestinationICAO());
+	}
+	
+	public String searchFreqInFile(String ICAO)
+	{
+		String label;
+		Frequencies freq = new Frequencies();
+		ArrayList<freqStruct> freqList = freq.getData(ICAO, this);
+		if(freqList.size() == 0)
+		{
+			label = "No Frequency information for this Aiport was found";
+			
+		}
+		else
+		{
+			label = "Airport Frequencies: \n";
+			for(int i=0; i<freqList.size(); i++)
+			{
+				label+=freqList.get(i).toString();
+			}
+		}
+		return label;
+	}
 
+	
+	public void loadAirportRunway()
+	{
+		departureRunways = searchRunwaysInFile(this.flightData.getDepartureICAO());
+		destinationRunways = searchRunwaysInFile(this.flightData.getDestinationICAO());
+	}
+	
+	public String searchRunwaysInFile(String ICAO)
+	{
+		String label;
+		Runways rw= new Runways();
+		rw.getData(ICAO, this);
+		
+		ArrayList<RunwayStruct> runList = rw.getData(ICAO, this);
+		if(runList.size() == 0)
+		{
+			label = "No Runway information for this Aiport was found";
+			
+		}
+		else
+		{
+			label = "Airport Runways: \n";
+			for(int i=0; i<runList.size(); i++)
+			{
+				label+=runList.get(i).toString();
+			}
+		}
+		return label;
+	}
+	
 
+	
+	
+	public void replaceListFragment()
+	{
+    	FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment newFragment = TitlesFragment.newInstance(flightData); 
+        ft.replace(R.id.titles, newFragment);
+        ft.commit();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.calculations, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) 
+	{
+	    switch (item.getItemId()) {
+	        case R.id.perform_calculations:
+	        	performCalculations();
+	        	
+	        	break;
+	        case R.id.save_calculations:
+	        	serializeFlight();
+	        	
+	        	break;
+	        	
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	    return true;
+	}
+	
+	
+
+	@Override
+	public void onDetailsSet(LegData aLeg) 
+	{
+		addOrUpdateLeg(aLeg);
+	}
+	
+	public void addOrUpdateLeg(LegData aLeg)
+	{
+		Boolean added;
+		 added = legs.addDataEntry(aLeg);
+		 if(added == false)
+		 {
+			 legs.updateLeg(aLeg);
+		 }
+	}
+	
+	public LegData getLegData(int index)
+	{
+		LegData leg;
+		try
+		{
+			leg = legs.getLegDataList().get(index);
+			return leg;
+		}
+		catch(Exception e)
+		{
+			leg = new LegData();
+			//Log.e("Calculations Activity", "Specified leg is null", e);
+			return leg;
+		}
+	}
+	
+	@Override
+    public void displayDetailsFragment(int index)
+    {
+		int labelCount = this.flightData.getAllLabels().length;
+		
+		if(index == 0 || index == labelCount-1 )
+		{
+			lastIndex = index;
+			String weather = getWeatherString(index);
+			String freq = getFreqString(index);
+			String runway = getRunwayString(index);
+			AirportFragment details = AirportFragment.newInstance(weather, freq, runway );
+			//Execute a transaction, replaceing any existing fragment
+			//with the new one inside the frame
+			
+			 FragmentTransaction ft = getFragmentManager().beginTransaction();
+	         ft.replace(R.id.details, details);
+	         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+	         ft.commit();	
+		}
+		else
+		{
+			//Only replace the fragment when a different item is selected
+			if(index != this.lastIndex)
+			{
+				lastIndex = index;
+				LegData leg = getLegData(index-1);
+				DetailsFragment details = DetailsFragment.newInstance(index-1, leg);
+				//Execute a transaction, replacing any existing fragment
+				//with the new one inside the frame
+				
+				 FragmentTransaction ft = getFragmentManager().beginTransaction();
+		         ft.replace(R.id.details, details);
+		         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+		         ft.commit();
+			}
+		}
+    }
+	
+
+	 private void getWeatherFromAWC(FlightWaypointsModel waypoints)
+	    {
+	    	try
+	    	{
+		    	AviationWeatherModel weather = new AviationWeatherModel(this);
+		    	weather.execute(waypoints);
+	    	}
+	    	catch(Exception e)
+	    	{
+	    		System.out.println("Error getting weather data = " + e);
+	    	}
+	    	
+	    }
+	   	
+	@Override
+	protected void onSaveInstanceState(Bundle out)
+	{
+		super.onSaveInstanceState(out);
+		out.putSerializable(legKey, legs);
+		out.putInt(indexKey, lastIndex);
+		out.putString(departureConditions, this.departureWeather);
+		out.putString(destinationConditions, destinationWeather);
+	}
+	
 	@Override
 	public void WeatherObtained(List<WeatherStation> w) {
 		String notAvailable = "This weather station has not reported weather data for the last week.\n";
@@ -347,8 +337,7 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 			
 		}
 		Toast.makeText(getApplicationContext(), "Weather data obtained, refresh tab if needed", Toast.LENGTH_SHORT).show();
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-		
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);	
 	}
 	
     private String getWeatherString(WeatherStation w)
@@ -422,8 +411,13 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 	
 	
 	
-	private void enterFlightName()
+	private void serializeFlight()
 	{
+		DetailsFragment d  =(DetailsFragment)  getFragmentManager().findFragmentById(R.id.details);
+		LegData currentLeg = d.getEditedLegData();
+		this.addOrUpdateLeg(currentLeg);
+		
+		this.performCalculations();
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("Saving Flight Data");
@@ -446,8 +440,7 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		  }
 		});
 
-		alert.show();
-		
+		alert.show();	
 	}
 	
 	
@@ -489,6 +482,4 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 		}
 		
 	}
-	
-
 }
