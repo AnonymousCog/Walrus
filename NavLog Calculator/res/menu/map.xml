@@ -1,11 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-	<item 
-        android:id="@+id/map_select"
+	
+	<item
+        android:id="@+id/select_map"
+        android:orderInCategory="100"
         android:showAsAction="always"
-        android:title="@string/map_selector"
-        android:actionViewClass="android.widget.Spinner" />
-		
+        android:title="@string/maps"/>		
    	
 	<item
         android:id="@+id/waypoint_remove_setting"

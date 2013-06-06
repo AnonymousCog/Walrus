@@ -413,9 +413,12 @@ public class CalculationsActivity extends Activity implements DetailsFragment.On
 	
 	private void serializeFlight()
 	{
-		DetailsFragment d  =(DetailsFragment)  getFragmentManager().findFragmentById(R.id.details);
-		LegData currentLeg = d.getEditedLegData();
-		this.addOrUpdateLeg(currentLeg);
+		if(!(this.lastIndex < 1 || this.lastIndex == flightData.getAllLabels().length-1))
+		{
+			DetailsFragment d  =(DetailsFragment)  getFragmentManager().findFragmentById(R.id.details);
+			LegData currentLeg = d.getEditedLegData();
+			this.addOrUpdateLeg(currentLeg);
+		}
 		
 		this.performCalculations();
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);

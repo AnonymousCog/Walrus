@@ -17,6 +17,7 @@ import android.app.Fragment;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -75,9 +76,17 @@ public class CalculationsHistoryActivity extends ListActivity {
     	CalculationsCollectionModel storage =  CalculationsCollectionModel.loadCalculationsList(this);
     	CalculationsModel calc = storage.getCalculationsModel(label);
     	b.putSerializable(flightKey, calc);
-    	intent.putExtra("caller","CalculationsHistoryActivity");
     	intent.putExtras(b);
+    	setEditableFalse();
     	startActivity(intent);
+	}
+	
+	public void setEditableFalse()
+	{
+		SharedPreferences settings = getSharedPreferences("waypoints_editable", 0);
+	    SharedPreferences.Editor editor = settings.edit();
+	    editor.putBoolean("editable", false);
+	    editor.commit();
 	}
 	
 	public void deleteFlight(String label)

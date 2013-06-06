@@ -61,21 +61,17 @@ public class NewFlightActivity extends Activity
     	}
     }
     
+    public void setEditableTrue()
+    {
+    	SharedPreferences settings = getSharedPreferences("waypoints_editable", 0);
+	    SharedPreferences.Editor editor = settings.edit();
+	    editor.putBoolean("editable", true);
+	    editor.commit();
+    }
+    
     
     public void findAirports()
     {
-    	
-    	 MapModel mapModel = new MapModel();
-    	 try
-    	 {
-    	 mapModel.parseXML(this.getApplicationContext(),"Maps");
-    	 }
-	     catch (Exception e) 
-	     {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-	     }
-    	
     	EditText deptAirportCode = (EditText) findViewById(R.id.departureAirportCode);
     	String deptCode = deptAirportCode.getText().toString();
     	
@@ -110,7 +106,8 @@ public class NewFlightActivity extends Activity
 	    		intent.putExtra(destinationLatitude, destinationLat);
 	    		intent.putExtra(destinationLongitude, destinationLong);
 	    		intent.putExtra(destinationICAO, destICAO);
-	    		intent.putExtra("caller", "NewFlightActivity");
+	    		
+	    		setEditableTrue();
 	    		
 	    		startActivity(intent);
 	    	}
