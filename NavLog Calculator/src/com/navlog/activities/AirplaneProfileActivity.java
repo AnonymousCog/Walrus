@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.navlog.calculator.R;
 import com.navlog.models.AirplaneProfileModel;
@@ -28,6 +29,7 @@ public class AirplaneProfileActivity extends Activity {
 	public static final String cruisePerformanceKey = "cruisePerformance";
 	private String performanceToEdit;
 	private ListView lv;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +141,12 @@ public class AirplaneProfileActivity extends Activity {
 		finish();
 
 		
+	}
+	
+	private void deletePerformance(String label)
+	{
+		this.profile.removeCruisePerformanceParam(label);
+		populateList();
 	}
 	
 	
@@ -274,10 +282,29 @@ public class AirplaneProfileActivity extends Activity {
 
 		public void onItemClick(AdapterView<?> parent, View view,
 				int position, long id) {
-			// When clicked, show a toast with the TextView text
-			String label = (String)((TextView) view).getText();
-			launchLoadedCruisePerformanceActivity(label);
-			//Toast.makeText(getApplicationContext(), label, Toast.LENGTH_SHORT).show();
+			
+			performanceToEdit = (String)((TextView) view).getText();
+			final CharSequence[] items = {"Open", "Delete"};
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(AirplaneProfileActivity.this);
+			builder.setTitle("Select an option");
+			builder.setItems(items, new DialogInterface.OnClickListener() {
+			    public void onClick(DialogInterface dialog, int item) {
+			        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
+
+			        if(items[item].equals("Open"))
+			        {
+			        	launchLoadedCruisePerformanceActivity(performanceToEdit);
+			        }
+			        else if (items[item].equals("Delete"))
+			        {
+			        	deletePerformance(performanceToEdit);
+			        }
+			    }
+			});
+			AlertDialog alert = builder.create();
+			alert.show();
+			
 		}
 		
 	}	

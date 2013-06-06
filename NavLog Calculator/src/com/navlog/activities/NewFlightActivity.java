@@ -5,7 +5,6 @@ import java.util.Locale;
 
 import com.example.navlog.calculator.R;
 import com.navlog.models.AirportModel;
-import com.navlog.models.MapModel;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,9 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 public class NewFlightActivity extends Activity 
@@ -61,21 +58,17 @@ public class NewFlightActivity extends Activity
     	}
     }
     
+    public void setEditableTrue()
+    {
+    	SharedPreferences settings = getSharedPreferences("waypoints_editable", 0);
+	    SharedPreferences.Editor editor = settings.edit();
+	    editor.putBoolean("editable", true);
+	    editor.commit();
+    }
+    
     
     public void findAirports()
     {
-    	
-    	 MapModel mapModel = new MapModel();
-    	 try
-    	 {
-    	 mapModel.parseXML(this.getApplicationContext(),"Maps");
-    	 }
-	     catch (Exception e) 
-	     {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-	     }
-    	
     	EditText deptAirportCode = (EditText) findViewById(R.id.departureAirportCode);
     	String deptCode = deptAirportCode.getText().toString();
     	
@@ -110,7 +103,8 @@ public class NewFlightActivity extends Activity
 	    		intent.putExtra(destinationLatitude, destinationLat);
 	    		intent.putExtra(destinationLongitude, destinationLong);
 	    		intent.putExtra(destinationICAO, destICAO);
-	    		intent.putExtra("caller", "NewFlightActivity");
+	    		
+	    		setEditableTrue();
 	    		
 	    		startActivity(intent);
 	    	}

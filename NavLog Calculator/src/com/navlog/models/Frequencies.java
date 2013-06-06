@@ -44,7 +44,6 @@ public class Frequencies
 		String csvFile = "data/frequencies.csv";
 		BufferedReader br = null;
 		String line = "";
-		String cvsSplitBy = ",";
 
 		try 
 		{

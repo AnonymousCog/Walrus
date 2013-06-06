@@ -28,21 +28,23 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 
 public class MapDownloadActivity extends Activity {
 	
 	private long downloadReference;
 	private DownloadManager manager;
+	String fileName;
 	private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
 		 
 		  @Override
 		  public void onReceive(Context context, Intent intent) 
 		  {
 			String path = Environment.getExternalStorageDirectory() + "/download/";
-			String fileName = "CJ-27-20-South.zip";
+			//String fileName = "CJ-27-20-South.zip";
 			
-		    unpackZip(path, fileName);
-		    File zipFile = new File(path, fileName);
+		    unpackZip(path, fileName+".zip");
+		    File zipFile = new File(path, fileName+".zip");
 		    zipFile.delete();
 		  }
 		 }; 
@@ -72,21 +74,25 @@ public class MapDownloadActivity extends Activity {
 		return true;
 	}
 	
+	
+	
 	public void downloadMap(View view)
 	{
+		Button b = (Button)view;
+		fileName = b.getText().toString().substring(9);
 		if(isDownloadManagerAvailable(this.getBaseContext()))
 		{
 		
-			String url = "https://dl.dropbox.com/s/x1em1vx0rrby0yi/CJ-27-20-South.zip?token_hash=AAEcdpTPTz0kJeO3avkBhbg2nJ5LD_SwlDg8UVKUtKB-Pw&dl=1";
+			String url = getURL(fileName);
 			DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 			request.setDescription("Downloading Map");
-			request.setTitle("Some map");
+			request.setTitle(fileName);
 			// in order for this if to run, you must use the android 3.2 to compile your app
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			    request.allowScanningByMediaScanner();
 			    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 			}
-			request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "CJ-27-20-South.zip");
+			request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName+".zip");
 			
 			
 
@@ -97,6 +103,20 @@ public class MapDownloadActivity extends Activity {
 
 		}
 		
+	}
+	
+	private String getURL(String aFileName)
+	{
+		String url;
+		if(aFileName.equals("CJ-27-20-South"))
+		{
+			 url = "https://dl.dropbox.com/s/x1em1vx0rrby0yi/CJ-27-20-South.zip?token_hash=AAEcdpTPTz0kJeO3avkBhbg2nJ5LD_SwlDg8UVKUtKB-Pw&dl=1";
+		}
+		else //if(aFileName.equals("CJ-27-20 North"))
+		{
+			url = "https://dl.dropboxusercontent.com/s/95y07z5eosnhe2v/CJ-27-20-North.zip?token_hash=AAG2u6ODbkUXopsjmDaXnprTgfjrkksE4zvOIVmSZBqJIw&dl=1";
+		}
+		return url;
 	}
 	
 	public static boolean isDownloadManagerAvailable(Context context) {

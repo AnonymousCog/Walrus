@@ -1,11 +1,5 @@
 package com.navlog.activities;
 
-import java.util.List;
-
-import com.navlog.models.AviationWeatherModel;
-import com.navlog.models.FlightWaypointsModel;
-import com.navlog.models.WeatherStation;
-
 import android.app.Fragment;
 import android.os.Bundle;
 import android.util.TypedValue;

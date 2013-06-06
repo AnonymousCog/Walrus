@@ -34,6 +34,7 @@
     <string name="new_flight">New Flight</string>
     <string name="history">History</string>
     <string name="downloadMaps">Download Maps</string>
+    <string name="maps">Select Map</string>
     <string name="airplaneProfiles">Airplane Profiles</string>
     <string name="airplaneName">Name</string>
     <string name="airplaneBrand">Brand</string>

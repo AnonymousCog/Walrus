@@ -36,24 +36,22 @@ package com.navlog.activities;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.example.navlog.calculator.R;
 import com.navlog.models.CalculationsModel;
 import com.navlog.models.FlightWaypointsModel.Waypoint;
+import com.navlog.models.MapModel;
 import com.navlog.support.MapTileDecoderResource;
 import com.qozix.mapview.MapView;
 import com.qozix.mapview.MapView.MapEventListener;
@@ -65,9 +63,6 @@ import android.location.LocationListener;
 
 public class MapActivity extends Activity 
 {	
-	private static final String allWaypointLongitudes = "Waypoint_Longitudes";
-	private static final String	allwaypointLatitudes = "Waypoint_Latitudes";
-	private static final String allwaypointAltitudes = "Waypoint_Altitudes";
 	
 	public static final String flightModelDetails = "Flight_Data";
 	
@@ -79,7 +74,7 @@ public class MapActivity extends Activity
 
 	
 	private MapEventListener myMapListener;
-	private OnItemSelectedListener mySpinnerListener;
+	
 	private LocationManager locationManager;
 	private LocationListener locationListener;
 	private MapTileDecoder mapDecoder;
@@ -88,40 +83,8 @@ public class MapActivity extends Activity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
-		
-		double top , left, right, bottom;	
-		top = 19.659721;
-		right = -73.116667;//-73.270000;
-		bottom = 16;
-		left = -60.626548;
-		
-		
-		//from map Better!
-		/*
-		left = -60.700833;
-		top = 19.651389;
-		right = -73.066667;
-		bottom = 16.1;
-		*/
-		
-		
 		super.onCreate(savedInstanceState);
-		
-		
-		mapView = new MapView(this);
-		//mapView.registerGeolocator(19.659721, -74.979220 , 14.730666, -60.626548);//works but not 100% accurate
-		int mapWidth = 10310;
-		int mapHeight = 3100;
-		mapView.registerGeolocator(top , right, bottom, left);
-		String mapPath = "CJ-27-20-South/CJ-27-20-South-%col%_%row%.jpg";
-		mapView.addZoomLevel(mapWidth, mapHeight, mapPath, 1031, 310);
-		mapDecoder = new MapTileDecoderResource();
-		mapView.setTileDecoder(mapDecoder);
-		//mapView.addZoomLevel(mapWidth, mapHeight, "tiles/CJ-27-20-South-%col%_%row%.jpg", 1031, 310);
-		mapView.setShouldIntercept( true );
-		mapView.setCacheEnabled( false );
-		
-	      
+		      
         currentLocationMarker = new ImageView(this);
 	    currentLocationMarker.setImageResource(R.drawable.ic_current_location);
 	   
@@ -130,33 +93,85 @@ public class MapActivity extends Activity
         locationListener = new MyLocationListener();  
         myMapListener = new NLMapListner();
        
+        initMap("CJ-27-20-South");
         
-        FrameLayout frame = new FrameLayout(this);
-		setContentView(frame);
-		FrameLayout.LayoutParams mapViewLayout = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        frame.addView(mapView, mapViewLayout);
 		setTitle("");
 		
+		
+		initMap("CJ-27-20-South");
 		initFlightData();//depends on previous
 
+	}
+	
+	private void initMap(String mapName)
+	{
+		MapModel mm = new MapModel();
+		try
+		{
+			mm.parseXML(getApplicationContext(), mapName);
+			double top , left, right, bottom;	
+			top = mm.getNorthBound();//19.659721;
+			right =mm.getWestBound(); //-73.116667;//-73.270000;
+			bottom = mm.getSouthBound();//16;
+			left = mm.getEastBound();//-60.626548;
+			int mapWidth = mm.getMapPxWidth();
+			int mapHeight = mm.getMapPxHeight();
+			int tileWidth = mm.getTilePxWidth();
+			int tileHeight = mm.getTilePxHeight();
+			
+		
+			mapView = new MapView(this);
+			//mapView.registerGeolocator(19.659721, -74.979220 , 14.730666, -60.626548);//works but not 100% accurate
+			
+			mapView.registerGeolocator(top , right, bottom, left);
+			//String mapPath = "CJ-27-20-South/CJ-27-20-South-%col%_%row%.jpg";
+			String mapPath = mapName+"/"+mapName+"-%col%_%row%.jpg";
+			mapView.addZoomLevel(mapWidth, mapHeight, mapPath, tileWidth, tileHeight);
+			
+			mapDecoder = new MapTileDecoderResource();
+			mapView.setTileDecoder(mapDecoder);
+			//mapView.addZoomLevel(mapWidth, mapHeight, "tiles/CJ-27-20-South-%col%_%row%.jpg", 1031, 310);
+			mapView.setShouldIntercept( true );
+			mapView.setCacheEnabled( false );
+			
+			FrameLayout frame = new FrameLayout(this);
+			setContentView(frame);
+			FrameLayout.LayoutParams mapViewLayout = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+	        frame.addView(mapView, mapViewLayout);
+	        
+	        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener); 
+		    mapView.addMapEventListener(myMapListener);
+	        
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	private Boolean flightIsEditable()
+	{
+		SharedPreferences settings = getSharedPreferences("waypoints_editable", 0);
+        Boolean editable = settings.getBoolean("editable", false);
+        return editable;
 	}
 	
 	private void initFlightData()
 	{
 		Intent i = getIntent();
-		String caller = i.getStringExtra("caller");
-		if(caller.equals("NewFlightActivity"))
-		{
-			setDataFromNewFlightActivity(i);
-		}
-		else //if(caller.equals("CalculationsHistoryActivity"))
-		{
-			mapView.removeMapEventListener(myMapListener);
-			//disable remove from overflow
-			setDataFromHistory(i);
-		}
 		
-		
+			if(flightIsEditable())//called by new flight
+			{
+				setDataFromNewFlightActivity(i);
+			}
+			else //if(caller.equals("CalculationsHistoryActivity"))
+			{
+				mapView.removeMapEventListener(myMapListener);
+				//disable remove from overflow
+				setDataFromHistory(i);
+			}
 	}
 	
 	private void setDataFromNewFlightActivity(Intent i)
@@ -179,7 +194,12 @@ public class MapActivity extends Activity
 	{
 		Bundle b = in.getExtras();
 		this.flightData = (CalculationsModel) b.getSerializable(CalculationsHistoryActivity.flightKey);
+		placeAllDataOnMap(flightData);
+	}
 		
+	
+	private void placeAllDataOnMap(CalculationsModel data)
+	{
 		double[] latitudes = flightData.getAllWaypointLatitudes();
 		double[] longitudes = flightData.getAllWaypointLongitudes();
 		double[] altitudes = flightData.getAllWaypointAltitudes();
@@ -200,11 +220,27 @@ public class MapActivity extends Activity
 				placeWaypointOnMap(latitudes[i], longitudes[i], altitudes[i]);
 			}
 		}
-		
-		
+	}
+	
+	
+	@Override
+	protected void onSaveInstanceState(Bundle out)
+	{
+		super.onSaveInstanceState(out);
+    	out.putSerializable(flightModelDetails, this.flightData);
+    	
 		
 	}
 	
+	@Override
+	protected void onRestoreInstanceState(Bundle in)
+	{
+		super.onRestoreInstanceState(in);
+		this.flightData = (CalculationsModel)in.getSerializable(flightModelDetails);
+		placeAllDataOnMap(flightData);
+		
+	}
+
 	private void placeDepartureAirport(double lat, double lon)
 	{
 		ImageView marker = new ImageView(this);
@@ -227,54 +263,11 @@ public class MapActivity extends Activity
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.map, menu);
-		
-		String[] maps = {"CJ-27-20 South"}; //This should be replaced by the contents of the MAPS XML FILE
-		
-        Spinner spinner = (Spinner) menu.findItem(R.id.map_select).getActionView();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-        	(this, android.R.layout.simple_spinner_item, maps);
-        
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        
-        mySpinnerListener = new MapSpinnerListener();
-        spinner.setOnItemSelectedListener(mySpinnerListener);// reference to a OnItemSelectedListener, that you can use to perform actions based on user selection
-        
+   
 		return true;
 	}
 	
-	@Override
-	protected void onSaveInstanceState(Bundle out)
-	{
-		super.onSaveInstanceState(out);
-		double[] latitudes = flightData.getAllWaypointLatitudes();
-		double[] longitudes = flightData.getAllWaypointLongitudes();
-		double[] altitudes = flightData.getAllWaypointAltitudes();
-		out.putDoubleArray(allwaypointLatitudes, latitudes);
-		out.putDoubleArray(allWaypointLongitudes, longitudes);
-		out.putDoubleArray(allwaypointAltitudes, altitudes);
-		
-	}
-	
-	@Override
-	protected void onRestoreInstanceState(Bundle in)
-	{
-		super.onRestoreInstanceState(in);
-		double[] latitudes = in.getDoubleArray(allwaypointLatitudes);
-		double[] longitudes = in.getDoubleArray(allWaypointLongitudes);
-		double[] altitudes = in.getDoubleArray(allwaypointAltitudes);
-		int waypointCount = latitudes.length;
-		
-		if(waypointCount > 0)
-		{
-			for(int i=0;i<waypointCount;i++)
-			{
-				placeWaypointOnMap(latitudes[i], longitudes[i], altitudes[i]);
-			}
-		}
 
-		
-	}
 	
 	@Override
 	protected void onStart() 
@@ -288,9 +281,7 @@ public class MapActivity extends Activity
 	@Override
 	protected void onResume() {
 	    super.onResume();
-	    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener); 
-	    mapView.addMapEventListener(myMapListener);
-	    mapView.requestRender();
+	    //mapView.requestRender();
 	    
 	}
 	
@@ -332,9 +323,8 @@ public class MapActivity extends Activity
 	        	break;
 	        
 	        case R.id.waypoint_remove_setting:
-	        	Intent i = getIntent();
-				String caller = i.getStringExtra("caller");
-	        	if(caller.equals("NewFlightActivity"))
+	        	
+	        	if(flightIsEditable())
 				{
 	        		removeLastPlacedWaypointOnMap();
 				}
@@ -351,10 +341,8 @@ public class MapActivity extends Activity
 	               
 	        	break;
 	            
-	        case R.id.map_select:
-	        	
-	        	
-	        	
+	        case R.id.select_map:
+	        	selectMap();
 	        	
 	        	break;
 	        	
@@ -406,7 +394,7 @@ public class MapActivity extends Activity
 			flightData.addWaypoint(marker, lat, lon, alt); 
 			mapView.addMarker(marker,lat, lon); //with true value computes addmarker with real pixel values
 			
-			Toast.makeText(getApplicationContext(), " Lat  : "+ lat + "\n Long: " + lon + "Alt : " + alt, Toast.LENGTH_SHORT).show();
+			//Toast.makeText(getApplicationContext(), " Lat  : "+ lat + "\n Long: " + lon + "Alt : " + alt, Toast.LENGTH_SHORT).show();
 		}
 		catch(Exception e)
 		{
@@ -414,6 +402,27 @@ public class MapActivity extends Activity
 		}
 		
 	}
+    
+    private void selectMap()
+    {
+    	final CharSequence[] items = {"CJ-27-20-South", "CJ-27-20-North"};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Select a Map");
+		builder.setItems(items, new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int item) {
+		        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
+		        String map = items[item].toString();
+		        mapView.destroy();
+		        initMap(map);
+		        placeAllDataOnMap(flightData);
+		        mapView.requestRender();
+		    }
+		});
+		AlertDialog alert = builder.create();
+		alert.show();
+
+    }
     
     
     private void placeCurrentLocationOnMap(double lat, double lon, double alt)
@@ -444,26 +453,6 @@ public class MapActivity extends Activity
     }
 
 
-
-	public class MapSpinnerListener implements OnItemSelectedListener
-    {
-
-		@Override
-		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) 
-		{
-			TextView view = (TextView) arg1;
-			Toast.makeText(getApplicationContext(),"Selected Map : " + view.getText().toString(), Toast.LENGTH_SHORT).show();
-			
-		}
-
-		@Override
-		public void onNothingSelected(AdapterView<?> arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-    	
-    }
     
     public class NLMapListner implements MapEventListener
     {
@@ -471,9 +460,8 @@ public class MapActivity extends Activity
 		@Override
 		public void onDoubleTap(int arg0, int arg1) 
 		{
-			Intent i = getIntent();
-			String caller = i.getStringExtra("caller");
-			if(caller.equals("NewFlightActivity"))
+			
+			if(flightIsEditable())
 			{
 				double latLong[] = new double[2];
 				latLong = mapView.pixelsToLatLng(arg0, arg1);
@@ -481,7 +469,7 @@ public class MapActivity extends Activity
 			}
 			else
 			{
-				Toast.makeText(getApplicationContext(), "Waypoints may not be added to a previously saved flight.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Waypoints may not be added to a saved flight.", Toast.LENGTH_SHORT).show();
 			}
 			
 		}
@@ -593,19 +581,14 @@ public class MapActivity extends Activity
 		@Override
 		public void onLocationChanged(Location location) 
 		{
-						
 			try
 			{
 				double latitude = location.getLatitude();
 				double longitude = location.getLongitude();
 				double altitude = location.getAltitude();
-
 				//float speed = location.getSpeed();
-
 				placeCurrentLocationOnMap(latitude, longitude, altitude);
-		
-				//mapView.slideToAndCenter(latitude, longitude);
-				//mapView.requestRender();
+	
 			}
 			catch(Exception e)
 			{

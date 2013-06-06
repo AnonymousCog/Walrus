@@ -84,18 +84,21 @@ extends FlightWaypointsModel
 			// We calculate the initial True Curse for later operations.
 			double[]tcs = this.calculateTrueCourse();
 			
+			
 			if(listData.size() >1)
 			{	
 				// Iterate through the Leg Quantity
 				int i=0; 
 				int size = listData.size();
 				while (i <= size-1) 
-				{			
+				{
+					
 					LegData tmpData = listData.get(i);
 					
+					listData.get(i).setTC(tcs[i]);
 					//Calculating Leg values
 					//WCA
-					double wca=this.calculateWCA(tmpData.getDIR(), tmpData.getSPD(), tcs[i] , tmpData.getTAS() , tmpData.getALT());
+					double wca=this.calculateWCA(tmpData.getDIR(), tmpData.getSPD(), tcs[i] , tmpData.getTAS());
 					listData.get(i).setWCA(wca);
 					
 					//TH
@@ -170,7 +173,7 @@ extends FlightWaypointsModel
 				
 				LegData tmpData = listData.get(0);
 				//WCA
-				double wca=this.calculateWCA(tmpData.getDIR(), tmpData.getSPD(), tcs[0] , tmpData.getTAS() , tmpData.getALT());
+				double wca=this.calculateWCA(tmpData.getDIR(), tmpData.getSPD(), tcs[0] , tmpData.getTAS());
 				listData.get(0).setWCA(wca);
 				
 				//TH
@@ -317,7 +320,7 @@ extends FlightWaypointsModel
 				}
 							
 				//Calculamos Waypoint N -> Llegada
-				TCs[length-1]= this.evaluateTC(this.points.lastElement(), this.destination);
+				TCs[length]= this.evaluateTC(this.points.lastElement(), this.destination);
 			}
 			else
 			{
@@ -381,12 +384,12 @@ extends FlightWaypointsModel
 		 * @return variation
 		 */
 		private double calculateVariation(double lat, double lon)
-		{			
+		{	
+			lon = lon * -1;
 		    double height = 0;
-		    
-		    int yy = 13;
-		    int mm = 7;
-		    int dd = 15;
+		    int yy = 13;//13;
+		    int mm = 6;//7;
+		    int dd = 6;//15;
 		    int model = 7;
 		    double[] field = new double[6];
 		    int latsign = +1; // N
@@ -463,7 +466,7 @@ extends FlightWaypointsModel
 		   * @param incValue valor en radianes
 		   * @return Resultado en grados
 		   */
-		private double radiansToDeg(double incValue)
+		public double radiansToDeg(double incValue)
 		{
 			return ((180/Math.PI)*incValue);
 		}
