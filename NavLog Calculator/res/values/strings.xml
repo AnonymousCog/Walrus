@@ -25,8 +25,10 @@
     <string name="map_selector">Map Select</string>
     <string name="map_center">Center Map</string>
     <string name="title_activity_map_download">Download Maps</string>
-    <string name="title_activity_calculations">Flight Calculations</string>
+    <string name="title_activity_calculations">Calculations</string>
+    <string name="select_airplane">Select Airplane</string>
     <string name="add_new_airplane">Add Airplane</string>
+    <string name="delete_airplane">Delete Airplane</string>
     <string name="title_activity_airplane_list">All Airplane Profiles</string>
     <string name="title_activity_airplane_profile">Airplane Profile</string>
     <string name="new_flight">New Flight</string>
@@ -39,8 +41,9 @@
     <string name="airplaneTailNumber">Tail Number</string>
     <string name="createCruisePerformance">Enter Performace Parameter</string>
     <string name="performanceParams">Cruise Performance Parameters</string>
-     <string name="saveCruiseParameters">Save Performance Parameters</string>
+    <string name="saveCruiseParameters">Save Performance Parameters</string>
     <string name="save_airplane_profile">Save Airplane Profile</string>
+     <string name="save_calculations">Save</string>
     <string name="title_activity_cruise_performance">Cruise Performance</string>
     <string name="altitude">Altitude</string>
     <string name="rpm">RPM</string>
@@ -49,5 +52,8 @@
     <string name="above20cStdTemp">Above 20C Standard Temperature</string>
     <string name="ktas">KTAS</string>
     <string name="gph">GPH</string>
+    <string name="perform_calculations">Do Calculations</string>
+    <string name="title_activity_details">DetailsActivity</string>
+    <string name="title_activity_calculations_history">History</string>
 
 </resources>

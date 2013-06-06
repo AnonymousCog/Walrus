@@ -35,15 +35,10 @@ import android.util.Xml;
 public class AirportModel
 {
 	private String name;
-	private String town;
-	private String country;
 	private String IATA;
 	private String ICAO;
 	private double latitude;
 	private double longitude;
-	private double ELEV;
-	private double UCS;//should be UTC!!!
-	private String letter;
 	private static final String ns = null; //ns -> namespace
 	private String TAG = "MapModel";
 	private static final String filePath = "data/Airports.xml";
@@ -61,15 +56,10 @@ public class AirportModel
 	public void copyAirport(AirportModel a)
 	{
 		setName(a.getName());
-		setTown(a.getTown());
-		setCountry(a.getCountry());
 		setIATA(a.getIATA());
 		setICAO(a.getICAO());
 		setLatitude(a.getLatitude());
 		setLongitude(a.getLongitude());
-		setELEV(a.getELEV());
-		setUCS(a.getUCS());
-		setLetter(a.getLetter());
 		
 		
 	}
@@ -163,14 +153,7 @@ public class AirportModel
 			{
 				data.setName(readChild(parser, "NAME"));
 			}
-			else if(child.equals("TOWN"))
-			{
-				data.setTown(readChild(parser, "TOWN"));
-			}
-			else if(child.equals("COUNTRY"))
-			{
-				data.setCountry(readChild(parser, "COUNTRY"));
-			}
+		
 			else if(child.equals("IATA"))
 			{
 				data.setIATA(readChild(parser, "IATA"));
@@ -191,22 +174,7 @@ public class AirportModel
 				double dlon = Double.parseDouble(lon);
 				data.setLongitude(dlon);
 			}
-			else if(child.equals("ELEV"))
-			{
-				String ELEV = readChild(parser, "ELEV");
-				double elev = Double.parseDouble(ELEV);
-				data.setELEV(elev);
-			}
-			else if(child.equals("UCS"))
-			{
-				String UCS = readChild(parser, "UCS");
-				double dUCS = Double.parseDouble(UCS);
-				data.setUCS(dUCS);
-			}
-			else if(child.equals("LETTER"))
-			{
-				data.setLetter(readChild(parser, "LETTER"));
-			}
+			
 			else
 			{
 				skip(parser);
@@ -272,24 +240,6 @@ public class AirportModel
 		return name;
 	}
 	
-	public void setTown(String t)
-	{
-		town = t;
-	}
-	
-	public String getTown()
-	{
-		return town;
-	}
-	
-	public void setCountry(String c)
-	{
-		country = c;
-	}
-	public String getCountry()
-	{
-		return country;
-	}
 	public void setIATA(String i)
 	{
 		IATA = i;
@@ -322,29 +272,6 @@ public class AirportModel
 	{
 		return longitude;
 	}
-	public void setELEV(double e)
-	{
-		ELEV = e;
-	}
-	public double getELEV()
-	{
-		return ELEV;
-	}
-	public void setUCS(double u)
-	{
-		UCS= u;
-	}
-	public double getUCS()
-	{
-		return UCS;
-	}
-	public void setLetter(String l)
-	{
-		letter = l;
-	}
-	public String getLetter()
-	{
-		return letter;
-	}
+	
 
 }

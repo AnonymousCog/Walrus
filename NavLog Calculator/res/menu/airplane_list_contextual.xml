@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+     
+   <item 
+        android:id="@+id/set_airplane"
+        android:title="@string/select_airplane"
+        android:icon="@drawable/ic_set_airplane" 
+        android:showAsAction="always" />
+   <item 
+        android:id="@+id/delete_airplane"
+        android:showAsAction="always"
+        android:icon="@drawable/ic_delete"  
+        android:title="@string/delete_airplane"/>
+</menu>

@@ -24,7 +24,6 @@ public class MainNavLogActivity extends Activity {
     
     public void GoToNewFlight(View view)
     {
-    	//Toast.makeText(getApplicationContext(), "Goin to new Flight", Toast.LENGTH_SHORT).show();
     	Intent intent = new Intent(this, NewFlightActivity.class);
     	startActivity(intent);
     }
@@ -38,5 +37,12 @@ public class MainNavLogActivity extends Activity {
     {
     	Intent intent = new Intent(this, MapDownloadActivity.class);
     	startActivity(intent);
+    }
+    
+    public void goToHistory(View view)
+    {
+    	Intent intent = new Intent(this, CalculationsHistoryActivity.class);
+    	startActivity(intent);
+    	
     }
 }

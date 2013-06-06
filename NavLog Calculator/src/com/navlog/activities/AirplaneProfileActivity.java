@@ -1,41 +1,40 @@
 package com.navlog.activities;
 
-import com.example.navlog.calculator.R;
-import com.example.navlog.calculator.R.layout;
-import com.example.navlog.calculator.R.menu;
-import com.navlog.activities.MapActivity.MapSpinnerListener;
-import com.navlog.models.AirplaneProfileModel;
-import com.navlog.models.CruisePerformanceModel;
-
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
+
+import com.example.navlog.calculator.R;
+import com.navlog.models.AirplaneProfileModel;
+import com.navlog.models.CruisePerformanceModel;
+
 
 
 public class AirplaneProfileActivity extends Activity {
 	private AirplaneProfileModel profile = new AirplaneProfileModel();
 	public static final String cruisePerformanceKey = "cruisePerformance";
 	private String performanceToEdit;
-	private String[] performanceProfileLabels;
-	private ProfileSpinnerListener mySpinnerListener;
+	private ListView lv;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_airplane_profile);
 		loadPreviousActivityFlightData();
+		populateList();		
 	}
 
 	@Override
@@ -59,15 +58,9 @@ public class AirplaneProfileActivity extends Activity {
 	    	CruisePerformanceModel performance = new CruisePerformanceModel();
 	  		performance = (CruisePerformanceModel) b.getSerializable(cruisePerformanceKey);
 	  		String label = performance.getLabel();
-	  		//this.profile.removeCruisePerformanceParam(performanceToEdit);
-	  		this.profile.addCruisePerformanceParam(label, performance);
-	  		
-	  		
-	  
-	  		this.performanceProfileLabels = this.profile.getAllLabels();
-	  		
-	  		
-	  		this.populateSpinner();
+	  		this.profile.removeCruisePerformanceParam(performanceToEdit);
+	  		this.profile.addCruisePerformanceParam(label, performance);	  		
+	  		this.populateList();
 	      
 	      } 
 	      break; 
@@ -91,9 +84,6 @@ public class AirplaneProfileActivity extends Activity {
 	{
 		super.onBackPressed();
 	}
-	
-	
-	
 	
 	public void launchLoadedCruisePerformanceActivity(String label)
     {
@@ -119,11 +109,8 @@ public class AirplaneProfileActivity extends Activity {
 	    switch (item.getItemId()) {
 	        case R.id.save_profile:
 	        	returnDataToPreviousActivity();
-	        	
-	        	
+	        	 	
 	        	break;
-	        
-
 	        
 	        default:
 	            return super.onOptionsItemSelected(item);
@@ -166,28 +153,48 @@ public class AirplaneProfileActivity extends Activity {
 			this.setAirplaneModelField(profile.getAirplaneModel());
 			this.setAirplaneNameField(profile.getAirplaneName());
 			this.setAirplaneTailNumberField(profile.getAirplaneTailNumber());
-			populateSpinner();
 		}
 			
 		
 	}
 	
-    public void populateSpinner()
+    public void populateList()
     {
-    	String[] performanceLabels = profile.getAllLabels();
-    	if(performanceLabels.length > 0)
-    	{
-	        Spinner spinner = (Spinner) findViewById(R.id.performanceSpinner);
-	        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-	        	(this, android.R.layout.simple_spinner_item, performanceLabels);
-	        
-	        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	        spinner.setAdapter(adapter);
-	        
-	        mySpinnerListener = new ProfileSpinnerListener();
-	        spinner.setOnItemSelectedListener(mySpinnerListener);
-    	}
+    	String[] paramKeys  = profile.getAllLabels();
+		lv = (ListView) findViewById(R.id.list);
+		lv.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_activated_1, paramKeys));
+
+		lv.setFastScrollEnabled(true);
+		PerformanceParamsClickListener clickListener = new PerformanceParamsClickListener();
+		lv.setOnItemClickListener(clickListener);
+		setListViewSize();
+
     }
+    
+    public void setListViewSize()
+    {
+    	ListAdapter myListAdapter = lv.getAdapter();
+    	if (myListAdapter == null) {
+            //do nothing return null
+            return;
+        }
+        //set listAdapter in loop for getting final size
+        int totalHeight = 0;
+        for (int size = 0; size < myListAdapter.getCount(); size++) {
+            View listItem = myListAdapter.getView(size, null, lv);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+      //setting listview item in adapter
+        ViewGroup.LayoutParams params = lv.getLayoutParams();
+        params.height = totalHeight + (lv.getDividerHeight() * (myListAdapter.getCount() - 1));
+        lv.setLayoutParams(params);
+        // print height of adapter on log
+        //Log.i("height of listItem:", String.valueOf(totalHeight));
+    }
+    	
+    
 	
 	
 	
@@ -261,25 +268,17 @@ public class AirplaneProfileActivity extends Activity {
 			
 	}
 	
-	public class ProfileSpinnerListener implements OnItemSelectedListener
-    {
+	
+	public class PerformanceParamsClickListener implements OnItemClickListener
+	{
 
-		@Override
-		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) 
-		{
-			TextView view = (TextView) arg1;
-			Toast.makeText(getApplicationContext(),"Selected : " + view.getText().toString(), Toast.LENGTH_SHORT).show();
-			launchLoadedCruisePerformanceActivity(view.getText().toString());
+		public void onItemClick(AdapterView<?> parent, View view,
+				int position, long id) {
+			// When clicked, show a toast with the TextView text
+			String label = (String)((TextView) view).getText();
+			launchLoadedCruisePerformanceActivity(label);
+			//Toast.makeText(getApplicationContext(), label, Toast.LENGTH_SHORT).show();
 		}
-
-		@Override
-		public void onNothingSelected(AdapterView<?> arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-    	
-    }
-
-
+		
+	}	
 }

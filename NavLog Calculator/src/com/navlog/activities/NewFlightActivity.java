@@ -9,6 +9,7 @@ import com.navlog.models.MapModel;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -21,20 +22,16 @@ public class NewFlightActivity extends Activity
 {
 	public final static String departureLatitude ="Departure_Latitude";
 	public final static String departureLongitude ="Departure_Longitude";
-	public final static String departureAltitude = "Departure_Altitude";
 	public final static String departureICAO = "Departure_ICAO";
 	
 	public final static String destinationLatitude ="Destination_Latitude";
 	public final static String destinationLongitude ="Destination_Longitude";
-	public final static String destinationAltitude = "Destination_Altitude";
 	public final static String destinationICAO = "Destination_ICAO";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_flight);
-        populateSpinner();
-        
+        setContentView(R.layout.activity_new_flight); 
     }
 
     @Override
@@ -43,9 +40,30 @@ public class NewFlightActivity extends Activity
         return true;
     }
     
-    public void submitPressed(View view)
+    public Boolean planeSelected()
     {
     	
+    	SharedPreferences settings = getSharedPreferences(AirplaneListActivity.selected_plane_pref, 0);
+        String plane = settings.getString(AirplaneListActivity.selected, "None");
+        Boolean selected = !plane.equals("None");
+        return selected;
+    }
+    
+    public void submitPressed(View view)
+    {
+    	if(planeSelected())
+    	{
+    		findAirports();
+    	}
+    	else
+    	{
+    		Toast.makeText(getApplicationContext(), "You must first select a plane", Toast.LENGTH_SHORT).show();
+    	}
+    }
+    
+    
+    public void findAirports()
+    {
     	
     	 MapModel mapModel = new MapModel();
     	 try
@@ -72,14 +90,12 @@ public class NewFlightActivity extends Activity
 			boolean departureFound = ap.parseAirportXML(this.getApplicationContext(), deptCode.toUpperCase(loc));
 			double departureLat = ap.getLatitude();
 			double departureLong = ap.getLongitude();
-			double departureAlt = ap.getELEV();
 			String deptICAO = ap.getICAO();
 			
 			ap = new AirportModel();
 			boolean destinationFound = ap.parseAirportXML(this.getApplicationContext(), destCode.toUpperCase(loc));
 			double destinationLat = ap.getLatitude();
 			double destinationLong = ap.getLongitude();
-			double destinationAlt = ap.getELEV();
 			String destICAO = ap.getICAO();
 			
 			
@@ -88,14 +104,13 @@ public class NewFlightActivity extends Activity
 	    		Intent intent = new Intent(this, MapActivity.class);
 	    		intent.putExtra(departureLatitude, departureLat);
 	    		intent.putExtra(departureLongitude, departureLong);
-	    		intent.putExtra(departureAltitude, departureAlt);
 	    		intent.putExtra(departureICAO, deptICAO);
 	    		
 	    		
 	    		intent.putExtra(destinationLatitude, destinationLat);
 	    		intent.putExtra(destinationLongitude, destinationLong);
-	    		intent.putExtra(destinationAltitude, destinationAlt);
 	    		intent.putExtra(destinationICAO, destICAO);
+	    		intent.putExtra("caller", "NewFlightActivity");
 	    		
 	    		startActivity(intent);
 	    	}
@@ -118,20 +133,5 @@ public class NewFlightActivity extends Activity
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
-    
-    	
-
-    }
-    
-    public void populateSpinner()
-    {
-    	String[] maps = {"Flight #1", "Flight #2","Flight #3"}; //This should be replaced by the contents of the MAPS XML FILE
-        Spinner spinner = (Spinner) findViewById(R.id.spinner1);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-        	(this, android.R.layout.simple_spinner_item, maps);
-        
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
     }
 }

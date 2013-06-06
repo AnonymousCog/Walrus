@@ -10,10 +10,10 @@
         android:layout_below="@+id/newFlightTextView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="17dp"
+        android:ems="10"
         android:hint="@string/Departure_Airport_Code"
         android:inputType="textCapWords"
-        android:text="tjsj"
-        android:ems="10" >
+        android:text="tjsj" >
 
         <requestFocus />
     </EditText>
@@ -25,10 +25,10 @@
         android:layout_alignLeft="@+id/departureAirportCode"
         android:layout_below="@+id/departureAirportCode"
         android:layout_marginTop="42dp"
-        android:inputType="textCapWords"
-        android:text="tjmz"
         android:ems="10"
-        android:hint="@string/Destination_Airport_Code" />
+        android:hint="@string/Destination_Airport_Code"
+        android:inputType="textCapWords"
+        android:text="tjmz" />
 
     <Button
         android:id="@+id/SubmitBtn"
@@ -42,36 +42,14 @@
         android:onClick="submitPressed"
         android:text="@string/Submit" />
 
-    <Spinner
-        android:id="@+id/spinner1"
-        style="@style/AppTheme"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/SubmitBtn"
-        android:layout_below="@+id/fromPreviousTextView"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="30dp"
-        android:spinnerMode="dialog" />
-
     <TextView
         android:id="@+id/newFlightTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/fromPreviousTextView"
         android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="27dp"
         android:text="@string/Create_A_New_Flight"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/fromPreviousTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/DestinationAirportCode"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="118dp"
-        android:text="@string/Choose_Previous_Flight"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
