@@ -13,5 +13,7 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/mapviewlib.jar"/>
+	<classpathentry kind="lib" path="C:/adt-bundle-windows-x86_64 - Copy - Copy/commons-math3-3.2-bin/commons-math3-3.2/commons-math3-3.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/adt-bundle-windows-x86_64 - Copy - Copy/commons-math3-3.2-bin/commons-math3-3.2/commons-math3-3.2.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
