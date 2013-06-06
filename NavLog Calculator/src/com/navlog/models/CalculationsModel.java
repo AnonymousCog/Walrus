@@ -3,8 +3,17 @@ package com.navlog.models;
 import java.text.DecimalFormat;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.math3.*;
+import org.apache.commons.math3.analysis.TrivariateFunction;
+import org.apache.commons.math3.analysis.interpolation.TricubicSplineInterpolator;
+import org.apache.commons.math3.analysis.interpolation.TrivariateGridInterpolator;
+
+import com.navlog.support.Magfield;
+
 
 /**
 * Calculations Model Class. All formulas evaluate using radians.
@@ -17,6 +26,7 @@ public class CalculationsModel
 extends FlightWaypointsModel
     implements java.io.Serializable 
     {
+		private String flightName;
 		private static final long serialVersionUID = 1L;
 		private ArrayList<LegData> listData;
 		
@@ -67,9 +77,9 @@ extends FlightWaypointsModel
 			listData = _dataEntry;
 			double tte=0;
 			// Using the Fligh Model information we calculate the total values of Distance, Time and Fuel Consumption.
-			totalDistance = getTotalDistance();
-			totalTime = this.getTotalTime();
-			totalFuel = this.getTotalFuel();
+			setTotalDistance(getTotalDistance());
+			setTotalTime(this.getTotalTime());
+			setTotalFuel(this.getTotalFuel());
 				
 			// We calculate the initial True Curse for later operations.
 			double[]tcs = this.calculateTrueCourse();
@@ -253,15 +263,15 @@ extends FlightWaypointsModel
 		 * haversine formula to calculate distance between 2 Waypoints.
 		 * @param A Waypoint (From)
 		 * @param B Waypoint (To)
-		 * @return double value in radians
+		 * @return double value in Kilometers
 		 */
 		private double getDistance(Waypoint A, Waypoint B)
 		{ 
 			double R = 6371.0087714; 		// Earch radius in Kilometers
-			double dLat = this.degToRadians(B.getLatitude()-A.getLatitude());
-			double dLon = this.degToRadians(B.getLongitude()-A.getLongitude());
-			double lat1 = this.degToRadians(A.getLatitude());
-			double lat2 = this.degToRadians(B.getLatitude());					
+			double dLat = this.doubleToRadians(B.getLatitude()-A.getLatitude());
+			double dLon = this.doubleToRadians(B.getLongitude()-A.getLongitude());
+			double lat1 = this.doubleToRadians(A.getLatitude());
+			double lat2 = this.doubleToRadians(B.getLatitude());					
 
 			double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
 			        Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
@@ -285,87 +295,71 @@ extends FlightWaypointsModel
 		}
 		
 		 /** Calculates True Course
-		 * @return (double)True Curse value
+		 * @return Double array with all True Curse values
 		 **/
 		private double[] calculateTrueCourse()
 		{
 			int length = this.points.size();
 			double[]TCs = new double[length+1];
 					
-			double lat1, lat2, lon1, lon2;
 			
 			if(length>0)
 			{
 				//Hay al menos 1 waypoint
 				
 				//Calculamos salida -> Waypoint1
-				lat1 = Math.toRadians(this.departure.getLatitude());
-				lon1 = Math.toRadians(this.departure.getLongitude());
-				lat2 = Math.toRadians(this.points.get(0).getLatitude());
-				lon2 = Math.toRadians(this.points.get(0).getLongitude());
-				
-				if (Math.sin(lon2-lon1)<0)       
-					   TCs[0]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
-					else       
-					   TCs[0]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));
+				TCs[0] = this.evaluateTC(this.departure, this.points.get(0));
 				
 				//Calculamos Waypoint 1 -> Waypoint N
 				for(int i=0; i<this.points.size()-1; i++)
 				{				
-					lat1 = Math.toRadians(this.points.get(i).getLatitude());
-					lon1 = Math.toRadians(this.points.get(i).getLongitude());
-					lat2 = Math.toRadians(this.points.get(i+1).getLatitude());
-					lon2 = Math.toRadians(this.points.get(i+1).getLongitude());
-					
-					if (Math.sin(lon2-lon1)<0)       
-						   TCs[i+1]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
-						else       
-						   TCs[i+1]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
+					TCs[i+1] = this.evaluateTC(this.points.get(i), this.points.get(i+1));
 				}
 							
 				//Calculamos Waypoint N -> Llegada
-				lat1 = Math.toRadians(this.points.lastElement().getLatitude());
-				//lat1 = Math.toRadians(this.points.get(this.points.size()-1).getLatitude());
-				lon1 = Math.toRadians(this.points.lastElement().getLongitude());
-				//lon1 = Math.toRadians(this.points.get(this.points.size()-1).getLongitude());
-				lat2 = Math.toRadians(this.destination.getLatitude());
-				lon2 =  Math.toRadians(this.destination.getLongitude());
-				if (Math.sin(lon2-lon1)<0)       
-				   TCs[length]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));    
-				else       
-				   TCs[length]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.points.get(0))))/(Math.sin(getDistance(this.departure,this.points.get(0)))*Math.cos(lat1)));
+				TCs[length-1]= this.evaluateTC(this.points.lastElement(), this.destination);
 			}
 			else
 			{
 				//No hay waypoints
-				lat1 = Math.toRadians(this.departure.getLatitude());
-				lon1 = Math.toRadians(this.departure.getLongitude());
-				lat2 = Math.toRadians(this.destination.getLatitude());
-				lon2 = Math.toRadians(this.destination.getLongitude());
-				
-				if (Math.sin(lon2-lon1)<0)       
-				   TCs[0]=Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.destination)))/(Math.sin(getDistance(this.departure,this.destination))*Math.cos(lat1)));    
-				else       
-				   TCs[0]=2*Math.PI-Math.acos((Math.sin(lat2)-Math.sin(lat1)*Math.cos(getDistance(this.departure,this.destination)))/(Math.sin(getDistance(this.departure,this.destination))*Math.cos(lat1)));
+				TCs[0] = this.evaluateTC(this.departure, this.destination);
 			}
 			return TCs;
 		}
 		
 		/**
-		 * Method to calculate the WCA at a certain LEG.
-		 * @param _windDirection Wind Directions.
-		 * @param _windVel Wind Velocity
-		 * @param _TC True Curse
-		 * @param _TAS TRue Airspeed
-		 * @param _altitude Altitude
-		 * @return double with the Wind Correction Angle
+		 * Function to evaluate TC for 2 points
+		 * @param A From
+		 * @param B TO
+		 * @return true curse
 		 */
-		private double calculateWCA(double _windDirection, double _windVel, double _TC, double _TAS, double _altitude)
+		private double evaluateTC(Waypoint A, Waypoint B)
+		{
+			double tc=0;
+			double lat1 = this.doubleToRadians(this.departure.getLatitude());
+			double lon1 = this.doubleToRadians(this.departure.getLongitude());
+			double lat2 = this.doubleToRadians(this.destination.getLatitude());
+			double lon2 = this.doubleToRadians(this.destination.getLongitude());
+			
+			tc=(Math.atan2(Math.sin(lon1-lon2)*Math.cos(lat2), Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(lon1-lon2)))%2*Math.PI;
+		
+			return tc;
+			
+		}
+		/**
+		 * Method to calculate the WCA at a certain LEG.
+		 * @param _windDirection Wind Directions as degree
+		 * @param _windVel Wind Velocity 
+		 * @param _TC True Curse in radian
+		 * @param _TAS TRue Airspeed 
+		 * @return double with the Wind Correction Angle in radians
+		 */
+		private double calculateWCA(double _windDirection, double _windVel, double _TC, double _TAS)
 		{
 			double wca=0;						
-			double m = Math.sin( _windDirection - _TC);
+			double m = Math.sin(this.degToRadians(_windDirection) - _TC);
 			double xw = m * _windVel;
-			wca = xw / (_TAS*_altitude);
+			wca = xw / (_TAS);
 			return wca;
 		}
 		
@@ -381,15 +375,35 @@ extends FlightWaypointsModel
 		}
 				
 		/**
-		 * Method to calculate the variation.
-		 * @return double in radians
+		 * Method to calculate the Magnetic Variation
+		 * @param lat latitude
+		 * @param lon longitude
+		 * @return variation
 		 */
 		private double calculateVariation(double lat, double lon)
 		{			
-			double var = -65.6811 + (0.99*lat) + (0.0128899*Math.pow(lat,2)) - 0.0000905928*Math.pow(lat, 3)+ 2.87622*lon - 
-				        0.0116268*lat*lon - 0.00000603925*(Math.pow(lat,2))*lon - 0.0389806*(Math.pow(lon, 2)) - 
-				        0.0000403488*lat*(Math.pow(lon,2)) + 0.000168556*(Math.pow(lon,3));
-			return 13;
+		    double height = 0;
+		    
+		    int yy = 13;
+		    int mm = 7;
+		    int dd = 15;
+		    int model = 7;
+		    double[] field = new double[6];
+		    int latsign = +1; // N
+		    int lonsign = -1; // W
+		    int varsign = -1; // W
+
+		    //System.out.println("lat = "+ latsign*Magfield.deg_to_rad(lat));
+		    //System.out.println("lon = "+ lonsign*Magfield.deg_to_rad(lon));
+		    //System.out.println("alt = "+ height);
+		    //System.out.println("julian = "+ Magfield.yymmdd_to_julian_days(yy,mm,dd));
+		    //System.out.println("model = "+ model);
+
+		    double variation = Magfield.rad_to_deg(varsign*Magfield.SGMagVar(latsign*this.doubleToRadians(lat),lonsign*this.doubleToRadians(lon),height,
+		                Magfield.yymmdd_to_julian_days(yy,mm,dd),model,field));
+		    
+		    return ((double)(Math.round( variation * 10 ) )/10);
+			  
 		}
 		
 		/**
@@ -469,7 +483,268 @@ extends FlightWaypointsModel
 		{
 			return (value *  Math.PI / 180);
 		}
-							
+		
+		/**
+		 * Method to evaluate and return True Air Speed and GPH values according to the
+		 * entered data in the aircraft profile
+		 * @param _profiles Aircraft Profile lcass
+		 * @param _altitude Desired Altitude
+		 * @param _RPMS Desired RPMS
+		 * @param _temperature Temperature
+		 * @return double array with the True Airspeed and GPH
+		 */
+		public double[] getCruisePerformanceData(AirplaneProfileModel _profiles, double _altitude, double _RPMS, double _temperature)
+        {
+			//Data respuesta donde indice 0 = TAS, indice 1= GPH
+			double[] returnData = new double[2];
+			
+            //Get all profile Altitudes
+            double[] altitudes = _profiles.getAllAltitudes();
+
+            //Get all profile RPMS
+            double[] rpms = _profiles.getAllRpms();
+
+            //determine temp bracket for TAS
+            double[] tempTAS;double[] tempGPH;
+            if(_temperature ==20)
+            {
+            	tempTAS = _profiles.getAllStdKTAS();
+            	tempGPH = _profiles.getAllstdGPH();
+            }
+            else if(_temperature<20)
+            {
+            	tempTAS = _profiles.getAllBelow20cKTAS();
+            	tempGPH = _profiles.getAllBelow20cGPH();
+            }
+            else 
+            {
+            	tempTAS = _profiles.getAllAbove20cKTAS();
+            	tempGPH = _profiles.getAllAbove20cGPH();
+            }
+            
+            //Los arreglos deben tener el mismo size.
+            if((altitudes.length != rpms.length) != (tempTAS.length != tempGPH.length))
+            	return null;
+            //Debe haber minimo 2 rows de data para efectos de interpolacion.
+            if(altitudes.length<3)
+            	return null;
+            
+            //Primero verificamos que la altitud solicitada exista en el profile.
+            //Si encontramos valor guardaremos un arreglo con los indices para luego buscar valores basados en estos indices.
+            double[] indexes= new double[0];
+            for(int i=0;i<altitudes.length;i++)
+            {
+            	if(altitudes.equals(_altitude))
+            	{
+            		//Creo arreglo nuevo
+            		double[] tmp =new double[indexes.length+1];
+            		//Busco size
+            		int len = tmp.length;
+            		//Agrego el indice en el ultimo row
+            		tmp[len-1]= i;
+            		//copiamos los valores del arreglo viejo al nuevo
+            		for(int j=0;j<indexes.length-1;j++)
+            		{
+            			tmp[j] = indexes[j];
+            		}
+            		//copiamos el nuevo arreglo al viejo
+            		indexes = tmp;
+            	}
+            }
+            
+            //Si el arreglo de indices >0 la altitud tiene valores
+            if(indexes.length>0)
+            {
+            	// 2 Casos aparecen en este escenario
+            	
+            	// 1. Los RPMS estan definidos y la data esta
+            	for(int i=0;i<indexes.length;i++)
+            	{
+            		if(_RPMS == indexes[i])
+            		{
+            			returnData[0] = tempTAS[i];
+            			returnData[1] = tempGPH[i];
+            			break;
+            		}
+            	}
+            	
+            	// 2. Los RPMS no estan.
+            	double belowRPMvalue=0;
+            	int belowRPMindex =-1;
+            	double overRPMvalue=999999;
+            	int overRPMindex=-1;
+        	
+            	for(int i=0; i< rpms.length;i++)
+            	{
+            		if((rpms[i]<_RPMS)&&(rpms[i]>belowRPMvalue))
+            		{
+            			belowRPMvalue = rpms[i];
+            			belowRPMindex=i;
+            		}
+            		if((rpms[i]>_RPMS)&&(rpms[i]<overRPMvalue))
+            		{
+            			overRPMvalue = rpms[i];
+            			overRPMindex=i;
+            		}
+            	}
+            	
+                       	
+            	
+            	// busco los valores de GPH y KTA para los indices conseguidos.
+            	double belowGPH = tempGPH[belowRPMindex];
+            	double overGPH = tempGPH[overRPMindex];
+            	double belowTAS = tempTAS[belowRPMindex];
+            	double overTAS = tempTAS[overRPMindex];
+            	
+            	//Interpolacion Lineal para evaluar el resultado
+            	//Calculamos TAS
+            	returnData[0] = lineal(_altitude, belowRPMvalue, overRPMvalue, belowTAS, overTAS);
+            	//Calculamos GPH
+            	returnData[1] = lineal(_altitude, belowRPMvalue, overRPMvalue, belowGPH, overGPH);
+            	
+            	//End
+            	return returnData;
+            
+            }
+            // Si el arreglo es 0 significa que hay que interpolar con data las altitudes y luego lineal.
+            else
+            {
+            	//Primero buscamos el indice y el valor de una altitud menor y una mayor a la solicitada.
+            	double belowAltvalue=0;
+            	ArrayList<Integer>belowAltindexes = new ArrayList<Integer>();
+            	double overAltValue=9999999;
+            	ArrayList<Integer>overAltindexes = new ArrayList<Integer>();
+            	
+            	for(int i=0; i< rpms.length;i++)
+            	{
+            		if((rpms[i]<_RPMS)&&(rpms[i]>belowAltvalue))
+            		{
+            			belowAltvalue = rpms[i];
+            			belowAltindexes.add(i);
+            		}
+            		if((rpms[i]>_RPMS)&&(rpms[i]<overAltValue))
+            		{
+            			overAltValue = rpms[i];
+            			overAltindexes.add(i);
+            		}
+            	}
+            	
+            	//Ahora creamos un arreglo con todos los RPMS para la altitud below y otro para over.
+            	ArrayList<Double> belowRpms = new ArrayList<Double>();            	
+            	ArrayList<Double> overRpms = new ArrayList<Double>();
+            	//Aprovechamos y creamos un arreglo con todos los GPH para la altitud below y otro para over.
+            	ArrayList<Double> belowGPH = new ArrayList<Double>();            	
+            	ArrayList<Double> overGPH = new ArrayList<Double>();
+            	//Aprovechamos y creamos un arreglo con todos los TAS para la altitud below y otro para over.
+            	ArrayList<Double> belowTAS = new ArrayList<Double>();
+            	ArrayList<Double> overTAS = new ArrayList<Double>();
+            	
+            	//Recorremos y asignamos
+            	for(int i=0;i<belowAltindexes.size();i++)
+            	{
+            		belowRpms.add(rpms[i]);
+            		belowGPH.add(tempGPH[i]);
+            		belowTAS.add(tempTAS[i]);
+            	}
+            	for(int i=0;i<overAltindexes.size();i++)
+            	{
+            		overRpms.add(rpms[i]);
+            		overGPH.add(tempGPH[i]);
+            		overTAS.add(tempTAS[i]);
+            	}
+            	
+                               
+                // Ahora vamos a calcular una dupla que no este directamente en la tabla, menor y mayor.
+            	//GPH para rpm dado
+                double x_gph_below = interpolateX(_RPMS, belowRpms, belowGPH);
+                double x_gph_over = interpolateX(_RPMS, overRpms, overGPH);
+                
+                //TAS para rpm dado
+                double x_tas_below = interpolateX(_RPMS, belowRpms, belowTAS);
+                double x_tas_over = interpolateX(_RPMS, overRpms, overTAS);
+                
+                // Ya que tenemos los datos, hacemos una
+                // interpolacion simple para saber los valores finales.
+                //indice 1 = GPH, indice 0 = TAS
+                returnData[1] = lineal(_RPMS, belowAltvalue, overAltValue, x_gph_below, x_gph_over);
+                returnData[0] = lineal(_RPMS, belowAltvalue, overAltValue, x_tas_below, x_tas_over);
+                return returnData;
+            }
+        }
+		
+	
+		/**
+		 * Method to interpolate
+		 * @param x the value to interpolate
+		 * @param xd Array with Values Below
+		 * @param yd Array with values Over
+		 * @return Interpolated value
+		 */
+        static public double interpolateX(double x, ArrayList<Double> xd, ArrayList<Double> yd)
+        {
+            double answer = 0;
+            for (int i = 0; i <= xd.size() - 1; i++)
+            {
+            	
+                double numerator = 1;
+                double denominator = 1;
+                
+                for (int c = 0; c <= xd.size() - 1; c++)
+                {
+                    if (c != i)
+                    {
+                        numerator *= (x - xd.get(c));
+                        denominator *= (xd.get(i) - xd.get(c));
+                    }
+                }
+                answer += (double)(yd.get(i) * (numerator / denominator));
+            }
+            return answer;
+        }
+
+        /**
+         * Method to do linear interpolation at a single Point
+         * @param x Altitude to evaluate
+         * @param x0 below RPM
+         * @param x1 over RPM
+         * @param y0 below Value
+         * @param y1 over Value
+         * @return interpolated value
+         */
+        static public double lineal(double x, double x0, double x1, double y0, double y1)
+        {
+            if ((x1 - x0) == 0)
+            {
+                return (y0 + y1) / 2;
+            }
+            return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+        }
+          
+
+		public String getFlightName() {
+			return flightName;
+		}
+
+
+		public void setFlightName(String flightName) {
+			this.flightName = flightName;
+		}
+
+
+		public void setTotalDistance(double totalDistance) {
+			this.totalDistance = totalDistance;
+		}
+
+
+		public void setTotalTime(double totalTime) {
+			this.totalTime = totalTime;
+		}
+
+
+		public void setTotalFuel(double totalFuel) {
+			this.totalFuel = totalFuel;
+		}
+						
    }
 
 
