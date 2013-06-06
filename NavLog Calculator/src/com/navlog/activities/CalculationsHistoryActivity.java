@@ -1,31 +1,18 @@
 package com.navlog.activities;
 
 import com.example.navlog.calculator.R;
-import com.example.navlog.calculator.R.layout;
-import com.example.navlog.calculator.R.menu;
-import com.navlog.activities.AirplaneListActivity.AirplaneListClickListener;
-import com.navlog.activities.AirplaneListActivity.AirplaneListContextualtMenu;
-import com.navlog.models.AirplaneCollectionModel;
-import com.navlog.models.AirplaneProfileModel;
 import com.navlog.models.CalculationsCollectionModel;
 import com.navlog.models.CalculationsModel;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.LayoutInflater;
+
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -47,7 +34,7 @@ public class CalculationsHistoryActivity extends ListActivity {
 		if(loaded != null)
 		{
 			list = loaded;
-			String[] calculations = loaded.getAllLabels();
+			String[] calculations = list.getAllLabels();
 			
 			setListAdapter(new ArrayAdapter<String>(this,
 	                android.R.layout.simple_list_item_activated_1, calculations));
@@ -56,8 +43,7 @@ public class CalculationsHistoryActivity extends ListActivity {
 			lv.getId();
 			CalculationsListClickListener clickListener = new CalculationsListClickListener();
 			lv.setOnItemClickListener(clickListener);
-			//lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-			//lv.setMultiChoiceModeListener(new AirplaneListContextualtMenu());	   
+	
 		}
 	}
 	

@@ -91,16 +91,45 @@ public class CruisePerformanceActivity extends Activity {
 		
 	}
 	
+	public int editTextToInt(int id)
+	{
+		EditText e = (EditText) findViewById(id);
+		String text = e.getText().toString();
+		int num;
+		if(!text.isEmpty())
+		{
+			num = Integer.parseInt(text);
+		}
+		else
+		{
+			num = 0;
+		}
+		return num;
+	}
 	
+	
+	public double editTextToDouble(int id)
+	{
+		EditText e = (EditText) findViewById(id);
+		String text = e.getText().toString();
+		double num;
+		if(!text.isEmpty())
+		{
+			num = Double.parseDouble(text);
+		}
+		else
+		{
+			num = 0;
+		}
+		return num;
+	}
 	
 	
 	public int getAltitude()
 	{
-		EditText alt = (EditText) findViewById(R.id.performanceAltitude);
-    	int altitude = Integer.parseInt(alt.getText().toString());
-    	return altitude;
-    	
+		return editTextToInt(R.id.performanceAltitude);	
 	}
+	
 	
 	public void setAltitude(int a)
 	{
@@ -110,10 +139,7 @@ public class CruisePerformanceActivity extends Activity {
 	
 	public int getRPM()
 	{
-		EditText rpm = (EditText) findViewById(R.id.performanceRPM);
-    	int r = Integer.parseInt(rpm.getText().toString());
-    	return r;
-    	
+		return editTextToInt(R.id.performanceRPM);		
 	}
 	
 	public void setRPM(int r)
@@ -124,10 +150,7 @@ public class CruisePerformanceActivity extends Activity {
 	
 	public double getKTASBelow20std()
 	{
-		EditText ktas = (EditText) findViewById(R.id.below20cKTAS);
-    	double k = Double.parseDouble(ktas.getText().toString());
-    	return k;
-    	
+    	return editTextToDouble(R.id.below20cKTAS);	
 	}
 	
 	public void setKTASBelow20std(Double k)
@@ -139,10 +162,7 @@ public class CruisePerformanceActivity extends Activity {
 	
 	public double getKTASstd()
 	{
-		EditText ktas = (EditText) findViewById(R.id.stdKTAS);
-    	double k = Double.parseDouble(ktas.getText().toString());
-    	return k;
-    	
+    	return editTextToDouble(R.id.stdKTAS);	    	
 	}
 	
 	public void setKTASstd(Double k)
@@ -154,10 +174,7 @@ public class CruisePerformanceActivity extends Activity {
 	
 	public double getKTASAbove20std()
 	{
-		EditText ktas = (EditText) findViewById(R.id.above20cKTAS);
-		double k = Double.parseDouble(ktas.getText().toString());
-    	return k;
-    	
+    	return editTextToDouble(R.id.above20cKTAS);		
 	}
 	
 	public void setKTASAbove20std(Double k)
@@ -169,10 +186,7 @@ public class CruisePerformanceActivity extends Activity {
 	
 	public double getGPHBelow20std()
 	{
-		EditText gph = (EditText) findViewById(R.id.below20cGPH);
-		double g = Double.parseDouble(gph.getText().toString());
-    	return g;
-    	
+    	return editTextToDouble(R.id.below20cGPH);	
 	}
 	
 	public void setGPHBelow20std(Double g)
@@ -184,10 +198,7 @@ public class CruisePerformanceActivity extends Activity {
 	
 	public double getGPHstd()
 	{
-		EditText ktas = (EditText) findViewById(R.id.stdGPH);
-		double g = Double.parseDouble(ktas.getText().toString());
-    	return g;
-    	
+    	return editTextToDouble(R.id.stdGPH);		
 	}
 	
 	public void setGPHstd(Double g)
@@ -198,10 +209,7 @@ public class CruisePerformanceActivity extends Activity {
 	
 	public double getGPHAbove20std()
 	{
-		EditText ktas = (EditText) findViewById(R.id.above20cGPH);
-		double g = Double.parseDouble(ktas.getText().toString());
-    	return g;
-    	
+    	return editTextToDouble(R.id.above20cGPH);	
 	}
 	
 	public void setGPHAbove20std(Double g)

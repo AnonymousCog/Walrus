@@ -49,7 +49,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.example.navlog.calculator.R;
-import com.navlog.models.CalculationsCollectionModel;
 import com.navlog.models.CalculationsModel;
 import com.navlog.models.FlightWaypointsModel.Waypoint;
 import com.navlog.models.MapModel;
@@ -85,22 +84,7 @@ public class MapActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		
-		/*mapView = new MapView(this);
-		//mapView.registerGeolocator(19.659721, -74.979220 , 14.730666, -60.626548);//works but not 100% accurate
-		int mapWidth = 10310;
-		int mapHeight = 3100;
-		mapView.registerGeolocator(top , right, bottom, left);
-		String mapPath = "CJ-27-20-South/CJ-27-20-South-%col%_%row%.jpg";
-		mapView.addZoomLevel(mapWidth, mapHeight, mapPath, 1031, 310);
-		
-		mapDecoder = new MapTileDecoderResource();
-		mapView.setTileDecoder(mapDecoder);
-		//mapView.addZoomLevel(mapWidth, mapHeight, "tiles/CJ-27-20-South-%col%_%row%.jpg", 1031, 310);
-		mapView.setShouldIntercept( true );
-		mapView.setCacheEnabled( false );*/
-		
-	      
+		      
         currentLocationMarker = new ImageView(this);
 	    currentLocationMarker.setImageResource(R.drawable.ic_current_location);
 	   

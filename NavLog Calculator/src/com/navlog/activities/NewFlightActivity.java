@@ -5,7 +5,6 @@ import java.util.Locale;
 
 import com.example.navlog.calculator.R;
 import com.navlog.models.AirportModel;
-import com.navlog.models.MapModel;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,9 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 public class NewFlightActivity extends Activity 

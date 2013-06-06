@@ -163,7 +163,6 @@ public class MapModel
 	{
 		boolean expired;
 		Date now = new Date();
-		
 		expired = now.after(expiration);
 		return expired;
 	}

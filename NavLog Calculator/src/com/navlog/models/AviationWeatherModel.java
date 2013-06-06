@@ -15,8 +15,6 @@ import org.w3c.dom.NodeList;
 import android.app.Activity;
 import android.os.AsyncTask;
 
-import com.navlog.activities.DetailsFragment.OnDetailsSetListener;
-import com.navlog.models.FlightWaypointsModel.Waypoint;
 
 public class AviationWeatherModel extends AsyncTask<FlightWaypointsModel , Void , List<WeatherStation>>
 {
