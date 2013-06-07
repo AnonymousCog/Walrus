@@ -77,7 +77,7 @@ extends FlightWaypointsModel
 			listData = _dataEntry;
 			double tte=0;
 			// Using the Fligh Model information we calculate the total values of Distance, Time and Fuel Consumption.
-			setTotalDistance(getTotalDistance());
+			setTotalDistance(calculateTotalDistance());
 			setTotalFuel(this.getTotalFuel());
 				
 			// We calculate the initial True Curse for later operations.
@@ -162,7 +162,8 @@ extends FlightWaypointsModel
 				}
 				
 				// Add the Total Time Enroute
-				totalTE= tte;		
+				totalTE= tte;	
+				this.setTotalTE(totalTE);
 			}
 			else if(listData.size()==1)
 			{
@@ -227,7 +228,7 @@ extends FlightWaypointsModel
 		/**
 		* Total distance
 		*/
-		public double getTotalDistance()
+		private double calculateTotalDistance()
 		{
 			double distance=0;
 			if(points.size()>0)
@@ -277,21 +278,7 @@ extends FlightWaypointsModel
 			double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
 			return (R * c);
 		}
-			
-		public double getTotalFuel()
-		{
-			return 0;
-		}
-		
-		/**
-		 * Method to get the total time en route
-		 * @return value
-		 */
-		public double getTotalTime()
-		{
-			return totalTE;
-		}
-		
+							
 		 /** Calculates True Course
 		 * @return Double array with all True Curse values
 		 **/
@@ -761,20 +748,32 @@ extends FlightWaypointsModel
 		}
 
 
-		public void setTotalDistance(double totalDistance) {
-			this.totalDistance = totalDistance;
-		}
-
-
-		public void setTotalTime(double totalTime) {
-			this.totalTime = totalTime;
+		public double getTotalFuel() {
+			return totalFuel;
 		}
 
 
 		public void setTotalFuel(double totalFuel) {
 			this.totalFuel = totalFuel;
 		}
-						
+
+
+		public double getTotalTE() 
+		{
+			return totalTE;
+		}
+
+
+		public void setTotalTE(double totalTE) 
+		{
+			this.totalTE = totalTE;
+		}
+
+
+		public void setTotalDistance(double totalDistance) 
+		{
+			this.totalDistance = totalDistance;
+		}						
    }
 
 
