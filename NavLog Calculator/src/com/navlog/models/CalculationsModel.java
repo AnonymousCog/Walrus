@@ -831,6 +831,11 @@ extends FlightWaypointsModel
 		{
 			this.totalDistance = totalDistance;
 		}
+		
+		public double getTotalDistance()
+		{
+			return this.totalDistance;
+		}
 		public void setLegsData(ArrayList<LegData> aLegs)
 		{
 			this.listData = aLegs;
