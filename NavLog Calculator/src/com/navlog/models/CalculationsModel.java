@@ -3,6 +3,8 @@ package com.navlog.models;
 import java.text.DecimalFormat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -29,17 +31,19 @@ extends FlightWaypointsModel
 		private String flightName;
 		private static final long serialVersionUID = 1L;
 		private ArrayList<LegData> listData;
+		AirplaneProfileModel _profiles;
 		
 		/**
 	   * Calculations Class Constructor 
 	   * @param incFlightModel class with Flight Information. It contains departure, destination and waypoints.
 	   * @param _dataEntry The List from LegDataEntry Class. It contains a List with leg by leg data entered by the user.*/
-		public CalculationsModel(FlightWaypointsModel incFlightModel, ArrayList<LegData> _dataEntry)
+		public CalculationsModel(FlightWaypointsModel incFlightModel, ArrayList<LegData> _dataEntry, AirplaneProfileModel a_profiles)
 	    {		
 			destination = incFlightModel.getDepartureLocation();
 			departure = incFlightModel.getArrivalLocation();
 			points = incFlightModel.getPoints();
 			listData = _dataEntry;
+			_profiles = a_profiles;
     	}
 		
 		
@@ -56,17 +60,7 @@ extends FlightWaypointsModel
 		public CalculationsModel()
 		{			
 		}
-		
-		public void setLegsData(ArrayList<LegData> aLegs)
-		{
-			this.listData = aLegs;
-		}
-		
-		public ArrayList<LegData> getLegsData()
-		{
-			return this.listData;
-		}
-		
+				
 		/**
 		 * Method to retrieve data with all Calculations
 		 * 
@@ -79,7 +73,9 @@ extends FlightWaypointsModel
 			// Using the Fligh Model information we calculate the total values of Distance, Time and Fuel Consumption.
 			setTotalDistance(calculateTotalDistance());
 			setTotalFuel(this.getTotalFuel());
-				
+			
+			
+			
 			// We calculate the initial True Curse for later operations.
 			double[]tcs = this.calculateTrueCourse();
 			
@@ -91,8 +87,14 @@ extends FlightWaypointsModel
 				int size = listData.size();
 				while (i <= size-1) 
 				{
-					
 					LegData tmpData = listData.get(i);
+					
+					double[] tmp = this.getCruisePerformanceData(tmpData.getALT(), tmpData.getRPM(), tmpData.getTMP());
+					listData.get(i).setTAS(tmp[0]);
+					listData.get(i).setLEG_FUEL(tmp[1]);
+					
+					//Refreshing with new data
+					tmpData = listData.get(i);
 					
 					listData.get(i).setTC(tcs[i]);
 					//Calculating Leg values
@@ -171,6 +173,14 @@ extends FlightWaypointsModel
 				//Just 1 leg available
 				
 				LegData tmpData = listData.get(0);
+				
+				double[] tmp = this.getCruisePerformanceData(tmpData.getALT(), tmpData.getRPM(), tmpData.getTMP());
+				listData.get(0).setTAS(tmp[0]);
+				listData.get(0).setLEG_FUEL(tmp[1]);
+				
+				//Refreshing with new data
+				tmpData = listData.get(0);
+				
 				//WCA
 				double wca=this.calculateWCA(tmpData.getDIR(), tmpData.getSPD(), tcs[0] , tmpData.getTAS());
 				listData.get(0).setWCA(wca);
@@ -204,7 +214,9 @@ extends FlightWaypointsModel
 							
 				//LEG FUEL
 				double fuel=0;
+				fuel = this.calculateLegFuel(tmpData.getLEG_FUEL(), ete);
 				listData.get(0).setLEG_FUEL(fuel);
+				totalFuel=+fuel;
 				
 				//FUEL REMAINING
 				double fuelRemaining=0;
@@ -221,6 +233,18 @@ extends FlightWaypointsModel
 			return listData;
 		}
 		
+		/**
+		 * Method to calculate the Fuel Consumption
+		 * @param leg_DIST Leg Distance
+		 * @param GPH GPH Consumption for this Leg 
+		 * @param ete Estimated Time
+		 * @return GPH for Leg
+		 */
+		private double calculateLegFuel(double GPH, double ete) 
+		{
+			return (ete/60)*GPH;
+		}
+
 		private double totalDistance;
 		private double totalFuel;
 		private double totalTE;
@@ -378,12 +402,6 @@ extends FlightWaypointsModel
 		    int lonsign = -1; // W
 		    int varsign = -1; // W
 
-		    //System.out.println("lat = "+ latsign*Magfield.deg_to_rad(lat));
-		    //System.out.println("lon = "+ lonsign*Magfield.deg_to_rad(lon));
-		    //System.out.println("alt = "+ height);
-		    //System.out.println("julian = "+ Magfield.yymmdd_to_julian_days(yy,mm,dd));
-		    //System.out.println("model = "+ model);
-
 		    double variation = Magfield.rad_to_deg(varsign*Magfield.SGMagVar(latsign*CalculationsModel.doubleToRadians(lat),lonsign*CalculationsModel.doubleToRadians(lon),height,
 		                Magfield.yymmdd_to_julian_days(yy,mm,dd),model,field));
 		    
@@ -444,73 +462,61 @@ extends FlightWaypointsModel
 			DecimalFormat twoDForm = new DecimalFormat("#0.0");
 			return (Double.valueOf(twoDForm.format(time)));
 		}
+		
+		/**
+		 * MEthod to evaluate if the values are in range of the array.
+		 * Values outside are not accepted.
+		 * @param altitudes All altitudes from the profile
+		 * @param rpms All RPM from the profile
+		 * @param alt altitude to evaluate
+		 * @param rpm Rpm to evaluate
+		 * @return 0 if False, 1 if OK
+		 */
+		public static int isArrayInValidRange(double[] altitudes, double[]rpms, double alt, double rpm)
+		{
+			int result=1;
 			
-		/**
-		 * Method to convert Kilometers to Nautical Miles
-		 * @param incValue value in kilometers
-		 * @return value in Nautical miles
-		 */
-		public static double KmtoNM(double incValue)
-		{
-			return (incValue*0.539957);
-		}
-		
-		/**
-		 * Method to convert Kilometers to Knots
-		 * @param incValue value in Kilometers 
-		 * @return value in Knots
-		 */
-		public static double KmtoKnots(double incValue)
-		{
-			//How many km/h in 1 knots? The answer is 1.852.
-			return (incValue/1.852);		
-		}
-		/**
-		   * Transforma valor Radianes a Millas Nauticas
-		   * @param incValue valor en radianes
-		   * @return valor en Millas Nauticas
-		   */
-		public static double radiansToNm(double incValue)
-		{
-			return (incValue*180*60/Math.PI);
-		}
-		
-		/**
-		   * Transform values from Radians to Degrees
-		   * @param incValue valor en radianes
-		   * @return Resultado en grados
-		   */
-		public static double radiansToDeg(double incValue)
-		{
-			return ((180/Math.PI)*incValue);
-		}
-		
-		/**
-		 * Transform a double value to radians.
-		 * @param value Value to be converted
-		 * @return
-		 */
-		public static double doubleToRadians(double value)
-		{
-			double valor= value;
-			return (Math.toRadians(valor));
-		}
-		
-		public static double degToRadians(double value)
-		{
-			return (value *  Math.PI / 180);
+            ArrayList<Double> newAltitudes = new ArrayList<Double>();
+			ArrayList<Double> newRpms = new ArrayList<Double>();
+			
+			for(int i=0;i<altitudes.length;i++)
+			{
+				newAltitudes.add(altitudes[i]);
+			}
+
+			double minAltitude = Collections.min(newAltitudes);
+			double maxAltitude = Collections.max(newAltitudes);
+			
+			
+			if((alt>maxAltitude)||(alt<minAltitude))
+				return 0;
+			
+			else
+			{
+				for(int i=0;i<newAltitudes.size();i++)
+				{
+					if(newAltitudes.get(i).equals(alt))
+						newRpms.add(rpms[i]);
+				}
+				double minRpms = Collections.min(newRpms);
+				double maxRpms = Collections.max(newRpms);
+				
+				
+				if((rpm>maxRpms)||(rpm<minRpms))
+					return 0;
+			}
+			return result;
 		}
 		
 		/**
 		 * Method to evaluate and return True Air Speed and GPH values according to the
 		 * entered data in the aircraft profile
-		 * @param _profiles Aircraft Profile lcass
 		 * @param _altitude Desired Altitude
 		 * @param _RPMS Desired RPMS
 		 * @param _temperature Temperature
 		 * @return double array with the True Airspeed and GPH
 		 */
-		public double[] getCruisePerformanceData(AirplaneProfileModel _profiles, double _altitude, double _RPMS, double _temperature)
+		private double[] getCruisePerformanceData(double _altitude, double _RPMS, double _temperature)
         {
 			//Data respuesta donde indice 0 = TAS, indice 1= GPH
 			double[] returnData = new double[2];
@@ -604,9 +610,7 @@ extends FlightWaypointsModel
             			overRPMindex=i;
             		}
             	}
-            	
-                       	
-            	
+
             	// busco los valores de GPH y KTA para los indices conseguidos.
             	double belowGPH = tempGPH[belowRPMindex];
             	double overGPH = tempGPH[overRPMindex];
@@ -669,8 +673,7 @@ extends FlightWaypointsModel
             		overGPH.add(tempGPH[i]);
             		overTAS.add(tempTAS[i]);
             	}
-            	
-                               
+            	                    
                 // Ahora vamos a calcular una dupla que no este directamente en la tabla, menor y mayor.
             	//GPH para rpm dado
                 double x_gph_below = interpolateX(_RPMS, belowRpms, belowGPH);
@@ -689,7 +692,6 @@ extends FlightWaypointsModel
             }
         }
 		
-	
 		/**
 		 * Method to interpolate
 		 * @param x the value to interpolate
@@ -736,7 +738,62 @@ extends FlightWaypointsModel
             }
             return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
         }
-          
+        
+        /**
+		 * Method to convert Kilometers to Nautical Miles
+		 * @param incValue value in kilometers
+		 * @return value in Nautical miles
+		 */
+		public static double KmtoNM(double incValue)
+		{
+			return (incValue*0.539957);
+		}
+		
+		/**
+		 * Method to convert Kilometers to Knots
+		 * @param incValue value in Kilometers 
+		 * @return value in Knots
+		 */
+		public static double KmtoKnots(double incValue)
+		{
+			//How many km/h in 1 knots? The answer is 1.852.
+			return (incValue/1.852);		
+		}
+		/**
+		   * Transforma valor Radianes a Millas Nauticas
+		   * @param incValue valor en radianes
+		   * @return valor en Millas Nauticas
+		   */
+		public static double radiansToNm(double incValue)
+		{
+			return (incValue*180*60/Math.PI);
+		}
+		
+		/**
+		   * Transform values from Radians to Degrees
+		   * @param incValue valor en radianes
+		   * @return Resultado en grados
+		   */
+		public static double radiansToDeg(double incValue)
+		{
+			return ((180/Math.PI)*incValue);
+		}
+		
+		/**
+		 * Transform a double value to radians.
+		 * @param value Value to be converted
+		 * @return
+		 */
+		public static double doubleToRadians(double value)
+		{
+			double valor= value;
+			return (Math.toRadians(valor));
+		}
+		
+		public static double degToRadians(double value)
+		{
+			return (value *  Math.PI / 180);
+		}
 
 		public String getFlightName() {
 			return flightName;
@@ -773,7 +830,16 @@ extends FlightWaypointsModel
 		public void setTotalDistance(double totalDistance) 
 		{
 			this.totalDistance = totalDistance;
-		}						
+		}
+		public void setLegsData(ArrayList<LegData> aLegs)
+		{
+			this.listData = aLegs;
+		}
+		
+		public ArrayList<LegData> getLegsData()
+		{
+			return this.listData;
+		}
    }
 
 
