@@ -78,7 +78,6 @@ extends FlightWaypointsModel
 			double tte=0;
 			// Using the Fligh Model information we calculate the total values of Distance, Time and Fuel Consumption.
 			setTotalDistance(getTotalDistance());
-			setTotalTime(this.getTotalTime());
 			setTotalFuel(this.getTotalFuel());
 				
 			// We calculate the initial True Curse for later operations.
@@ -119,7 +118,7 @@ extends FlightWaypointsModel
 					double mh = this.calculateMH(th, var);
 					
 					//LEG DISTANCE
-					double legDistance=0;
+					double legDistance;
 					
 					if(i==0)
 						legDistance = this.getDistance(this.departure, this.points.get(i));
@@ -136,7 +135,6 @@ extends FlightWaypointsModel
 					double legRemDistance = 0;
 					if(this.points.size() == i)
 						legRemDistance = 0; //check
-						
 					else
 						legRemDistance = this.getDistance(this.points.get(i), this.destination);
 					
@@ -213,7 +211,6 @@ extends FlightWaypointsModel
 				
 				// Add the Total Time Enroute
 				totalTE= tte;
-					
 			}
 			else
 			{
@@ -224,14 +221,13 @@ extends FlightWaypointsModel
 		}
 		
 		private double totalDistance;
-		private double totalTime;
 		private double totalFuel;
 		private double totalTE;
 		
 		/**
 		* Total distance
 		*/
-		private double getTotalDistance()
+		public double getTotalDistance()
 		{
 			double distance=0;
 			if(points.size()>0)
@@ -281,20 +277,19 @@ extends FlightWaypointsModel
 			double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
 			return (R * c);
 		}
-		
-		/**
-		 * Total Time calculation
-		 */
-		private double getTotalTime()
+			
+		public double getTotalFuel()
 		{
-			double time=0;
-			return time;
+			return 0;
 		}
 		
-		private double getTotalFuel()
+		/**
+		 * Method to get the total time en route
+		 * @return value
+		 */
+		public double getTotalTime()
 		{
-			double fuel=0;
-			return fuel;
+			return totalTE;
 		}
 		
 		 /** Calculates True Course
@@ -452,17 +447,37 @@ extends FlightWaypointsModel
 	
 		/**
 		 * Method to calculate the Time Enroute for a determined distance.
-		 * @param distance Distance to be evaluated
-		 * @param groundSpeed Ground Speed.
-		 * @return
+		 * @param distance Distance to be evaluated in Km
+		 * @param groundSpeed Ground Speed in knots
+		 * @return Time in hours
 		 */
 		private double calculateTE(double distance, double groundSpeed)
 		{	
-			double time= (distance / groundSpeed) * 60.0;
+			double time= (CalculationsModel.KmtoKnots(distance) / groundSpeed) * 60.0;
 			DecimalFormat twoDForm = new DecimalFormat("#0.0");
 			return (Double.valueOf(twoDForm.format(time)));
 		}
-				
+			
+		/**
+		 * Method to convert Kilometers to Nautical Miles
+		 * @param incValue value in kilometers
+		 * @return value in Nautical miles
+		 */
+		public static double KmtoNM(double incValue)
+		{
+			return (incValue*0.539957);
+		}
+		
+		/**
+		 * Method to convert Kilometers to Knots
+		 * @param incValue value in Kilometers 
+		 * @return value in Knots
+		 */
+		public static double KmtoKnots(double incValue)
+		{
+			//How many km/h in 1 knots? The answer is 1.852.
+			return (incValue/1.852);		
+		}
 		/**
 		   * Transforma valor Radianes a Millas Nauticas
 		   * @param incValue valor en radianes
