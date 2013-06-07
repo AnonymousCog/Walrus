@@ -271,10 +271,10 @@ extends FlightWaypointsModel
 		private double getDistance(Waypoint A, Waypoint B)
 		{ 
 			double R = 6371.0087714; 		// Earch radius in Kilometers
-			double dLat = this.doubleToRadians(B.getLatitude()-A.getLatitude());
-			double dLon = this.doubleToRadians(B.getLongitude()-A.getLongitude());
-			double lat1 = this.doubleToRadians(A.getLatitude());
-			double lat2 = this.doubleToRadians(B.getLatitude());					
+			double dLat = CalculationsModel.doubleToRadians(B.getLatitude()-A.getLatitude());
+			double dLon = CalculationsModel.doubleToRadians(B.getLongitude()-A.getLongitude());
+			double lat1 = CalculationsModel.doubleToRadians(A.getLatitude());
+			double lat2 = CalculationsModel.doubleToRadians(B.getLatitude());					
 
 			double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
 			        Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
@@ -339,10 +339,10 @@ extends FlightWaypointsModel
 		private double evaluateTC(Waypoint A, Waypoint B)
 		{
 			double tc=0;
-			double lat1 = this.doubleToRadians(this.departure.getLatitude());
-			double lon1 = this.doubleToRadians(this.departure.getLongitude());
-			double lat2 = this.doubleToRadians(this.destination.getLatitude());
-			double lon2 = this.doubleToRadians(this.destination.getLongitude());
+			double lat1 = CalculationsModel.doubleToRadians(this.departure.getLatitude());
+			double lon1 = CalculationsModel.doubleToRadians(this.departure.getLongitude());
+			double lat2 = CalculationsModel.doubleToRadians(this.destination.getLatitude());
+			double lon2 = CalculationsModel.doubleToRadians(this.destination.getLongitude());
 			
 			tc=(Math.atan2(Math.sin(lon1-lon2)*Math.cos(lat2), Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(lon1-lon2)))%2*Math.PI;
 		
@@ -360,7 +360,7 @@ extends FlightWaypointsModel
 		private double calculateWCA(double _windDirection, double _windVel, double _TC, double _TAS)
 		{
 			double wca=0;						
-			double m = Math.sin(this.degToRadians(_windDirection) - _TC);
+			double m = Math.sin(CalculationsModel.degToRadians(_windDirection) - _TC);
 			double xw = m * _windVel;
 			wca = xw / (_TAS);
 			return wca;
@@ -402,7 +402,7 @@ extends FlightWaypointsModel
 		    //System.out.println("julian = "+ Magfield.yymmdd_to_julian_days(yy,mm,dd));
 		    //System.out.println("model = "+ model);
 
-		    double variation = Magfield.rad_to_deg(varsign*Magfield.SGMagVar(latsign*this.doubleToRadians(lat),lonsign*this.doubleToRadians(lon),height,
+		    double variation = Magfield.rad_to_deg(varsign*Magfield.SGMagVar(latsign*CalculationsModel.doubleToRadians(lat),lonsign*CalculationsModel.doubleToRadians(lon),height,
 		                Magfield.yymmdd_to_julian_days(yy,mm,dd),model,field));
 		    
 		    return ((double)(Math.round( variation * 10 ) )/10);
@@ -430,12 +430,24 @@ extends FlightWaypointsModel
 		 */
 		private double calculateGS(double windDir,double windVel, double tc,double tas)
 		{
-			double l = Math.cos(windDir - tc);
-			double m = Math.sin(windDir - tc);
-			double k = (windVel / tas)*m;
-			k = Math.pow(k,2);
-			double gs = tas*(Math.sqrt(1-k))-windVel*l;
-			return gs;				
+			double gs;
+			double swc = (windVel/tas)*Math.sin(windDir - CalculationsModel.radiansToDeg(tc));
+			if(Math.abs(swc)>1)
+				return 0; //Course cannot be flown -- Wind too strong
+			else
+			{
+				double hd = CalculationsModel.radiansToDeg(tc)+Math.asin(swc);
+				if(hd<0)
+					hd = hd + 2*Math.PI;
+				if(hd>2*Math.PI)
+					hd= hd-2*Math.PI;
+				
+				gs = tas*Math.sqrt(1-Math.pow(swc, 2))-windVel*Math.cos(windDir-CalculationsModel.radiansToDeg(tc));
+				
+				if(gs<0)
+					return 0;
+			}
+			return gs;
 		}
 	
 		/**
@@ -456,7 +468,7 @@ extends FlightWaypointsModel
 		   * @param incValue valor en radianes
 		   * @return valor en Millas Nauticas
 		   */
-		private double radiansToNm(double incValue)
+		public static double radiansToNm(double incValue)
 		{
 			return (incValue*180*60/Math.PI);
 		}
@@ -466,7 +478,7 @@ extends FlightWaypointsModel
 		   * @param incValue valor en radianes
 		   * @return Resultado en grados
 		   */
-		public double radiansToDeg(double incValue)
+		public static double radiansToDeg(double incValue)
 		{
 			return ((180/Math.PI)*incValue);
 		}
@@ -476,13 +488,13 @@ extends FlightWaypointsModel
 		 * @param value Value to be converted
 		 * @return
 		 */
-		private double doubleToRadians(double value)
+		public static double doubleToRadians(double value)
 		{
 			double valor= value;
 			return (Math.toRadians(valor));
 		}
 		
-		private double degToRadians(double value)
+		public static double degToRadians(double value)
 		{
 			return (value *  Math.PI / 180);
 		}
